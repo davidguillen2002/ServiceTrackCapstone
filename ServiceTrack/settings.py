@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'gamificacion',    # App de Gamificación
     'seguimiento',     # App de Seguimiento de Reparaciones
     'dashboard',       # App de Dashboard de KPIs
+    'authentication',
 ]
 
 
@@ -83,9 +84,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'service_track_db',
         'USER': 'postgres',
-        'PASSWORD': 'Monono123',
+        'PASSWORD': 'post17clave',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
@@ -126,8 +127,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # Asegúrate de que esta línea está presente
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = '/dashboard/'  # Redirige después del login a la página principal
+LOGOUT_REDIRECT_URL = '/auth/login/'  # Redirige después del logout al login
+
+
