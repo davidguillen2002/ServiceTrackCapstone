@@ -15,8 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from authentication.views import CustomLoginView  # Importa tu vista de login
 
 urlpatterns = [
+    path('', CustomLoginView.as_view(), name='login'),  # Muestra login en la ruta raíz
     path('admin/', admin.site.urls),
+    path('auth/', include('authentication.urls')),  # Incluye otras rutas de autenticación
+    path('dashboard/', include('dashboard.urls')),  # URL del dashboard
 ]
+
