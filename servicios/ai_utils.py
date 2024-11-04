@@ -1,6 +1,7 @@
+# servicios/ai_utils.py
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from .models import Guia, Servicio
+from ServiceTrack.models import Guia, Servicio  # Cambiar a ServiceTrack.models
 
 def get_similar_guides(current_service):
     # Obtener todas las guías relacionadas con el tipo de equipo del servicio actual

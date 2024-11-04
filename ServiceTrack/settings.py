@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ServiceTrack',
     'servicios',       # App de Registro de Servicios
     'gamificacion',    # App de Gamificación
     'seguimiento',     # App de Seguimiento de Reparaciones
