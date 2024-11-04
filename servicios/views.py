@@ -1,7 +1,8 @@
+# servicios/views.py
 from django.shortcuts import render, get_object_or_404
-from .models import Guia, Categoria, Servicio, Usuario
-from django.db.models import Q, Avg  # Aquí es donde importamos 'Avg'
-from .ai_utils import get_similar_guides
+from ServiceTrack.models import Guia, Categoria, Servicio, Usuario
+from django.db.models import Q, Avg
+from .ai_utils import get_similar_guides  # Asumiendo que `ai_utils.py` sigue siendo relevante
 
 def base_conocimiento(request):
     query = request.GET.get('q', '')  # Palabras clave
@@ -45,7 +46,6 @@ def register_service(request, service_id):
         'current_service': current_service,
         'similar_guides': similar_guides,
     })
-
 
 def dashboard(request):
     # Obtener estadísticas
