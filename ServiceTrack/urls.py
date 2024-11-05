@@ -23,6 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('authentication.urls')),  # Incluye otras rutas de autenticación
     path('dashboard/', include('dashboard.urls')),  # URL del dashboard
-    #comentario temporal (borrar)
+    path('servicios/', include('servicios.urls')),
 ]
 
