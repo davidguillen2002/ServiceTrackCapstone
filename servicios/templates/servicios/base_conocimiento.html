@@ -8,130 +8,19 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        /* Estilo general */
-        body {
-            background-color: #ffffff;
-            font-family: 'Arial', sans-serif;
-            color: #2c3e50;
-        }
-
-        .container {
-            margin-top: 40px;
-            margin-bottom: 60px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            font-weight: bold;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        /* Formulario de búsqueda */
-        .search-container {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 25px;
-            border: 1px solid #ced4da;
-            padding: 10px;
-        }
-
-        .form-select {
-            width: auto;
-            margin-right: 10px;
-        }
-
-        .btn-search {
-            background-color: #000000;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 25px;
-            transition: background-color 0.3s ease;
-            border: none;
-        }
-
-        .btn-search:hover {
-            background-color: #333333;
-        }
-
-        .btn-search i {
-            margin-left: 10px;
-        }
-
-        /* Estilo para las tarjetas de las guías */
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .card-text {
-            font-size: 1rem;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
-
-        .btn-primary {
-            background-color: #000000;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-        }
-
-        .btn-primary:hover {
-            background-color: #333333;
-        }
-
-        .empty-message {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 1.25rem;
-        }
-
-        /* Espaciado */
-        .row {
-            margin-top: 20px;
-        }
-
-        .form-control {
-            width: 100%;
-            max-width: 300px;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #f2f3f7;
-            color: #2c3e50;
-        }
-
+        /* CSS de la búsqueda y la estructura de la página */
+        body { background-color: #ffffff; font-family: 'Arial', sans-serif; color: #2c3e50; }
+        .container { margin-top: 40px; margin-bottom: 60px; }
+        h1 { color: #2c3e50; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .search-container { background-color: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .form-control, .form-select { border-radius: 25px; padding: 10px; border: 1px solid #ced4da; }
+        .btn-search { background-color: #000000; color: white; padding: 10px 25px; border-radius: 25px; border: none; }
+        .btn-search:hover { background-color: #333333; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: scale(1.02); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+        .card-title { font-size: 1.3rem; font-weight: bold; color: #2c3e50; }
+        .empty-message { text-align: center; color: #7f8c8d; font-size: 1.25rem; }
+        footer { text-align: center; padding: 20px; background-color: #f2f3f7; color: #2c3e50; }
     </style>
 </head>
 
@@ -139,57 +28,34 @@
     <div class="container">
         <h1>Base de Conocimientos</h1>
         <div class="search-container">
-            <div style="flex: 1;">
-                <form method="GET" id="search-form">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <input type="text" name="q" class="form-control" placeholder="Buscar guías o soluciones..." value="{{ query }}">
-                        </div>
-                        <div class="col-md-4">
-                            <select name="categoria" class="form-select">
-                                <option value="">Filtrar por Categoría</option>
-                                {% for categoria in categorias %}
-                                    <option value="{{ categoria.nombre }}" {% if categoria.nombre == categoria_filtro %}selected{% endif %}>
-                                        {{ categoria.nombre }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select name="tipo_servicio" class="form-select">
-                                <option value="">Filtrar por Tipo de Servicio</option>
-                                {% for tipo in tipos_servicio %}
-                                    <option value="{{ tipo }}" {% if tipo == tipo_servicio_filtro %}selected{% endif %}>
-                                        {{ tipo }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
+            <form id="search-form">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar guías o soluciones..." id="search-input">
                     </div>
-                </form>
-            </div>
-            <div>
-                <button type="submit" form="search-form" class="btn btn-search">Buscar <i class="fas fa-search"></i></button>
-            </div>
-        </div>
-
-        <div class="row">
-            {% for guia in guias %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ guia.titulo }}</h5>
-                            <p class="card-text">{{ guia.descripcion|slice:":100" }}...</p>
-                            <p><strong>Categoría:</strong> {{ guia.categoria.nombre }}</p>
-                            <p><strong>Tipo de Servicio:</strong> {{ guia.tipo_servicio }}</p>
-                            <p><strong>Puntuación:</strong> <i class="fas fa-star"></i> {{ guia.puntuacion }}</p>
-                            <a href="{% url 'guia_detalle' guia.id %}" class="btn btn-primary">Ver Detalles</a>
-                        </div>
+                    <div class="col-md-4">
+                        <select name="categoria" class="form-select" id="categoria-select">
+                            <option value="">Filtrar por Categoría</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.nombre }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="tipo_servicio" class="form-select" id="tipo-servicio-select">
+                            <option value="">Filtrar por Tipo de Servicio</option>
+                            {% for tipo in tipos_servicio %}
+                                <option value="{{ tipo }}">{{ tipo }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
-            {% empty %}
-                <p class="empty-message">No se encontraron guías.</p>
-            {% endfor %}
+            </form>
+        </div>
+
+        <!-- Contenedor para mostrar los resultados de búsqueda -->
+        <div id="guide-list">
+            {% include 'servicios/guia_list.html' %}
         </div>
     </div>
 
@@ -198,6 +64,33 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Función de búsqueda en tiempo real
+        function searchGuides() {
+            const query = $('#search-input').val();
+            const categoria = $('#categoria-select').val();
+            const tipoServicio = $('#tipo-servicio-select').val();
+
+            $.ajax({
+                url: '{% url "base_conocimiento" %}',
+                data: {
+                    q: query,
+                    categoria: categoria,
+                    tipo_servicio: tipoServicio
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#guide-list').html(data.html); // Actualiza el contenedor con los resultados
+                }
+            });
+        }
+
+        // Eventos para la búsqueda en tiempo real
+        $('#search-input').on('keyup', searchGuides);
+        $('#categoria-select').on('change', searchGuides);
+        $('#tipo-servicio-select').on('change', searchGuides);
+    </script>
 </body>
 
 </html>
