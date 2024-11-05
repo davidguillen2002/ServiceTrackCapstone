@@ -3,25 +3,28 @@ from django.shortcuts import render, get_object_or_404
 from ServiceTrack.models import Guia, Categoria, Servicio, Usuario
 from django.db.models import Q, Avg
 from .ai_utils import get_similar_guides  # Asumiendo que `ai_utils.py` sigue siendo relevante
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 def base_conocimiento(request):
-    query = request.GET.get('q', '')  # Palabras clave
+    query = request.GET.get('q', '')  # Palabra clave de búsqueda
     categoria_filtro = request.GET.get('categoria', '')
     tipo_servicio_filtro = request.GET.get('tipo_servicio', '')
 
-    # Filtro por guías, categoría y tipo de servicio
+    # Filtrar guías según los criterios de búsqueda
     guias = Guia.objects.all()
-
     if query:
-        guias = guias.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
-
+        guias = guias.filter(titulo__icontains=query) | guias.filter(descripcion__icontains=query)
     if categoria_filtro:
         guias = guias.filter(categoria__nombre=categoria_filtro)
-
     if tipo_servicio_filtro:
         guias = guias.filter(tipo_servicio__icontains=tipo_servicio_filtro)
 
-    # Cargar las categorías y tipos de servicio para los filtros
+    # Si la solicitud es AJAX, devolver solo el HTML de los resultados de búsqueda
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('servicios/guia_list.html', {'guias': guias})
+        return JsonResponse({'html': html})
+
     categorias = Categoria.objects.all()
     tipos_servicio = Guia.objects.values_list('tipo_servicio', flat=True).distinct()
 
