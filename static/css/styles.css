@@ -12,6 +12,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    width: 100%;
 }
 
 /* Estilo para formularios */
@@ -29,6 +30,7 @@ body {
 .btn-dark {
     background-color: #343a40;
     border: none;
+    width: 100%;
 }
 
 .btn-dark:hover {
@@ -39,6 +41,8 @@ body {
 .card {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 15px;
 }
 
 /* Footer */
@@ -47,7 +51,75 @@ footer {
     color: white;
     text-align: center;
     padding: 10px;
-    position: fixed;
-    bottom: 0;
     width: 100%;
+    position: relative; /* Para evitar que se sobreponga en móviles */
+    bottom: 0;
+    margin-top: 20px;
+}
+
+/* Flexbox para tarjetas en diferentes tamaños de pantalla */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.col-md-4 {
+    flex: 1 1 30%;
+    max-width: 30%;
+    min-width: 250px;
+}
+
+.card-title, .card-text {
+    text-align: center;
+}
+
+/* Tabla */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Media Queries */
+@media (max-width: 992px) {
+    .container {
+        padding: 15px;
+    }
+
+    .btn-dark {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .row {
+        display: block; /* Cada tarjeta en una fila */
+    }
+
+    .col-md-4 {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+
+    footer {
+        position: relative; /* Evita superposición en pantallas pequeñas */
+    }
+}
+
+@media (max-width: 576px) {
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+    }
+
+    .btn-dark {
+        padding: 0.75rem 1rem;
+    }
 }
