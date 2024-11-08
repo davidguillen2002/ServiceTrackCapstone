@@ -1,80 +1,158 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+{% extends 'base.html' %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Panel de Control{% endblock %}
 
-    <style>
-        body {
-            background-color: #f0f2f5;
-        }
-        .container {
-            margin-top: 50px;
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center fw-bold">Panel de Control</h1>
+    <p class="text-center text-muted">Visualiza el rendimiento de los técnicos y los servicios en tiempo real.</p>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">ServiceTrack</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'base_conocimiento' %}">Base Conocimintos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tecnico-list' %}">Gestionar Técnicos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
-                    </li>
-                </ul>
+    <!-- Gráficas de rendimiento -->
+    <div class="row my-4">
+        <div class="col-md-6">
+            <h3 class="text-center">Rendimiento de los Técnicos</h3>
+            <canvas id="technicianPerformanceChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h3 class="text-center">Servicios Completados por Mes</h3>
+            <canvas id="monthlyCompletedServicesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabla de KPIs -->
+    <h2 class="mt-5">Indicadores Clave de Rendimiento (KPIs)</h2>
+    <table class="table table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Técnico</th>
+                <th>Servicios Completados</th>
+                <th>Puntuación de Clientes</th>
+                <th>Tiempo Medio de Resolución (hrs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tecnico in tecnicos_kpis %}
+                <tr>
+                    <td>{{ tecnico.nombre }}</td>
+                    <td>{{ tecnico.servicios_completados }}</td>
+                    <td>{{ tecnico.puntuacion_clientes }}</td>
+                    <td>{{ tecnico.tiempo_resolucion }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Tabla de rendimiento de técnicos -->
+    <h2 class="mt-5">Rendimiento de los técnicos</h2>
+    <table class="table table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Técnico</th>
+                <th>Servicios Realizados</th>
+                <th>Rendimiento (%)</th>
+                <th>Puntos</th>
+                <th>Logros</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tecnico in tecnicos_rendimiento %}
+                <tr>
+                    <td>{{ tecnico.nombre }}</td>
+                    <td>{{ tecnico.servicios_realizados }}</td>
+                    <td>{{ tecnico.rendimiento }}%</td>
+                    <td>{{ tecnico.puntos }}</td>
+                    <td>{{ tecnico.logros }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Retos a conseguir -->
+    <h2 class="mt-5 text-center">Retos a conseguir</h2>
+    <p class="text-center text-muted">Aprende cómo solucionar problemas de conexión en dispositivos técnicos.</p>
+    <div class="row justify-content-center">
+        <div class="col-md-6 mb-3">
+            <div class="card text-center shadow-sm p-3">
+                <p>Completa 10 Servicios en una Semana</p>
+                <p><strong>Recompensa:</strong> 500 puntos</p>
+                <button class="btn btn-dark">Ver Reto</button>
             </div>
         </div>
-    </nav>
-
-
-    <div class="container">
-        <h1 class="text-center">Bienvenido al Dashboard</h1>
-        <p class="text-center">Aquí puedes gestionar las secciones del sistema.</p>
-
-        <div class="row mt-5">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Servicios</h5>
-                        <p class="card-text">Administra los servicios registrados.</p>
-                        <a href="#" class="btn btn-primary">Ir a Servicios</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Seguimiento</h5>
-                        <p class="card-text">Monitorea el estado de las reparaciones.</p>
-                        <a href="#" class="btn btn-primary">Ir a Seguimiento</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Gamificación</h5>
-                        <p class="card-text">Gestiona el sistema de gamificación.</p>
-                        <a href="#" class="btn btn-primary">Ir a Gamificación</a>
-                    </div>
-                </div>
+        <div class="col-md-6 mb-3">
+            <div class="card text-center shadow-sm p-3">
+                <p>Alcanza un Rendimiento del 90%</p>
+                <p><strong>Recompensa:</strong> 700 puntos</p>
+                <button class="btn btn-dark">Ver Reto</button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Proceso General de Técnicos -->
+    <h2 class="mt-5">Proceso General de Técnicos</h2>
+    <table class="table table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Técnico</th>
+                <th>Progreso de Servicios</th>
+                <th>Puntos Totales</th>
+                <th>Último Logro</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tecnico in tecnicos_proceso %}
+                <tr>
+                    <td>{{ tecnico.nombre }}</td>
+                    <td>{{ tecnico.progreso_servicios }}</td>
+                    <td>{{ tecnico.puntos_totales }}</td>
+                    <td>{{ tecnico.ultimo_logro }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Scripts para cargar gráficas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfica de Rendimiento de los Técnicos
+    var technicianPerformanceCtx = document.getElementById('technicianPerformanceChart').getContext('2d');
+    var technicianPerformanceChart = new Chart(technicianPerformanceCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Juan Pérez', 'María García', 'Pedro Ortiz'],
+            datasets: [{
+                label: 'Servicios Completados',
+                data: [45, 52, 38],
+                backgroundColor: '#007bff',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+
+    // Gráfica de Servicios Completados por Mes
+    var monthlyCompletedServicesCtx = document.getElementById('monthlyCompletedServicesChart').getContext('2d');
+    var monthlyCompletedServicesChart = new Chart(monthlyCompletedServicesCtx, {
+        type: 'line',
+        data: {
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+            datasets: [{
+                label: 'Servicios Completados',
+                data: [20, 25, 30, 28, 40, 35],
+                borderColor: '#28a745',
+                fill: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+</script>
+{% endblock %}
