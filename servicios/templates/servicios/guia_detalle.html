@@ -1,116 +1,29 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de la Guía</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        /* Estilo general */
-        body {
-            background-color: #f4f4f4;
-            font-family: 'Arial', sans-serif;
-            color: #2c3e50;
-        }
+{% block title %}Detalle de la Guía{% endblock %}
 
-        .container {
-            margin-top: 40px;
-            max-width: 900px;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
+{% block content %}
+<div class="container my-5">
+    <h1 class="fw-bold">{{ guia.titulo }}</h1>
+    <p><strong>Categoría:</strong> {{ guia.categoria.nombre }}</p>
+    <p><strong>Descripción:</strong> {{ guia.descripcion }}</p>
+    <p><strong>Tipo de Servicio:</strong> {{ guia.tipo_servicio }}</p>
+    <p><strong>Marca del Equipo:</strong> {{ guia.equipo_marca }}</p>
+    <p><strong>Modelo del Equipo:</strong> {{ guia.equipo_modelo }}</p>
+    <p><strong>Fecha de Creación:</strong> {{ guia.fecha_creacion|date:"d/m/Y" }}</p>
 
-        h1 {
-            font-size: 2rem;
-            color: #000000;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: #555555;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            color: #000000;
-            font-weight: bold;
-            margin-top: 30px;
-        }
-
-        /* Botones */
-        .btn {
-            margin-right: 10px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 30px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-primary {
-            background-color: #000000;
-            border: none;
-            color: #ffffff;
-        }
-
-        .btn-primary:hover {
-            background-color: #333333;
-        }
-
-        .btn-secondary {
-            background-color: #007bff;
-            border: none;
-            color: #ffffff;
-        }
-
-        .btn-secondary:hover {
-            background-color: #0056b3;
-        }
-
-        .back-button {
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        /* Iconos */
-        .fa-book, .fa-video, .fa-arrow-left {
-            margin-right: 8px;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <h1>{{ guia.titulo }}</h1>
-        <p><strong>Categoría:</strong> {{ guia.categoria.nombre }}</p>
-        <p><strong>Descripción:</strong> {{ guia.descripcion }}</p>
-        <p><strong>Tipo de Servicio:</strong> {{ guia.tipo_servicio }}</p>
-        <p><strong>Marca del Equipo:</strong> {{ guia.equipo_marca }}</p>
-        <p><strong>Modelo del Equipo:</strong> {{ guia.equipo_modelo }}</p>
-        <p><strong>Fecha de Creación:</strong> {{ guia.fecha_creacion|date:"d/m/Y" }}</p>
-
-        <h2>Enlaces Útiles:</h2>
-        <div>
-            {% if guia.manual %}
-                <a href="{{ guia.manual.url }}" class="btn btn-primary"><i class="fas fa-book"></i> Ver Manual</a>
-            {% endif %}
-            {% if guia.video %}
-                <a href="{{ guia.video }}" class="btn btn-secondary"><i class="fas fa-video"></i> Ver Video</a>
-            {% endif %}
-        </div>
-
-        <div class="back-button">
-            <a href="{% url 'base_conocimiento' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
-        </div>
+    <h2 class="mt-4">Enlaces Útiles:</h2>
+    <div class="my-3">
+        {% if guia.manual %}
+            <a href="{{ guia.manual.url }}" class="btn btn-primary"><i class="fas fa-book"></i> Ver Manual</a>
+        {% endif %}
+        {% if guia.video %}
+            <a href="{{ guia.video }}" class="btn btn-secondary"><i class="fas fa-video"></i> Ver Video</a>
+        {% endif %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+    <div class="mt-5">
+        <a href="{% url 'base_conocimiento' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %}
