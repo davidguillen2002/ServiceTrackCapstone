@@ -7,7 +7,7 @@ from random import randint, choice
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ServiceTrack.settings')
 django.setup()
 
-from ServiceTrack.models import Rol, Usuario, Equipo, Servicio, Categoria, Guia, ObservacionIncidente, Enlace
+from ServiceTrack.models import Rol, Usuario, Equipo, Servicio, Categoria, Guia, ObservacionIncidente, Enlace, Medalla, Reto, RegistroPuntos
 
 # Crear roles
 tecnico_rol = Rol.objects.get_or_create(nombre="tecnico")[0]
@@ -135,6 +135,44 @@ for i, guia in enumerate(Guia.objects.all()):
         servicio=servicios[i % len(servicios)],
         enlace=f"http://manuales.com/manual_{guia.id}",
         descripcion=f"Enlace a la guía de {guia.titulo} para más detalles."
+    )
+
+# Crear medallas
+medallas = [
+    {"nombre": "Medalla de Excelencia", "descripcion": "Por completar 10 servicios", "puntos_necesarios": 100},
+    {"nombre": "Medalla de Lealtad", "descripcion": "Por estar más de 1 año como usuario activo", "puntos_necesarios": 50},
+    {"nombre": "Medalla de Rapidez", "descripcion": "Por completar servicios en tiempo récord", "puntos_necesarios": 75},
+]
+
+for medalla_data in medallas:
+    medalla = Medalla.objects.get_or_create(
+        nombre=medalla_data["nombre"],
+        descripcion=medalla_data["descripcion"],
+        puntos_necesarios=medalla_data["puntos_necesarios"]
+    )[0]
+    # Asignar medallas a algunos técnicos
+    choice(tecnicos).medallas.add(medalla)
+
+# Crear retos
+retos = [
+    {"nombre": "Completa 5 servicios", "descripcion": "Obtén puntos por completar 5 servicios", "puntos_otorgados": 20, "requisito": 5},
+    {"nombre": "Gana 100 puntos", "descripcion": "Obtén esta medalla al alcanzar 100 puntos", "puntos_otorgados": 100, "requisito": 100},
+]
+
+for reto_data in retos:
+    Reto.objects.get_or_create(
+        nombre=reto_data["nombre"],
+        descripcion=reto_data["descripcion"],
+        puntos_otorgados=reto_data["puntos_otorgados"],
+        requisito=reto_data["requisito"]
+    )
+
+# Crear registros de puntos
+for tecnico in tecnicos:
+    RegistroPuntos.objects.create(
+        usuario=tecnico,
+        puntos_obtenidos=randint(10, 50),
+        descripcion="Completó un reto de gamificación."
     )
 
 print("Datos de prueba completos y realistas cargados exitosamente.")
