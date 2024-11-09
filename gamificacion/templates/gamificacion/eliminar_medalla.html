@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Medalla{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Eliminar Medalla</h1>
+    <p class="text-center">¿Estás seguro de que deseas eliminar la medalla <strong>{{ medalla.nombre }}</strong>?</p>
+
+    <form method="post" class="text-center">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'lista_medallas' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

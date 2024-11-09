@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Perfil de Gamificación{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Perfil de Gamificación</h1>
+    <p><strong>Usuario:</strong> {{ usuario.nombre }}</p>
+    <p><strong>Puntos:</strong> {{ puntos }}</p>
+    <ul>
+        {% for medalla in medallas %}
+            <li>{{ medalla.nombre }} - {{ medalla.descripcion }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

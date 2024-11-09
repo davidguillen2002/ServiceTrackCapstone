@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Guías{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Lista de Guías</h1>
+
+    <div class="text-end mb-3">
+        <a href="{% url 'crear_guia' %}" class="btn btn-success">Agregar Nueva Guía</a>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Categoría</th>
+                <th>Puntuación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guia in guias %}
+                <tr>
+                    <td>{{ guia.titulo }}</td>
+                    <td>{{ guia.categoria.nombre }}</td>
+                    <td>{{ guia.puntuacion }}</td>
+                    <td>
+                        <a href="{% url 'editar_guia' guia.id %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'eliminar_guia' guia.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta guía?');">Eliminar</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay guías registradas.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

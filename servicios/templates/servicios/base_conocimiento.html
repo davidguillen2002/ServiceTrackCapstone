@@ -1,54 +1,61 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Base de Conocimientos{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-center fw-bold">Base de Conocimientos</h1>
-    <div class="search-container my-4 p-4 shadow-sm rounded bg-light">
-        <form method="GET" id="search-form" class="row align-items-center">
-            <div class="col-md-4 mb-2">
-                <input type="text" name="q" class="form-control" placeholder="Buscar guías o soluciones..." value="{{ query }}">
-            </div>
-            <div class="col-md-4 mb-2">
-                <select name="categoria" class="form-select">
-                    <option value="">Filtrar por Categoría</option>
-                    {% for categoria in categorias %}
-                        <option value="{{ categoria.nombre }}" {% if categoria.nombre == categoria_filtro %}selected{% endif %}>{{ categoria.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4 mb-2">
-                <select name="tipo_servicio" class="form-select">
-                    <option value="">Filtrar por Tipo de Servicio</option>
-                    {% for tipo in tipos_servicio %}
-                        <option value="{{ tipo }}" {% if tipo == tipo_servicio_filtro %}selected{% endif %}>{{ tipo }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-12 text-center mt-3">
-                <button type="submit" form="search-form" class="btn btn-search">Buscar <i class="fas fa-search"></i></button>
+<div class="container">
+    <h1>Base de Conocimientos</h1>
+    <div class="search-container">
+        <form id="search-form">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar guías o soluciones..." id="search-input">
+                </div>
+                <div class="col-md-4">
+                    <select name="categoria" class="form-select" id="categoria-select">
+                        <option value="">Filtrar por Categoría</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.nombre }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="tipo_servicio" class="form-select" id="tipo-servicio-select">
+                        <option value="">Filtrar por Tipo de Servicio</option>
+                        {% for tipo in tipos_servicio %}
+                            <option value="{{ tipo }}">{{ tipo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
         </form>
     </div>
 
-    <div class="row">
-        {% for guia in guias %}
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ guia.titulo }}</h5>
-                        <p class="card-text">{{ guia.descripcion|slice:":100" }}...</p>
-                        <p><strong>Categoría:</strong> {{ guia.categoria.nombre }}</p>
-                        <p><strong>Tipo de Servicio:</strong> {{ guia.tipo_servicio }}</p>
-                        <p><strong>Puntuación:</strong> <i class="fas fa-star"></i> {{ guia.puntuacion }}</p>
-                        <a href="{% url 'guia_detalle' guia.id %}" class="btn btn-primary">Ver Detalles</a>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-center text-muted">No se encontraron guías.</p>
-        {% endfor %}
+    <!-- Contenedor para mostrar los resultados de búsqueda -->
+    <div id="guide-list">
+        {% include 'servicios/guia_list.html' %}
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function searchGuides() {
+        const query = $('#search-input').val();
+        const categoria = $('#categoria-select').val();
+        const tipoServicio = $('#tipo-servicio-select').val();
+
+        $.ajax({
+            url: '{% url "base_conocimiento" %}',
+            data: { q: query, categoria: categoria, tipo_servicio: tipoServicio },
+            dataType: 'json',
+            success: function (data) {
+                $('#guide-list').html(data.html);
+            }
+        });
+    }
+
+    $('#search-input').on('keyup', searchGuides);
+    $('#categoria-select').on('change', searchGuides);
+    $('#tipo-servicio-select').on('change', searchGuides);
+</script>
 {% endblock %}

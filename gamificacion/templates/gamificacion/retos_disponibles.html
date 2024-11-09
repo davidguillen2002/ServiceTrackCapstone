@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Retos Disponibles{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Retos Disponibles</h1>
+    <ul>
+        {% for reto in retos %}
+            <li><strong>{{ reto.nombre }}</strong>: {{ reto.descripcion }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

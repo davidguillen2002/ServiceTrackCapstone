@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Medalla{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Editar Medalla</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" value="{{ medalla.nombre }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea name="descripcion" id="descripcion" class="form-control" required>{{ medalla.descripcion }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="puntos_necesarios" class="form-label">Puntos Necesarios</label>
+            <input type="number" name="puntos_necesarios" id="puntos_necesarios" class="form-control" value="{{ medalla.puntos_necesarios }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="icono" class="form-label">Icono</label>
+            <input type="file" name="icono" id="icono" class="form-control">
+            {% if medalla.icono %}
+                <p class="mt-2">Icono actual: <img src="{{ medalla.icono.url }}" alt="Icono actual" width="50"></p>
+            {% endif %}
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'lista_medallas' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
