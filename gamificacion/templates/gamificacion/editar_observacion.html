@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Observación{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Editar Observación</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea name="descripcion" id="descripcion" class="form-control" required>{{ observacion.descripcion }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="tipo_observacion" class="form-label">Tipo de Observación</label>
+            <input type="text" name="tipo_observacion" id="tipo_observacion" class="form-control" value="{{ observacion.tipo_observacion }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            <input type="text" name="estado" id="estado" class="form-control" value="{{ observacion.estado }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a href="{% url 'lista_observaciones' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

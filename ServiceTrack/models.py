@@ -1,5 +1,34 @@
 # ServiceTrack/models.py
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+
+class UsuarioManager(BaseUserManager):
+    def create_user(self, username, password=None, **extra_fields):
+        if not username:
+            raise ValueError("El usuario debe tener un nombre de usuario")
+        if 'rol' not in extra_fields:
+            raise ValueError("El rol es requerido para crear un usuario")
+
+        user = self.model(username=username, **extra_fields)
+        user.set_password(password)  # Encripta la contraseña
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        # Establece un rol por defecto para el superusuario si no se proporciona uno
+        if 'rol' not in extra_fields:
+            try:
+                admin_role = Rol.objects.get(nombre="administrador")
+                extra_fields['rol'] = admin_role
+            except Rol.DoesNotExist:
+                raise ValueError(
+                    "Debes crear el rol 'administrador' en la base de datos antes de crear un superusuario.")
+
+        return self.create_user(username, password, **extra_fields)
 
 class Rol(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
@@ -7,7 +36,7 @@ class Rol(models.Model):
     def __str__(self):
         return self.nombre
 
-class Usuario(models.Model):
+class Usuario(AbstractBaseUser, PermissionsMixin):
     nombre = models.CharField(max_length=100)
     username = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=255)
@@ -15,7 +44,17 @@ class Usuario(models.Model):
     cedula = models.CharField(max_length=20, unique=True)
     correo = models.EmailField(max_length=100)
     celular = models.CharField(max_length=20)
-    puntos = models.IntegerField(default=0)
+    puntos = models.IntegerField(default=0)  # Solo los técnicos usan puntos
+    medallas = models.ManyToManyField('Medalla', blank=True, related_name="usuarios")
+
+    # Campos requeridos por AbstractBaseUser y PermissionsMixin
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UsuarioManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.nombre
@@ -83,3 +122,32 @@ class Enlace(models.Model):
 
     def __str__(self):
         return f"Enlace {self.id} para Servicio {self.servicio.id}"
+
+# Modelos adicionales para gamificación
+
+class Medalla(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    icono = models.ImageField(upload_to='medallas/', null=True, blank=True)  # Campo opcional para icono de medalla
+    puntos_necesarios = models.IntegerField()  # Puntos necesarios para obtener la medalla
+
+    def __str__(self):
+        return self.nombre
+
+class Reto(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    puntos_otorgados = models.IntegerField()  # Puntos que otorga este reto al completarlo
+    requisito = models.IntegerField(help_text="Ejemplo: cantidad de servicios completados o puntos a alcanzar")
+
+    def __str__(self):
+        return self.nombre
+
+class RegistroPuntos(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    puntos_obtenidos = models.IntegerField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    descripcion = models.TextField()  # Ejemplo: "Completó un servicio", "Obtuvo una medalla", etc.
+
+    def __str__(self):
+        return f"{self.usuario} - {self.puntos_obtenidos} puntos en {self.fecha}"

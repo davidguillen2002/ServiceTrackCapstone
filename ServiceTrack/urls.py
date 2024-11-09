@@ -24,5 +24,6 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),  # Incluye otras rutas de autenticación
     path('dashboard/', include('dashboard.urls')),  # URL del dashboard
     path('servicios/', include('servicios.urls')),
+    path('gamificacion/', include('gamificacion.urls')),
 ]
 
