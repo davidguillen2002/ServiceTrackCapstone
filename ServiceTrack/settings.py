@@ -86,13 +86,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'service_track_db',
         'USER': 'postgres',
-        'PASSWORD': 'post17clave',
+        'PASSWORD': 'Monono123',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -148,3 +146,4 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+AUTH_USER_MODEL = 'ServiceTrack.Usuario'

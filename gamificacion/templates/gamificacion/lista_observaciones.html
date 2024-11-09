@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Observaciones{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Lista de Observaciones</h1>
+
+    <div class="text-end mb-3">
+        <a href="{% url 'crear_observacion' %}" class="btn btn-success">Agregar Nueva Observación</a>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for observacion in observaciones %}
+                <tr>
+                    <td>{{ observacion.descripcion }}</td>
+                    <td>{{ observacion.tipo_observacion }}</td>
+                    <td>{{ observacion.estado }}</td>
+                    <td>
+                        <a href="{% url 'editar_observacion' observacion.id %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'eliminar_observacion' observacion.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta observación?');">Eliminar</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay observaciones registradas.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

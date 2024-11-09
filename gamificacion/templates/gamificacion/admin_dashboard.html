@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Sistema de Gamificación</h1>
+
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Técnicos Registrados</h5>
+                    <p class="display-6">{{ total_tecnicos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Retos Activos</h5>
+                    <p class="display-6">{{ total_retos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Puntos Totales Otorgados</h5>
+                    <p class="display-6">{{ total_puntos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Medallas Desbloqueadas</h5>
+                    <p class="display-6">{{ total_medallas }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mt-5">Datos de los Técnicos</h2>
+    <table class="table table-bordered table-striped text-center mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre del Técnico</th>
+                <th>Puntos Acumulados</th>
+                <th>Retos Completados</th>
+                <th>Medallas Desbloqueadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tecnico in progreso_tecnicos %}
+                <tr>
+                    <td>{{ tecnico.nombre }}</td>
+                    <td>{{ tecnico.puntos_acumulados }}</td>
+                    <td>{{ tecnico.retos_completados }}</td>
+                    <td>{{ tecnico.medallas_desbloqueadas }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-center mt-5">
+        <h3>Acciones Administrativas</h3>
+        <a href="{% url 'lista_retos' %}" class="btn btn-primary m-2">Gestionar Retos</a>
+        <a href="{% url 'lista_medallas' %}" class="btn btn-secondary m-2">Gestionar Medallas</a>
+    </div>
+</div>
+{% endblock %}

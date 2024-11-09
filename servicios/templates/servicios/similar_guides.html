@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Guías Recomendadas{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-center fw-bold">Servicio: {{ current_service.equipo }}</h1>
-    <h2 class="my-4">Guías Recomendadas:</h2>
+<div class="container">
+    <h1>Servicio: {{ current_service.equipo }}</h1>
+    <h2>Guías Recomendadas:</h2>
 
     <ul class="list-group">
         {% for guide in similar_guides %}
