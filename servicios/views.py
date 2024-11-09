@@ -50,7 +50,7 @@ def register_service(request, service_id):
         'similar_guides': similar_guides,
     })
 
-def dashboard(request):
+'''def dashboard(request):
     # Obtener estadísticas
     total_servicios = Servicio.objects.count()
     calificacion_promedio = Servicio.objects.filter(calificacion__isnull=False).aggregate(Avg('calificacion'))['calificacion__avg']
@@ -63,7 +63,7 @@ def dashboard(request):
         'calificacion_promedio': calificacion_promedio,
         'guias_mas_consultadas': guias_mas_consultadas,
         'tecnicos': tecnicos,
-    })
+    })'''
 
 def guia_detalle(request, guia_id):
     guia = get_object_or_404(Guia, id=guia_id)
