@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,12 +8,8 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Estilos Personalizados -->
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -25,18 +20,61 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'base_conocimiento' %}">Base Conocimintos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tecnico-list' %}">Gestionar Usuarios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        {% if user.rol.nombre == "administrador" %}
+                            <!-- Enlaces exclusivos para Administrador -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Gamificación</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lista_retos' %}">Gestionar Retos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lista_medallas' %}">Gestionar Medallas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lista_guias' %}">Gestionar Guías</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lista_observaciones' %}">Gestionar Observaciones</a>
+                            </li>
+
+                        {% elif user.rol.nombre == "tecnico" %}
+                            <!-- Enlaces exclusivos para Técnicos -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lista_equipos_tecnico' %}">Seguimiento de Equipos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'perfil_gamificacion' %}">Mi Gamificación</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'retos_disponibles' %}">Retos Disponibles</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'historial_puntos' %}">Historial de Puntos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
+                            </li>
+
+                        {% elif user.rol.nombre == "cliente" %}
+                            <!-- Enlaces exclusivos para Clientes -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
+                            </li>
+                        {% endif %}
+
+                        <!-- Enlace de Cerrar Sesión, común para todos los roles -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -46,15 +84,11 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!--<footer class="bg-dark text-white text-center py-3">
+    <footer class="bg-dark text-white text-center py-3">
         <p class="mb-0">© 2024 ServiceTrack. Todos los derechos reservados.</p>
-    </footer>-->
+    </footer>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

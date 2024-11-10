@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Seguimiento de Reparaciones - Cliente{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Seguimiento de Reparaciones</h1>
+    <p class="text-center">Consulta el estado de las reparaciones técnicas en curso y completadas.</p>
+
+    <table class="table table-bordered table-striped text-center mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Equipo</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha Estimada de Finalización</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</td>
+                    <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
+                    <td>{{ servicio.fecha_fin|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if servicio.estado == 'completado' %}
+                            <span class="badge bg-success">Completado</span>
+                        {% elif servicio.estado == 'pendiente' %}
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        {% elif servicio.estado == 'en_progreso' %}
+                            <span class="badge bg-info text-dark">En Progreso</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <a href="{% url 'detalle_equipo_cliente' servicio.equipo.id %}" class="btn btn-outline-primary btn-sm">Ver Detalle</a>
+                            {% if servicio.estado == 'completado' %}
+                                <a href="{% url 'dejar_resena' servicio.id %}" class="btn btn-outline-success btn-sm">Dejar Reseña</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No tienes reparaciones en curso.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

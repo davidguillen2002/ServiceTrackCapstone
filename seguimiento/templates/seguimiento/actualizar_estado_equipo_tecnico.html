@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Actualizar Estado del Servicio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Actualizar Estado del Servicio</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Equipo: {{ equipo.marca }} {{ equipo.modelo }}</h5>
+            <p><strong>Cliente:</strong> {{ equipo.cliente.nombre }}</p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            <a href="{% url 'lista_equipos_tecnico' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
