@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>Servicio: {{ current_service.equipo }}</h1>
+    <h1>Servicio: {{ current_service.equipo.marca }} {{ current_service.equipo.modelo }} ({{ current_service.equipo.anio }})</h1>
     <h2>Guías Recomendadas:</h2>
 
     <ul class="list-group">
@@ -26,7 +26,7 @@
                 </div>
             </li>
         {% empty %}
-            <li class="list-group-item no-guides">No se encontraron guías similares.</li>
+            <li class="list-group-item text-center">No se encontraron guías similares.</li>
         {% endfor %}
     </ul>
 </div>

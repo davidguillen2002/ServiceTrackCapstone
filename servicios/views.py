@@ -16,6 +16,24 @@ def is_admin(user):
     return user.rol.nombre == "administrador"
 
 @login_required
+@user_passes_test(is_tecnico)
+def tecnico_services_list(request):
+    """Vista para mostrar todos los servicios asociados a un técnico."""
+    services = Servicio.objects.filter(tecnico=request.user)
+    return render(request, 'servicios/tecnico_services_list.html', {'services': services})
+
+@login_required
+@user_passes_test(is_tecnico)
+def register_service(request, service_id):
+    """Vista para obtener guías recomendadas para un servicio específico del técnico."""
+    current_service = get_object_or_404(Servicio, id=service_id, tecnico=request.user)
+    similar_guides = get_similar_guides(current_service)
+    return render(request, 'servicios/similar_guides.html', {
+        'current_service': current_service,
+        'similar_guides': similar_guides,
+    })
+
+@login_required
 @user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
 def base_conocimiento(request):
     query = request.GET.get('q', '')

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Seguimiento de Reparaciones - Técnico{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Seguimiento de Reparaciones</h1>
+
+    <table class="table table-bordered table-striped text-center mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Equipo</th>
+                <th>Cliente</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha Estimada de Finalización</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipo in equipos %}
+                {% with servicio=equipo.servicio_set.first %}
+                    <tr>
+                        <td>{{ equipo.marca }} {{ equipo.modelo }}</td>
+                        <td>{{ equipo.cliente.nombre }}</td>
+
+                        <td>
+                            {% if servicio %}
+                                {{ servicio.fecha_inicio|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">No Disponible</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if servicio %}
+                                {{ servicio.fecha_fin|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">No Disponible</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if servicio %}
+                                {% with normalized_estado=servicio.estado|lower|replace_spaces:"_" %}
+                                    <span class="estado-label
+                                        {% if normalized_estado == 'completado' %} estado-completado{% endif %}
+                                        {% if normalized_estado == 'pendiente' %} estado-pendiente{% endif %}
+                                        {% if normalized_estado == 'en_progreso' %} estado-en-progreso{% endif %}
+                                    ">
+                                        {% if normalized_estado == 'completado' %}
+                                            <i class="fas fa-check-circle"></i> Completado
+                                        {% elif normalized_estado == 'pendiente' %}
+                                            <i class="fas fa-times-circle"></i> Pendiente
+                                        {% elif normalized_estado == 'en_progreso' %}
+                                            <i class="fas fa-hourglass-half"></i> En Progreso
+                                        {% endif %}
+                                    </span>
+                                {% endwith %}
+                            {% else %}
+                                <span class="text-muted">No Disponible</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if servicio %}
+                                <a href="{% url 'detalle_servicio_tecnico' servicio.id %}" class="btn btn-outline-primary btn-sm">Ver Detalle</a>
+                                <a href="{% url 'actualizar_estado_equipo_tecnico' equipo.id %}" class="btn btn-outline-secondary btn-sm">Actualizar Estado</a>
+                            {% else %}
+                                <span class="text-muted">No Disponible</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endwith %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

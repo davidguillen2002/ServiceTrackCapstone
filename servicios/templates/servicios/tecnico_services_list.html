@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Servicios{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Mis Servicios</h1>
+    <p>Selecciona un servicio para ver las guías recomendadas.</p>
+    <ul class="list-group">
+        {% for service in services %}
+            <li class="list-group-item">
+                <h5>{{ service.equipo.marca }} {{ service.equipo.modelo }} ({{ service.equipo.anio }})</h5>
+                <p><strong>Fecha de Inicio:</strong> {{ service.fecha_inicio|date:"d/m/Y" }}</p>
+                <p><strong>Estado:</strong> {{ service.estado }}</p>
+                <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías Recomendadas</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-center">No tienes servicios registrados.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
