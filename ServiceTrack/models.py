@@ -75,6 +75,15 @@ class Servicio(models.Model):
     tecnico = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='tecnico_servicios')
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField(null=True, blank=True)
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('pendiente', 'Pendiente'),
+            ('en_progreso', 'En Progreso'),
+            ('completado', 'Completado')
+        ],
+        default='pendiente'
+    )
     calificacion = models.IntegerField(null=True, blank=True)
     comentario_cliente = models.TextField(null=True, blank=True)
     costo = models.DecimalField(max_digits=10, decimal_places=2)

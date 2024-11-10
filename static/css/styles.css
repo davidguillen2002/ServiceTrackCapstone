@@ -80,6 +80,27 @@ footer {
     overflow-x: auto;
 }
 
+/* Estilos para las etiquetas de estado */
+.estado-label {
+    font-weight: bold;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+}
+
+.estado-completado {
+    background-color: green;
+}
+
+.estado-pendiente {
+    background-color: red;
+}
+
+.estado-en-progreso {
+    background-color: orange;
+}
+
 /* Media Queries */
 @media (max-width: 992px) {
     .container {
@@ -123,3 +144,4 @@ footer {
         padding: 0.75rem 1rem;
     }
 }
+
