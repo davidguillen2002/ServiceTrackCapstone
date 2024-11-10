@@ -5,6 +5,12 @@
 {% block content %}
 <div class="container">
     <h1>Base de Conocimientos</h1>
+
+    <!-- Botón para el Panel de Conocimiento (solo visible para el administrador) -->
+    {% if user.rol.nombre == "administrador" %}
+        <a href="{% url 'knowledge_dashboard' %}" class="btn btn-info mb-3">Ver Panel de Conocimiento</a>
+    {% endif %}
+
     <div class="search-container">
         <form id="search-form">
             <div class="row">
@@ -35,8 +41,16 @@
     <div id="guide-list">
         {% include 'servicios/guia_list.html' %}
     </div>
+
+    <!-- Enlace para ver guías similares, solo visible para técnicos -->
+    {% if user.rol.nombre == 'tecnico' %}
+        <div class="text-center mt-4">
+            <a href="{% url 'register_service' service_id=1 %}" class="btn btn-primary">Ver Guías Similares</a>
+        </div>
+    {% endif %}
 </div>
 
+<!-- Script para la búsqueda en AJAX -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function searchGuides() {

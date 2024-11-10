@@ -14,16 +14,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# ServiceTrack/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from authentication.views import CustomLoginView  # Importa tu vista de login
+from . import views  # Importa las vistas de inicio de rol
 
 urlpatterns = [
-    path('', CustomLoginView.as_view(), name='login'),  # Muestra login en la ruta raíz
+    path('', views.home_view, name='home'),  # Redirige a la vista principal según el rol
     path('admin/', admin.site.urls),
-    path('auth/', include('authentication.urls')),  # Incluye otras rutas de autenticación
-    path('dashboard/', include('dashboard.urls')),  # URL del dashboard
-    path('servicios/', include('servicios.urls')),
-    path('gamificacion/', include('gamificacion.urls')),
+    path('auth/', include('authentication.urls')),  # Para el login y autenticación
+    path('dashboard/', include('dashboard.urls')),  # URLs exclusivas de administración
+    path('servicios/', include('servicios.urls')),  # URLs de servicios
+    path('gamificacion/', include('gamificacion.urls')),  # URLs de gamificación
+    path('seguimiento/', include('seguimiento.urls')),  # URLs de seguimiento
+
+    # Vistas de inicio según el rol
+    path('admin_dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
+    path('tecnico_home/', views.tecnico_home_view, name='tecnico_home'),
+    path('cliente_home/', views.cliente_home_view, name='cliente_home'),
 ]
 

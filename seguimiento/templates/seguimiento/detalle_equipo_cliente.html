@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Equipo - Cliente{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Detalle del Equipo</h1>
+
+    <!-- Device Information -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Equipo: {{ equipo.marca }} {{ equipo.modelo }}</h5>
+            <p><strong>Año:</strong> {{ equipo.anio }}</p>
+            <p><strong>Tipo de Equipo:</strong> {{ equipo.tipo_equipo }}</p>
+            <p><strong>Observaciones:</strong> {{ equipo.observaciones|default:"No hay observaciones." }}</p>
+        </div>
+    </div>
+
+    <!-- Repair History Section -->
+    <h3 class="mt-5">Historial de Servicios</h3>
+    <ul class="list-group">
+        {% for servicio in servicios %}
+            <li class="list-group-item">
+                <strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d/m/Y" }} <br>
+                <strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin|date:"d/m/Y" }} <br>
+                <strong>Estado:</strong>
+                <span class="{% if servicio.estado == 'completado' %}estado-completado{% elif servicio.estado == 'pendiente' %}estado-pendiente{% elif servicio.estado == 'en_progreso' %}estado-en-progreso{% endif %}">
+                    {{ servicio.estado|capfirst }}
+                </span><br>
+                <strong>Costo:</strong> ${{ servicio.costo }} <br>
+                <strong>Calificación:</strong> {{ servicio.calificacion|default:"Sin calificar" }} <br>
+                <strong>Comentario del Cliente:</strong> {{ servicio.comentario_cliente|default:"Sin comentarios." }}
+            </li>
+        {% empty %}
+            <li class="list-group-item text-center">No hay historial de servicios para este equipo.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Back Button -->
+    <a href="{% url 'lista_equipos_cliente' %}" class="btn btn-secondary mt-4">Volver</a>
+</div>
+{% endblock %}
