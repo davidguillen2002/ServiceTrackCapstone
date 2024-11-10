@@ -11,7 +11,7 @@ from django import forms
 @login_required
 def dashboard_view(request):
     """Vista del dashboard."""
-    return render(request, 'dashboard/dashboard.html')
+    return render(request, 'dashboard/knowledge_dashboard.html')
 
 class TecnicoForm(forms.ModelForm):
     """Formulario personalizado para técnicos."""
