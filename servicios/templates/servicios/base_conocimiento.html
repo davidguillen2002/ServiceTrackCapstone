@@ -11,6 +11,11 @@
         <a href="{% url 'knowledge_dashboard' %}" class="btn btn-info mb-3">Ver Panel de Conocimiento</a>
     {% endif %}
 
+    <!-- Botón para técnicos para ver sus servicios -->
+    {% if user.rol.nombre == 'tecnico' %}
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-primary mb-3">Ver Mis Servicios</a>
+    {% endif %}
+
     <div class="search-container">
         <form id="search-form">
             <div class="row">
@@ -41,13 +46,6 @@
     <div id="guide-list">
         {% include 'servicios/guia_list.html' %}
     </div>
-
-    <!-- Enlace para ver guías similares, solo visible para técnicos -->
-    {% if user.rol.nombre == 'tecnico' %}
-        <div class="text-center mt-4">
-            <a href="{% url 'register_service' service_id=1 %}" class="btn btn-primary">Ver Guías Similares</a>
-        </div>
-    {% endif %}
 </div>
 
 <!-- Script para la búsqueda en AJAX -->
