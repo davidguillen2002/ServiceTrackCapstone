@@ -1,22 +1,16 @@
-<!-- servicios/templates/servicios/lista_servicios.html -->
 {% extends "base.html" %}
+
+{% block title %}Lista de Servicios{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Lista de Servicios</h2>
+    <h1 class="text-center my-4">Lista de Servicios</h1>
 
-    <!-- Mensajes de confirmación, específicos para la lista de servicios -->
-    {% if messages %}
-        <div class="my-3">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div class="text-end mb-3">
+        <a href="{% url 'registrar_servicio' %}" class="btn btn-success">Agregar Nuevo Servicio</a>
+    </div>
 
-    <table class="table">
+    <table class="table table-hover">
         <thead>
             <tr>
                 <th>Equipo</th>
@@ -36,9 +30,13 @@
                     <td>{{ servicio.estado }}</td>
                     <td>{{ servicio.costo }}</td>
                     <td>
-                        <a href="{% url 'eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-secondary btn-sm">Editar</a>
+                        <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este servicio?');">Eliminar</a>
                     </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay servicios registrados.</td>
                 </tr>
             {% endfor %}
         </tbody>

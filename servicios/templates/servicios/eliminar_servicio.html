@@ -1,12 +1,13 @@
-              <!-- servicios/templates/servicios/eliminar_servicio.html -->
 {% extends "base.html" %}
+
+{% block title %}Eliminar Servicio{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Eliminar Servicio</h2>
-    <p>¿Estás seguro de que deseas eliminar el servicio de <strong>{{ servicio.equipo }}</strong> asignado al técnico <strong>{{ servicio.tecnico }}</strong>?</p>
+    <h1 class="text-center my-4">Eliminar Servicio</h1>
+    <p class="text-center">¿Estás seguro de que deseas eliminar el servicio de <strong>{{ servicio.equipo }}</strong> asignado al técnico <strong>{{ servicio.tecnico }}</strong>?</p>
 
-    <!-- Mensaje de confirmación para eliminación -->
+    <!-- Mensajes de confirmación para eliminación -->
     {% if messages %}
         <div class="my-3">
             {% for message in messages %}
@@ -17,10 +18,12 @@
         </div>
     {% endif %}
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Eliminar</button>
+    <div class="text-center">
+        <form method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
         <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+    </div>
 </div>
 {% endblock %}
