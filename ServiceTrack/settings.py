@@ -134,9 +134,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static']  # Asegúrate de que esta línea está 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/dashboard/'  # Redirige después del login a la página principal
-LOGOUT_REDIRECT_URL = '/auth/login/'  # Redirige después del logout al login
-
+LOGIN_URL = '/auth/login/'  # URL donde los usuarios no autenticados serán redirigidos
+LOGIN_REDIRECT_URL = 'home'  # Redirige a la vista principal que redirecciona por rol
+LOGOUT_REDIRECT_URL = 'home'  # Redirige a la vista home después de cerrar sesión
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -148,4 +148,3 @@ MESSAGE_TAGS = {
 
 AUTH_USER_MODEL = 'ServiceTrack.Usuario'
 
-LOGIN_REDIRECT_URL = 'home'

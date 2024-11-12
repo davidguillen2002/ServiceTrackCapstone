@@ -146,11 +146,18 @@ class Medalla(models.Model):
 class Reto(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    puntos_otorgados = models.IntegerField()  # Puntos que otorga este reto al completarlo
+    puntos_otorgados = models.IntegerField()  # Puntos al completar el reto
     requisito = models.IntegerField(help_text="Ejemplo: cantidad de servicios completados o puntos a alcanzar")
+    completado_por = models.ManyToManyField('Usuario', through='RetoUsuario', related_name='retos_completados')
 
     def __str__(self):
         return self.nombre
+
+class RetoUsuario(models.Model):
+    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+    reto = models.ForeignKey('Reto', on_delete=models.CASCADE)
+    fecha_completado = models.DateTimeField(null=True, blank=True)
+    cumplido = models.BooleanField(default=False)
 
 class RegistroPuntos(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)

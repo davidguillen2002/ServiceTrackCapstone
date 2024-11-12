@@ -24,13 +24,13 @@
                         {% if user.rol.nombre == "administrador" %}
                             <!-- Enlaces exclusivos para Administrador -->
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Dashboard</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Gamificación</a>
+                                <a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}">Gamificación</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'lista_retos' %}">Gestionar Retos</a>
