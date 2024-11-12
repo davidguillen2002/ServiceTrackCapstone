@@ -8,7 +8,8 @@ urlpatterns = [
     path('historial-puntos/', views.historial_puntos, name='historial_puntos'),
 
     # Panel de administración
-    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard_gamificacion'),
+    path('otorgar-puntos/', views.otorgar_puntos_view, name='otorgar_puntos'),
 
     # CRUD para Guías
     path('guias/', views.lista_guias, name='lista_guias'),
