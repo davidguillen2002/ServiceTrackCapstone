@@ -149,3 +149,5 @@ MESSAGE_TAGS = {
 AUTH_USER_MODEL = 'ServiceTrack.Usuario'
 
 LOGIN_REDIRECT_URL = 'home'
+
+LOGIN_URL = '/auth/login/'
