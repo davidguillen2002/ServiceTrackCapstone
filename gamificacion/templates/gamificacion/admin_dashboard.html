@@ -49,6 +49,7 @@
                 <th>Puntos Acumulados</th>
                 <th>Retos Completados</th>
                 <th>Medallas Desbloqueadas</th>
+                <th>Calificación Promedio</th>
             </tr>
         </thead>
         <tbody>
@@ -58,6 +59,7 @@
                     <td>{{ tecnico.puntos_acumulados }}</td>
                     <td>{{ tecnico.retos_completados }}</td>
                     <td>{{ tecnico.medallas_desbloqueadas }}</td>
+                    <td>{{ tecnico.calificacion_promedio }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -67,6 +69,7 @@
         <h3>Acciones Administrativas</h3>
         <a href="{% url 'lista_retos' %}" class="btn btn-primary m-2">Gestionar Retos</a>
         <a href="{% url 'lista_medallas' %}" class="btn btn-secondary m-2">Gestionar Medallas</a>
+        <a href="{% url 'otorgar_puntos' %}" class="btn btn-success m-2">Otorgar Puntos</a>
     </div>
 </div>
 {% endblock %}

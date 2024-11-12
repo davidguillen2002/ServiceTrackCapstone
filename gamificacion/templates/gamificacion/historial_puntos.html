@@ -1,25 +1,24 @@
+<!-- gamificacion/templates/gamificacion/historial_puntos.html -->
 {% extends "base.html" %}
-{% block title %}Historial de Puntos{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1>Historial de Puntos</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Puntos</th>
-                <th>Descripción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for registro in registros %}
-                <tr>
-                    <td>{{ registro.fecha }}</td>
-                    <td>{{ registro.puntos_obtenidos }}</td>
-                    <td>{{ registro.descripcion }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<h2>Historial de Puntos</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Puntos Obtenidos</th>
+            <th>Descripción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for registro in registros %}
+        <tr>
+            <td>{{ registro.fecha }}</td>
+            <td>{{ registro.puntos_obtenidos }}</td>
+            <td>{{ registro.descripcion }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
