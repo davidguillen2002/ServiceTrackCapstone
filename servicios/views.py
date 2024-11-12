@@ -1,11 +1,12 @@
-# servicios/views.py
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.contrib.auth.decorators import user_passes_test, login_required
 from ServiceTrack.models import Guia, Categoria, Servicio, Usuario
 from .ai_utils import get_similar_guides
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from .forms import ServicioForm
+from django.contrib import messages
 
 # Función para verificar si el usuario es técnico
 def is_tecnico(user):
@@ -14,6 +15,47 @@ def is_tecnico(user):
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.rol.nombre == "administrador"
+
+@login_required
+@user_passes_test(is_admin)
+def registrar_servicio(request):
+    if request.method == "POST":
+        form = ServicioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("lista_servicios")
+    else:
+        form = ServicioForm()
+    return render(request, "servicios/registrar_servicio.html", {"form": form})
+
+@login_required
+@user_passes_test(is_admin)
+def lista_servicios(request):
+    servicios = Servicio.objects.all()
+    return render(request, "servicios/lista_servicios.html", {"servicios": servicios})
+
+@login_required
+@user_passes_test(is_admin)
+def actualizar_servicio(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id)
+    if request.method == "POST":
+        form = ServicioForm(request.POST, instance=servicio)
+        if form.is_valid():
+            form.save()
+            return redirect("lista_servicios")
+    else:
+        form = ServicioForm(instance=servicio)
+    return render(request, "servicios/actualizar_servicio.html", {"form": form, "servicio": servicio})
+
+@login_required
+@user_passes_test(is_admin)
+def eliminar_servicio(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id)
+    if request.method == "POST":
+        servicio.delete()
+        messages.success(request, "Servicio eliminado correctamente.")
+        return redirect("lista_servicios")  # Redirige a la lista de servicios después de eliminar
+    return render(request, "servicios/eliminar_servicio.html", {"servicio": servicio})
 
 @login_required
 @user_passes_test(is_tecnico)
@@ -42,7 +84,7 @@ def base_conocimiento(request):
 
     guias = Guia.objects.all()
     if query:
-        guias = guias.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
+        guias = guias.filter(Q(titulo_icontains=query) | Q(descripcion_icontains=query))
     if categoria_filtro:
         guias = guias.filter(categoria__nombre=categoria_filtro)
     if tipo_servicio_filtro:
@@ -68,7 +110,7 @@ def base_conocimiento(request):
 @user_passes_test(is_admin)
 def knowledge_dashboard(request):
     total_servicios = Servicio.objects.count()
-    calificacion_promedio = Servicio.objects.filter(calificacion__isnull=False).aggregate(Avg('calificacion'))['calificacion__avg']
+    calificacion_promedio = Servicio.objects.filter(calificacion_isnull=False).aggregate(Avg('calificacion'))['calificacion_avg']
     guias_mas_consultadas = Guia.objects.order_by('-puntuacion')[:5]
     tecnicos = Usuario.objects.filter(rol__nombre='tecnico')
 
