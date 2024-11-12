@@ -1,11 +1,35 @@
-              <!-- servicios/templates/servicios/registrar_servicio.html -->
 {% extends "base.html" %}
 
+{% block title %}Registrar Servicio{% endblock %}
+
 {% block content %}
-<h2>Registrar Nuevo Servicio</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Registrar Servicio</button>
-</form>
+<div class="container">
+    <h1 class="text-center my-4">Registrar Nuevo Servicio</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="equipo" class="form-label">Equipo</label>
+            {{ form.equipo }}
+        </div>
+        <div class="mb-3">
+            <label for="tecnico" class="form-label">Técnico</label>
+            {{ form.tecnico }}
+        </div>
+        <div class="mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+            {{ form.fecha_inicio }}
+        </div>
+        <div class="mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            {{ form.estado }}
+        </div>
+        <div class="mb-3">
+            <label for="costo" class="form-label">Costo</label>
+            {{ form.costo }}
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar Servicio</button>
+        <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
 {% endblock %}
