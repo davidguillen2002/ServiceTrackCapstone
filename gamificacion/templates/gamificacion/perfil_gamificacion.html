@@ -2,9 +2,9 @@
 {% block title %}Perfil de Gamificación{% endblock %}
 {% block content %}
 <div class="container">
-    <h1>Perfil de Gamificación</h1>
-    <p><strong>Usuario:</strong> {{ usuario.nombre }}</p>
-    <p><strong>Puntos:</strong> {{ puntos }}</p>
+    <h1>Mi Perfil de Gamificación</h1>
+    <p>Puntos acumulados: {{ puntos }}</p>
+    <h3>Mis Medallas</h3>
     <ul>
         {% for medalla in medallas %}
             <li>{{ medalla.nombre }} - {{ medalla.descripcion }}</li>

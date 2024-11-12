@@ -1,37 +1,69 @@
 # gamificacion/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Sum
-from ServiceTrack.models import Usuario, Guia, ObservacionIncidente, Medalla, Reto, RegistroPuntos
+from django.db.models import Count, Sum
+from ServiceTrack.models import Usuario, Medalla, Reto, RegistroPuntos, RetoUsuario, Guia, ObservacionIncidente, Servicio
 from .forms import GuiaForm, ObservacionIncidenteForm, RetoForm, MedallaForm
-from .utils import actualizar_puntos_usuario, asignar_medalla
+from .utils import otorgar_puntos_por_servicio, verificar_retos, asignar_medalla
+from django import forms
+from django.contrib import messages
 
-# Verificación para acceder solo si el usuario es admin
 def is_admin(user):
     return user.is_superuser
 
-# Vista del perfil de gamificación para usuarios
+class OtorgarPuntosForm(forms.Form):
+    usuario = forms.ModelChoiceField(queryset=Usuario.objects.filter(rol__nombre="tecnico"))
+    puntos = forms.IntegerField(min_value=1)
+    descripcion = forms.CharField(max_length=255)
+
+@login_required
+@user_passes_test(is_admin)
+def otorgar_puntos_view(request):
+    if request.method == 'POST':
+        form = OtorgarPuntosForm(request.POST)
+        if form.is_valid():
+            usuario = form.cleaned_data['usuario']
+            puntos = form.cleaned_data['puntos']
+            descripcion = form.cleaned_data['descripcion']
+
+            # Otorgar puntos al usuario
+            usuario.puntos += puntos
+            usuario.save()
+
+            # Registrar en RegistroPuntos
+            RegistroPuntos.objects.create(usuario=usuario, puntos_obtenidos=puntos, descripcion=descripcion)
+
+            # Update challenges and medals as needed
+            verificar_retos(usuario)
+            asignar_medalla(usuario)
+
+            messages.success(request, f"{puntos} puntos otorgados a {usuario.nombre}")
+            return redirect('admin_dashboard_gamificacion')
+    else:
+        form = OtorgarPuntosForm()
+
+    return render(request, 'gamificacion/otorgar_puntos.html', {'form': form})
+
 @login_required
 def perfil_gamificacion(request):
     usuario = request.user
-    puntos = actualizar_puntos_usuario(usuario)
-    asignar_medalla(usuario)
-    medallas = usuario.medallas.all()
-    return render(request, 'gamificacion/perfil_gamificacion.html', {'usuario': usuario, 'puntos': puntos, 'medallas': medallas})
+    puntos = usuario.puntos  # Fetch points directly from the user's stored data
+    medallas = usuario.medallas.all()  # Fetch existing medals
+    return render(request, 'gamificacion/perfil_gamificacion.html', {
+        'usuario': usuario, 'puntos': puntos, 'medallas': medallas
+    })
 
-# Vista para ver retos disponibles
 @login_required
 def retos_disponibles(request):
-    retos = Reto.objects.all()
-    return render(request, 'gamificacion/retos_disponibles.html', {'retos': retos})
+    usuario = request.user
+    retos_pendientes = Reto.objects.exclude(retousuario__usuario=usuario, retousuario__cumplido=True)
+    retos_completados = Reto.objects.filter(retousuario__usuario=usuario, retousuario__cumplido=True)
 
-# Historial de puntos para el usuario actual
-@login_required
-def historial_puntos(request):
-    registros = RegistroPuntos.objects.filter(usuario=request.user).order_by('-fecha')
-    return render(request, 'gamificacion/historial_puntos.html', {'registros': registros})
+    return render(request, 'gamificacion/retos_disponibles.html', {
+        'retos_pendientes': retos_pendientes,
+        'retos_completados': retos_completados
+    })
 
-# Panel de Administración solo para admin
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
@@ -43,14 +75,16 @@ def admin_dashboard(request):
 
     progreso_tecnicos = []
     for tecnico in tecnicos:
-        retos_completados = RegistroPuntos.objects.filter(usuario=tecnico, descripcion__icontains="reto").count()
+        retos_completados = tecnico.retousuario_set.filter(cumplido=True).count()
         medallas_desbloqueadas = tecnico.medallas.count()
-        puntos_acumulados = tecnico.puntos
+        puntos_acumulados = RegistroPuntos.objects.filter(usuario=tecnico).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
+        calificacion_promedio = Servicio.objects.filter(tecnico=tecnico, estado='completado').aggregate(promedio=Sum('calificacion') / Count('calificacion'))['promedio'] or 0
         progreso_tecnicos.append({
             'nombre': tecnico.nombre,
             'puntos_acumulados': puntos_acumulados,
             'retos_completados': retos_completados,
             'medallas_desbloqueadas': medallas_desbloqueadas,
+            'calificacion_promedio': round(calificacion_promedio, 2)
         })
 
     context = {
@@ -62,6 +96,11 @@ def admin_dashboard(request):
     }
 
     return render(request, 'gamificacion/admin_dashboard.html', context)
+
+@login_required
+def historial_puntos(request):
+    registros = RegistroPuntos.objects.filter(usuario=request.user).order_by('-fecha')
+    return render(request, 'gamificacion/historial_puntos.html', {'registros': registros})
 
 # CRUD para Guías
 @login_required
