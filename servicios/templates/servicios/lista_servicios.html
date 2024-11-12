@@ -1,0 +1,47 @@
+<!-- servicios/templates/servicios/lista_servicios.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Lista de Servicios</h2>
+
+    <!-- Mensajes de confirmación, específicos para la lista de servicios -->
+    {% if messages %}
+        <div class="my-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Equipo</th>
+                <th>Técnico</th>
+                <th>Fecha Inicio</th>
+                <th>Estado</th>
+                <th>Costo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.equipo }}</td>
+                    <td>{{ servicio.tecnico }}</td>
+                    <td>{{ servicio.fecha_inicio }}</td>
+                    <td>{{ servicio.estado }}</td>
+                    <td>{{ servicio.costo }}</td>
+                    <td>
+                        <a href="{% url 'eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-secondary btn-sm">Editar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
