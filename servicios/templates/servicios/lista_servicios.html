@@ -1,45 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}Lista de Servicios{% endblock %}
+{% block title %}Gestión de Servicios{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1 class="text-center my-4">Lista de Servicios</h1>
+    <h1>Gestión de Servicios</h1>
+    <p>Consulta y gestiona los servicios técnicos asignados.</p>
 
-    <div class="text-end mb-3">
-        <a href="{% url 'registrar_servicio' %}" class="btn btn-success">Agregar Nuevo Servicio</a>
+    <div class="search-container mb-4">
+        <form id="search-form">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar servicios..." id="search-input">
+                </div>
+                <div class="col-md-4">
+                    <select name="estado" class="form-select" id="estado-select">
+                        <option value="">Filtrar por Estado</option>
+                        {% for estado in estados %}
+                            <option value="{{ estado }}">{{ estado }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </form>
     </div>
 
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Equipo</th>
-                <th>Técnico</th>
-                <th>Fecha Inicio</th>
-                <th>Estado</th>
-                <th>Costo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for servicio in servicios %}
-                <tr>
-                    <td>{{ servicio.equipo }}</td>
-                    <td>{{ servicio.tecnico }}</td>
-                    <td>{{ servicio.fecha_inicio }}</td>
-                    <td>{{ servicio.estado }}</td>
-                    <td>{{ servicio.costo }}</td>
-                    <td>
-                        <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este servicio?');">Eliminar</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center">No hay servicios registrados.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Contenedor para mostrar los resultados de búsqueda -->
+    <div id="service-list">
+        {% include 'servicios/servicio_list.html' %}
+    </div>
 </div>
+
+<!-- Script para búsqueda y filtrado en tiempo real con AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function searchServices() {
+        const query = $('#search-input').val();
+        const estado = $('#estado-select').val();
+
+        $.ajax({
+            url: '{% url "lista_servicios" %}',
+            data: { q: query, estado: estado },
+            dataType: 'json',
+            success: function (data) {
+                $('#service-list').html(data.html);
+            }
+        });
+    }
+
+    $('#search-input').on('keyup', searchServices);
+    $('#estado-select').on('change', searchServices);
+</script>
 {% endblock %}
