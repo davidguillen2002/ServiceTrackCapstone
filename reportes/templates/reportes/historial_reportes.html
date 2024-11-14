@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Historial de Reportes{% endblock %}
+{% block content %}
+<div class="container my-5">
+    <h1>Historial de Reportes Generados</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha de Generación</th>
+                <th>Tipo de Reporte</th>
+                <th>Generado por</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reporte in reportes %}
+            <tr>
+                <td>{{ reporte.fecha_generacion }}</td>
+                <td>{{ reporte.tipo_reporte }}</td>
+                <td>{{ reporte.generado_por.nombre }}</td>
+                <td><a href="{{ reporte.archivo.url }}" class="btn btn-primary">Descargar</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'panel_reportes' %}" class="btn btn-secondary">Regresar al Panel de Reportes</a>
+</div>
+{% endblock %}
