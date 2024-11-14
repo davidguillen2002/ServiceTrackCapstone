@@ -11,12 +11,7 @@
         <a href="{% url 'knowledge_dashboard' %}" class="btn btn-info mb-3">Ver Panel de Conocimiento</a>
     {% endif %}
 
-    <!-- Botón para técnicos para ver sus servicios -->
-    {% if user.rol.nombre == 'tecnico' %}
-        <a href="{% url 'tecnico_services_list' %}" class="btn btn-primary mb-3">Ver Mis Servicios</a>
-    {% endif %}
-
-    <div class="search-container">
+    <div class="search-container mb-4">
         <form id="search-form">
             <div class="row">
                 <div class="col-md-4">
@@ -48,7 +43,7 @@
     </div>
 </div>
 
-<!-- Script para la búsqueda en AJAX -->
+<!-- Script para búsqueda y filtrado en tiempo real con AJAX -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function searchGuides() {
