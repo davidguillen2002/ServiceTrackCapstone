@@ -1,6 +1,7 @@
 # ServiceTrack/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth import get_user_model
 
 
 class UsuarioManager(BaseUserManager):
@@ -26,7 +27,8 @@ class UsuarioManager(BaseUserManager):
                 extra_fields['rol'] = admin_role
             except Rol.DoesNotExist:
                 raise ValueError(
-                    "Debes crear el rol 'administrador' en la base de datos antes de crear un superusuario.")
+                    "Debes crear el rol 'administrador' en la base de datos antes de crear un superusuario."
+                )
 
         return self.create_user(username, password, **extra_fields)
 
@@ -167,3 +169,13 @@ class RegistroPuntos(models.Model):
 
     def __str__(self):
         return f"{self.usuario} - {self.puntos_obtenidos} puntos en {self.fecha}"
+
+# Modelo para almacenar el historial de reportes generados
+class HistorialReporte(models.Model):
+    fecha_generacion = models.DateTimeField(auto_now_add=True)
+    tipo_reporte = models.CharField(max_length=10, choices=[('PDF', 'PDF'), ('Excel', 'Excel')])
+    generado_por = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    archivo = models.FileField(upload_to='reportes/', null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.tipo_reporte} generado por {self.generado_por} el {self.fecha_generacion}"
