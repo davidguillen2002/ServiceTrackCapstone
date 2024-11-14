@@ -33,10 +33,7 @@
                                 <a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}">Gamificación</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_guias' %}">Gestionar Guías</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_observaciones' %}">Gestionar Observaciones</a>
+                                <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
                             </li>
 
                             <!-- Enlaces para CRUD de Servicios -->
@@ -59,6 +56,9 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
                             </li>
 
                         {% elif user.rol.nombre == "cliente" %}

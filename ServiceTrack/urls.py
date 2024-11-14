@@ -27,6 +27,7 @@ urlpatterns = [
     path('servicios/', include('servicios.urls')),  # URLs de servicios
     path('gamificacion/', include('gamificacion.urls')),  # URLs de gamificación
     path('seguimiento/', include('seguimiento.urls')),  # URLs de seguimiento
+    path('reportes/', include('reportes.urls')), # URLs de reportes
 
     # Vistas de inicio según el rol
     path('admin_dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
