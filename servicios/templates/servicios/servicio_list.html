@@ -1,0 +1,19 @@
+<div class="service-list">
+    {% for servicio in servicios %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ servicio.equipo.modelo }}</h5>
+                <p class="card-text">
+                    Cliente: {{ servicio.equipo.cliente.nombre }}<br>
+                    Técnico: {{ servicio.tecnico.nombre }}<br>
+                    Estado: {{ servicio.estado }}<br>
+                    Fecha de Inicio: {{ servicio.fecha_inicio }}<br>
+                    Fecha de Finalización: {{ servicio.fecha_fin }}
+                </p>
+                <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-primary">Ver Detalle</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>No se encontraron servicios que coincidan con los criterios de búsqueda.</p>
+    {% endfor %}
+</div>
