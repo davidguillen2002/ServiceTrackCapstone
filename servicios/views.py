@@ -31,8 +31,28 @@ def registrar_servicio(request):
 @login_required
 @user_passes_test(is_admin)
 def lista_servicios(request):
+    # Recibir parámetros de búsqueda y filtros
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
+
+    # Filtrar los servicios basados en los parámetros de búsqueda
     servicios = Servicio.objects.all()
-    return render(request, "servicios/lista_servicios.html", {"servicios": servicios})
+    if query:
+        servicios = servicios.filter(Q(equipo_modeloicontains=query) | Q(tecniconombre_icontains=query))
+    if estado_filtro:
+        servicios = servicios.filter(estado=estado_filtro)
+
+    # Si es una petición AJAX, retornar solo el HTML con los resultados
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('servicios/servicio_list.html', {'servicios': servicios})
+        return JsonResponse({'html': html})
+
+    # Renderizar la página completa en caso contrario
+    estados = Servicio.objects.values_list('estado', flat=True).distinct()
+    return render(request, "servicios/lista_servicios.html", {
+        "servicios": servicios,
+        "estados": estados
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -82,6 +102,7 @@ def base_conocimiento(request):
     categoria_filtro = request.GET.get('categoria', '')
     tipo_servicio_filtro = request.GET.get('tipo_servicio', '')
 
+    # Filtrar guías con los criterios de búsqueda
     guias = Guia.objects.all()
     if query:
         guias = guias.filter(Q(titulo_icontains=query) | Q(descripcion_icontains=query))
@@ -90,10 +111,12 @@ def base_conocimiento(request):
     if tipo_servicio_filtro:
         guias = guias.filter(tipo_servicio__icontains=tipo_servicio_filtro)
 
+    # Si es una solicitud AJAX, devolver solo el HTML con los resultados
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('servicios/guia_list.html', {'guias': guias})
         return JsonResponse({'html': html})
 
+    # En caso contrario, renderizar la página completa
     categorias = Categoria.objects.all()
     tipos_servicio = Guia.objects.values_list('tipo_servicio', flat=True).distinct()
 
@@ -110,6 +133,7 @@ def base_conocimiento(request):
 @user_passes_test(is_admin)
 def knowledge_dashboard(request):
     total_servicios = Servicio.objects.count()
+    # Corrige el filtro de calificación
     calificacion_promedio = Servicio.objects.filter(calificacion_isnull=False).aggregate(Avg('calificacion'))['calificacion_avg']
     guias_mas_consultadas = Guia.objects.order_by('-puntuacion')[:5]
     tecnicos = Usuario.objects.filter(rol__nombre='tecnico')
