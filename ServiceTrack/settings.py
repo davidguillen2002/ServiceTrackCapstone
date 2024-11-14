@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'seguimiento',     # App de Seguimiento de Reparaciones
     'dashboard',       # App de Dashboard de KPIs
     'authentication',
+    'reportes',
 ]
 
 

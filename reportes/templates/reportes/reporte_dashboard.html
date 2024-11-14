@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Panel de Reportes{% endblock %}
+{% block content %}
+<div class="container my-5">
+    <h1>Panel de Reportes</h1>
+    <p>Selecciona el formato para descargar el reporte de servicios completados:</p>
+
+    {% if user.is_superuser or user.rol.nombre == "administrador" %}
+        <a href="{% url 'reporte_pdf' %}" class="btn btn-primary">Generar Reporte PDF Completo</a>
+        <a href="{% url 'reporte_excel' %}" class="btn btn-secondary">Generar Reporte Excel Completo</a>
+    {% elif user.rol.nombre == "tecnico" %}
+        <a href="{% url 'reporte_pdf' %}" class="btn btn-primary">Generar Reporte PDF Simplificado</a>
+        <a href="{% url 'reporte_excel' %}" class="btn btn-secondary">Generar Reporte Excel Simplificado</a>
+    {% endif %}
+    <a href="{% url 'historial_reportes' %}" class="btn btn-info mt-3">Ver Historial de Reportes</a>
+</div>
+{% endblock %}
