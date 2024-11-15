@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Eliminar Técnico{% endblock %}
+{% block title %}Eliminar Usuario{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -10,7 +10,7 @@
             {% csrf_token %}
             <div class="d-grid">
                 <button type="submit" class="btn btn-danger">Eliminar</button>
-                <a href="{% url 'tecnico-list' %}" class="btn btn-secondary mt-2">Cancelar</a>
+                <a href="{% url 'usuario-list' %}" class="btn btn-secondary mt-2">Cancelar</a>
             </div>
         </form>
     </div>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from ServiceTrack.models import Equipo, Servicio, Usuario
+from ServiceTrack.models import Equipo, Servicio, Notificacion, Usuario
 from .forms import ServicioEstadoForm, ResenaForm
 
 # Helper to check if the user is a technician
@@ -35,7 +35,6 @@ def detalle_equipo_cliente(request, equipo_id):
         'servicios': servicios,
     })
 
-
 @login_required
 @user_passes_test(is_cliente)
 def dejar_resena(request, servicio_id):
@@ -45,6 +44,9 @@ def dejar_resena(request, servicio_id):
         form = ResenaForm(request.POST, instance=servicio)
         if form.is_valid():
             form.save()
+            # Crear notificación para el administrador sobre la nueva reseña
+            mensaje = f"El cliente {request.user.nombre} ha dejado una nueva observación en el servicio {servicio.id}."
+            Notificacion.crear_notificacion(usuario=Usuario.objects.get(rol__nombre="administrador"), tipo="nueva_observacion", mensaje=mensaje)
             return redirect('lista_equipos_cliente')
     else:
         form = ResenaForm(instance=servicio)

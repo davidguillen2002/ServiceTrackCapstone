@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Sum
-from ServiceTrack.models import Usuario, Medalla, Reto, RegistroPuntos, RetoUsuario, Guia, ObservacionIncidente, Servicio
+from ServiceTrack.models import Usuario, Medalla, Reto, RegistroPuntos, RetoUsuario, Guia, ObservacionIncidente, Servicio, Notificacion
 from .forms import GuiaForm, ObservacionIncidenteForm, RetoForm, MedallaForm
 from .utils import otorgar_puntos_por_servicio, verificar_retos, asignar_medalla
 from django import forms
@@ -185,7 +185,12 @@ def crear_reto(request):
     if request.method == 'POST':
         form = RetoForm(request.POST)
         if form.is_valid():
-            form.save()
+            reto = form.save()
+            # Notificar a todos los técnicos sobre el nuevo reto
+            tecnicos = Usuario.objects.filter(rol__nombre="tecnico")
+            for tecnico in tecnicos:
+                mensaje = f"Se le ha asignado un nuevo reto: {reto.nombre}."
+                Notificacion.crear_notificacion(usuario=tecnico, tipo="reto_asignado", mensaje=mensaje)
             return redirect('lista_retos')
     else:
         form = RetoForm()

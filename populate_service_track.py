@@ -1,41 +1,43 @@
-# populate_service_track.py
 import django
 import os
 from datetime import date, timedelta
 from random import randint, choice
+from django.contrib.auth.hashers import make_password
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ServiceTrack.settings')
 django.setup()
 
-from ServiceTrack.models import Rol, Usuario, Equipo, Servicio, Categoria, Guia, ObservacionIncidente, Enlace, Medalla, Reto, RegistroPuntos
+from ServiceTrack.models import Rol, Usuario, Equipo, Servicio, Categoria, Guia, ObservacionIncidente, Enlace, Medalla, Reto, RegistroPuntos, RetoUsuario
 
 # Crear roles
 tecnico_rol = Rol.objects.get_or_create(nombre="tecnico")[0]
 admin_rol = Rol.objects.get_or_create(nombre="administrador")[0]
 cliente_rol = Rol.objects.get_or_create(nombre="cliente")[0]
 
-# Crear usuarios (técnicos y clientes)
+# Crear usuarios (técnicos, clientes y un administrador)
 tecnicos = []
 clientes = []
 
+# Crear técnicos
 for i in range(5):
     tecnico = Usuario.objects.get_or_create(
         nombre=f"Tecnico {i+1}",
         username=f"tecnico{i+1}",
-        password="hashed_password",
+        password=make_password("Monono123"),
         rol=tecnico_rol,
-        cedula=f"111222333{i}",
+        cedula=f"111222333{i+1}",
         correo=f"tecnico{i+1}@tech.com",
         celular=f"09999999{i+1}",
         puntos=randint(50, 200)
     )[0]
     tecnicos.append(tecnico)
 
-for i in range(10):
+# Crear clientes
+for i in range(5):
     cliente = Usuario.objects.get_or_create(
         nombre=f"Cliente {i+1}",
         username=f"cliente{i+1}",
-        password="hashed_password",
+        password=make_password("Monono123"),
         rol=cliente_rol,
         cedula=f"12345678{i}0",
         correo=f"cliente{i+1}@gmail.com",
@@ -43,6 +45,18 @@ for i in range(10):
         puntos=0
     )[0]
     clientes.append(cliente)
+
+# Crear un administrador
+admin = Usuario.objects.get_or_create(
+    nombre="Administrador",
+    username="admin",
+    password=make_password("Monono123"),
+    rol=admin_rol,
+    cedula="1234567890",
+    correo="admin@service.com",
+    celular="0987654321",
+    puntos=0
+)[0]
 
 # Crear equipos para cada cliente
 equipos = []
@@ -77,6 +91,7 @@ for equipo in equipos:
         tecnico=tecnico,
         fecha_inicio=fecha_inicio,
         fecha_fin=fecha_fin,
+        estado=choice(["pendiente", "en_progreso", "completado"]),
         calificacion=randint(1, 5),
         comentario_cliente="Excelente servicio y atención al cliente.",
         costo=round(randint(50, 200) + randint(0, 99) / 100, 2)
@@ -116,7 +131,7 @@ observacion_tipos = ["Error", "Observación", "Incidente"]
 estados = ["Abierto", "Cerrado", "En progreso"]
 
 for servicio in servicios:
-    for i in range(randint(1, 3)):
+    for _ in range(randint(1, 3)):
         tipo_observacion = choice(observacion_tipos)
         estado = choice(estados)
         observacion = ObservacionIncidente.objects.get_or_create(
@@ -150,7 +165,6 @@ for medalla_data in medallas:
         descripcion=medalla_data["descripcion"],
         puntos_necesarios=medalla_data["puntos_necesarios"]
     )[0]
-    # Asignar medallas a algunos técnicos
     choice(tecnicos).medallas.add(medalla)
 
 # Crear retos
@@ -160,12 +174,19 @@ retos = [
 ]
 
 for reto_data in retos:
-    Reto.objects.get_or_create(
+    reto = Reto.objects.get_or_create(
         nombre=reto_data["nombre"],
         descripcion=reto_data["descripcion"],
         puntos_otorgados=reto_data["puntos_otorgados"],
         requisito=reto_data["requisito"]
-    )
+    )[0]
+    for tecnico in tecnicos:
+        RetoUsuario.objects.get_or_create(
+            usuario=tecnico,
+            reto=reto,
+            cumplido=bool(randint(0, 1)),
+            fecha_completado=date.today() - timedelta(days=randint(1, 30)) if bool(randint(0, 1)) else None
+        )
 
 # Crear registros de puntos
 for tecnico in tecnicos:

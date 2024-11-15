@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'dashboard',       # App de Dashboard de KPIs
     'authentication',
     'reportes',
+    'notificaciones',
 ]
 
 
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notificaciones.context_processors.notificaciones_no_leidas',
             ],
         },
     },

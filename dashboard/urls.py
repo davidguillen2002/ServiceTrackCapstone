@@ -1,10 +1,11 @@
+# dashboard/urls.py
 from django.urls import path
-from .views import TecnicoListView, TecnicoCreateView, TecnicoUpdateView, TecnicoDeleteView, dashboard_view
+from .views import UsuarioListView, UsuarioCreateView, UsuarioUpdateView, UsuarioDeleteView, dashboard_view
 
 urlpatterns = [
     path('', dashboard_view, name='dashboard'),  # Ruta principal del dashboard
-    path('tecnicos/', TecnicoListView.as_view(), name='tecnico-list'),  # Lista de técnicos
-    path('tecnicos/nuevo/', TecnicoCreateView.as_view(), name='tecnico-create'),  # Formulario para agregar técnico
-    path('tecnicos/editar/<int:pk>/', TecnicoUpdateView.as_view(), name='tecnico-update'),  # Actualizar técnico
-    path('tecnicos/eliminar/<int:pk>/', TecnicoDeleteView.as_view(), name='tecnico-delete'),  # Eliminar técnico
+    path('usuarios/', UsuarioListView.as_view(), name='usuario-list'),  # Lista de usuarios
+    path('usuarios/nuevo/', UsuarioCreateView.as_view(), name='usuario-create'),  # Formulario para agregar usuario
+    path('usuarios/editar/<int:pk>/', UsuarioUpdateView.as_view(), name='usuario-update'),  # Actualizar usuario
+    path('usuarios/eliminar/<int:pk>/', UsuarioDeleteView.as_view(), name='usuario-delete'),  # Eliminar usuario
 ]

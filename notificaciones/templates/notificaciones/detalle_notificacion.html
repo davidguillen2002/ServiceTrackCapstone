@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Notificación{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Detalle de Notificación</h1>
+    <p><strong>Tipo:</strong> {{ notificacion.get_tipo_display }}</p>
+    <p><strong>Mensaje:</strong> {{ notificacion.mensaje }}</p>
+    <p><small><strong>Fecha:</strong> {{ notificacion.fecha_creacion }}</small></p>
+    <a href="{% url 'lista_notificaciones' %}" class="btn btn-secondary">Volver a Mis Notificaciones</a>
+</div>
+{% endblock %}

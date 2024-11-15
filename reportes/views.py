@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.files.base import ContentFile
 from reportlab.pdfgen import canvas
-from ServiceTrack.models import Servicio, HistorialReporte
+from ServiceTrack.models import Servicio, HistorialReporte, Notificacion
 from datetime import datetime
 import pandas as pd
 import io
@@ -13,7 +13,7 @@ def is_admin(user):
     return user.is_superuser or (user.rol.nombre == "administrador")
 
 def is_tecnico(user):
-    return user.rol.nombre == "tecnico"
+    return user.rol.nombre == "usuarios"
 
 @login_required
 def panel_reportes(request):
@@ -46,6 +46,8 @@ def generar_reporte_pdf(request):
     archivo_reporte = ContentFile(file_content, f"reporte_servicios_{datetime.now().strftime('%Y%m%d')}.pdf")
     reporte = HistorialReporte.objects.create(tipo_reporte='PDF', generado_por=request.user)
     reporte.archivo.save(archivo_reporte.name, archivo_reporte)
+    mensaje = "Se ha generado un nuevo reporte en formato PDF."
+    Notificacion.crear_notificacion(usuario=request.user, tipo="actualizacion_reporte", mensaje=mensaje)
     return HttpResponse(file_content, content_type='application/pdf')
 
 @login_required
@@ -64,6 +66,8 @@ def generar_reporte_excel(request):
     archivo_reporte = ContentFile(file_content, f"reporte_servicios_{datetime.now().strftime('%Y%m%d')}.xlsx")
     reporte = HistorialReporte.objects.create(tipo_reporte='Excel', generado_por=request.user)
     reporte.archivo.save(archivo_reporte.name, archivo_reporte)
+    mensaje = "Se ha generado un nuevo reporte en formato Excel."
+    Notificacion.crear_notificacion(usuario=request.user, tipo="actualizacion_reporte", mensaje=mensaje)
     return HttpResponse(file_content, content_type='application/vnd.ms-excel')
 
 @login_required

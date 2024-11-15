@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if form.instance.pk %}Editar Técnico{% else %}Registrar Nuevo Técnico{% endif %}{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Usuario{% else %}Registrar Nuevo Usuario{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex flex-column align-items-center mb-4">
         <h1 class="fw-bold text-center">
-            {% if form.instance.pk %}Editar Técnico{% else %}Registrar Nuevo Técnico{% endif %}
+            {% if form.instance.pk %}Editar Usuario{% else %}Registrar Nuevo Usuario{% endif %}
         </h1>
         <p class="text-center text-muted">Ingrese los siguientes datos</p>
     </div>
@@ -19,7 +19,7 @@
                     {{ form.as_p }}
                     <div class="d-grid">
                         <button type="submit" class="btn btn-dark btn-lg">
-                            {% if form.instance.pk %}Actualizar Técnico{% else %}Agregar Técnico{% endif %}
+                            {% if form.instance.pk %}Actualizar Usuario{% else %}Agregar Usuario{% endif %}
                         </button>
                     </div>
                 </form>

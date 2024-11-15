@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Lista de Técnicos{% endblock %}
+{% block title %}Lista de Usuarios{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">Técnicos Registrados</h1>
-        <a href="{% url 'tecnico-create' %}" class="btn btn-success">Agregar Técnico</a>
+        <h1 class="fw-bold">Usuarios Registrados</h1>
+        <a href="{% url 'usuario-create' %}" class="btn btn-success">Agregar Usuario</a>
     </div>
 
     <div class="card shadow-sm">
@@ -16,6 +16,7 @@
                     <tr>
                         <th scope="col">Nombre</th>
                         <th scope="col">Usuario</th>
+                        <th scope="col">Rol</th>
                         <th scope="col">Cédula</th>
                         <th scope="col">Correo</th>
                         <th scope="col">Celular</th>
@@ -23,25 +24,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for tecnico in tecnicos %}
+                    {% for usuario in usuarios %}
                     <tr>
-                        <td>{{ tecnico.nombre }}</td>
-                        <td>{{ tecnico.username }}</td>
-                        <td>{{ tecnico.cedula }}</td>
-                        <td>{{ tecnico.correo }}</td>
-                        <td>{{ tecnico.celular }}</td>
+                        <td>{{ usuario.nombre }}</td>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.rol.nombre }}</td>
+                        <td>{{ usuario.cedula }}</td>
+                        <td>{{ usuario.correo }}</td>
+                        <td>{{ usuario.celular }}</td>
                         <td class="text-center">
-                            <a href="{% url 'tecnico-update' tecnico.pk %}" class="btn btn-warning btn-sm me-2">
+                            <a href="{% url 'usuario-update' usuario.pk %}" class="btn btn-warning btn-sm me-2">
                                 <i class="bi bi-pencil-square"></i> Editar
                             </a>
-                            <a href="{% url 'tecnico-delete' tecnico.pk %}" class="btn btn-danger btn-sm">
+                            <a href="{% url 'usuario-delete' usuario.pk %}" class="btn btn-danger btn-sm">
                                 <i class="bi bi-trash"></i> Eliminar
                             </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted">No hay técnicos registrados.</td>
+                        <td colspan="7" class="text-center text-muted">No hay usuarios registrados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
