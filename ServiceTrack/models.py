@@ -2,8 +2,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
-
+# Manager para el modelo Usuario
 class UsuarioManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
         if not username:
@@ -20,7 +21,6 @@ class UsuarioManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        # Establece un rol por defecto para el superusuario si no se proporciona uno
         if 'rol' not in extra_fields:
             try:
                 admin_role = Rol.objects.get(nombre="administrador")
@@ -32,12 +32,14 @@ class UsuarioManager(BaseUserManager):
 
         return self.create_user(username, password, **extra_fields)
 
+# Modelo Rol
 class Rol(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.nombre
 
+# Modelo Usuario
 class Usuario(AbstractBaseUser, PermissionsMixin):
     nombre = models.CharField(max_length=100)
     username = models.CharField(max_length=100, unique=True)
@@ -49,7 +51,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     puntos = models.IntegerField(default=0)  # Solo los técnicos usan puntos
     medallas = models.ManyToManyField('Medalla', blank=True, related_name="usuarios")
 
-    # Campos requeridos por AbstractBaseUser y PermissionsMixin
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -61,6 +62,52 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.nombre
 
+# Modelo Notificacion
+class Notificacion(models.Model):
+    TIPO_NOTIFICACION = [
+        ('nuevo_servicio', 'Nuevo Servicio Asignado'),
+        ('servicio_completado', 'Servicio Completado'),
+        ('reto_asignado', 'Nuevo Reto Asignado'),
+        ('actualizacion_reporte', 'Actualización de Reporte'),
+        ('nueva_observacion', 'Nueva Observación en un Incidente'),
+        ('nuevo_equipo', 'Nuevo Equipo Registrado'),
+    ]
+
+    ROL_DESTINATARIO = [
+        ('administrador', 'Administrador'),
+        ('tecnico', 'Técnico'),
+        ('cliente', 'Cliente'),
+    ]
+
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='notificaciones')
+    tipo = models.CharField(max_length=30, choices=TIPO_NOTIFICACION)
+    mensaje = models.TextField()
+    fecha_creacion = models.DateTimeField(default=timezone.now)
+    leido = models.BooleanField(default=False)
+    rol_destinatario = models.CharField(max_length=20, choices=ROL_DESTINATARIO)
+
+    def __str__(self):
+        return f"Notificación {self.tipo} para {self.usuario.username}"
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+
+    @classmethod
+    def crear_notificacion(cls, usuario, tipo, mensaje):
+        """
+        Método para crear una notificación.
+        """
+        rol = usuario.rol.nombre
+        cls.objects.create(usuario=usuario, tipo=tipo, mensaje=mensaje, rol_destinatario=rol)
+
+    @classmethod
+    def obtener_notificaciones_por_rol(cls, usuario):
+        """
+        Obtiene las notificaciones según el rol del usuario.
+        """
+        return cls.objects.filter(usuario=usuario, rol_destinatario=usuario.rol.nombre)
+
+# Modelo Equipo
 class Equipo(models.Model):
     cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     marca = models.CharField(max_length=50)
@@ -72,6 +119,7 @@ class Equipo(models.Model):
     def __str__(self):
         return f"{self.marca} {self.modelo} ({self.anio})"
 
+# Modelo Servicio
 class Servicio(models.Model):
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
     tecnico = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='tecnico_servicios')
