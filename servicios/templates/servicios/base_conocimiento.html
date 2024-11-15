@@ -6,10 +6,13 @@
 <div class="container">
     <h1>Base de Conocimientos</h1>
 
-    <!-- Botón para el Panel de Conocimiento (solo visible para el administrador) -->
+    <!-- Botones específicos según el rol -->
     {% if user.rol.nombre == "administrador" %}
         <a href="{% url 'knowledge_dashboard' %}" class="btn btn-info mb-3">Ver Panel de Conocimiento</a>
+    {% elif user.rol.nombre == "tecnico" %}
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-warning mb-3">Mis Servicios</a>
     {% endif %}
+
 
     <div class="search-container mb-4">
         <form id="search-form">
@@ -46,7 +49,9 @@
 <!-- Script para búsqueda y filtrado en tiempo real con AJAX -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function searchGuides() {
+    function searchGuides(event) {
+        event.preventDefault();  // Evitar que el formulario se envíe de la manera tradicional
+
         const query = $('#search-input').val();
         const categoria = $('#categoria-select').val();
         const tipoServicio = $('#tipo-servicio-select').val();
@@ -61,6 +66,7 @@
         });
     }
 
+    // Adjuntar eventos al campo de búsqueda y los selectores de filtros
     $('#search-input').on('keyup', searchGuides);
     $('#categoria-select').on('change', searchGuides);
     $('#tipo-servicio-select').on('change', searchGuides);

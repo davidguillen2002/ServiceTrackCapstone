@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Mis Notificaciones</h1>
+    <a href="{% url 'marcar_todas_como_leidas' %}" class="btn btn-primary mb-3">Marcar todas como leídas</a>
+    <ul class="list-group">
+        {% for notificacion in notificaciones %}
+            <li class="list-group-item {% if notificacion.leido %}list-group-item-light{% else %}list-group-item-warning{% endif %}">
+                <a href="{% url 'detalle_notificacion' notificacion.id %}">
+                    {{ notificacion.get_tipo_display }} - {{ notificacion.mensaje }}
+                </a>
+                <small class="text-muted float-end">{{ notificacion.fecha_creacion }}</small>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No tienes notificaciones.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -14,7 +14,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard' %}">ServiceTrack</a>
+            <a class="navbar-brand" href="{% url 'home' %}">ServiceTrack</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -35,9 +35,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
                             </li>
-
-                            <!-- Enlaces para CRUD de Servicios -->
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'lista_servicios' %}">Servicios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'usuario-list' %}">Usuarios</a>
                             </li>
 
                         {% elif user.rol.nombre == "tecnico" %}
@@ -67,6 +69,16 @@
                                 <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
                             </li>
                         {% endif %}
+
+                        <!-- Campanita de notificaciones al lado de Cerrar Sesión -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_notificaciones' %}">
+                                <i class="bi bi-bell"></i>
+                                {% if notificaciones_no_leidas > 0 %}
+                                    <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
 
                         <!-- Enlace de Cerrar Sesión, común para todos los roles -->
                         <li class="nav-item">

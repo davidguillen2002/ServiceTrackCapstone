@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.contrib.auth.decorators import user_passes_test, login_required
-from ServiceTrack.models import Guia, Categoria, Servicio, Usuario
+from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion
 from .ai_utils import get_similar_guides
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -22,7 +22,10 @@ def registrar_servicio(request):
     if request.method == "POST":
         form = ServicioForm(request.POST)
         if form.is_valid():
-            form.save()
+            servicio = form.save()
+            # Crear notificación para el técnico asignado
+            mensaje = f"Nuevo servicio asignado al equipo {servicio.equipo.marca} {servicio.equipo.modelo}."
+            Notificacion.crear_notificacion(usuario=servicio.tecnico, tipo="nuevo_servicio", mensaje=mensaje)
             return redirect("lista_servicios")
     else:
         form = ServicioForm()
@@ -38,7 +41,7 @@ def lista_servicios(request):
     # Filtrar los servicios basados en los parámetros de búsqueda
     servicios = Servicio.objects.all()
     if query:
-        servicios = servicios.filter(Q(equipo_modeloicontains=query) | Q(tecniconombre_icontains=query))
+        servicios = servicios.filter(Q(equipo__modelo__icontains=query) | Q(tecnico__nombre__icontains=query))
     if estado_filtro:
         servicios = servicios.filter(estado=estado_filtro)
 
@@ -62,6 +65,10 @@ def actualizar_servicio(request, servicio_id):
         form = ServicioForm(request.POST, instance=servicio)
         if form.is_valid():
             form.save()
+            if servicio.estado == "completado":
+                # Crear notificación para el cliente
+                mensaje = f"Su servicio para el equipo {servicio.equipo.marca} {servicio.equipo.modelo} ha sido completado."
+                Notificacion.crear_notificacion(usuario=servicio.equipo.cliente, tipo="servicio_completado", mensaje=mensaje)
             return redirect("lista_servicios")
     else:
         form = ServicioForm(instance=servicio)
@@ -105,7 +112,7 @@ def base_conocimiento(request):
     # Filtrar guías con los criterios de búsqueda
     guias = Guia.objects.all()
     if query:
-        guias = guias.filter(Q(titulo_icontains=query) | Q(descripcion_icontains=query))
+        guias = guias.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
     if categoria_filtro:
         guias = guias.filter(categoria__nombre=categoria_filtro)
     if tipo_servicio_filtro:
@@ -134,7 +141,7 @@ def base_conocimiento(request):
 def knowledge_dashboard(request):
     total_servicios = Servicio.objects.count()
     # Corrige el filtro de calificación
-    calificacion_promedio = Servicio.objects.filter(calificacion_isnull=False).aggregate(Avg('calificacion'))['calificacion_avg']
+    calificacion_promedio = Servicio.objects.filter(calificacion__isnull=False).aggregate(Avg('calificacion'))['calificacion__avg']
     guias_mas_consultadas = Guia.objects.order_by('-puntuacion')[:5]
     tecnicos = Usuario.objects.filter(rol__nombre='tecnico')
 
