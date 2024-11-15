@@ -8,7 +8,7 @@ urlpatterns = [
     path('servicio/<int:servicio_id>/dejar_resena/', views.dejar_resena, name='dejar_resena'),
 
     # Vistas para técnicos
-    path('tecnico/equipos/', views.lista_equipos_tecnico, name='lista_equipos_tecnico'),
-    path('tecnico/equipo/<int:equipo_id>/actualizar_estado/', views.actualizar_estado_equipo_tecnico, name='actualizar_estado_equipo_tecnico'),
-    path('tecnico/servicio/<int:servicio_id>/', views.detalle_servicio_tecnico, name='detalle_servicio_tecnico'),
+    path('usuarios/equipos/', views.lista_equipos_tecnico, name='lista_equipos_tecnico'),
+    path('usuarios/equipo/<int:equipo_id>/actualizar_estado/', views.actualizar_estado_equipo_tecnico, name='actualizar_estado_equipo_tecnico'),
+    path('usuarios/servicio/<int:servicio_id>/', views.detalle_servicio_tecnico, name='detalle_servicio_tecnico'),
 ]
