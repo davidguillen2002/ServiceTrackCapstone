@@ -67,6 +67,16 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.nombre
 
+    def calcular_promedio_tiempo_servicio(self):
+        servicios = Servicio.objects.filter(tecnico=self, estado="completado")
+        if servicios.exists():
+            total_dias = sum((servicio.fecha_fin - servicio.fecha_inicio).days for servicio in servicios if servicio.fecha_fin)
+            return total_dias / servicios.count()
+        return None
+
+    def servicios_con_baja_calificacion(self):
+        return Servicio.objects.filter(tecnico=self, calificacion__lt=3).count()
+
 class Notificacion(models.Model):
     TIPO_NOTIFICACION = [
         ('nuevo_servicio', 'Nuevo Servicio Asignado'),
@@ -217,9 +227,14 @@ class Guia(models.Model):
     def __str__(self):
         return self.titulo
 
-
-# Modelo ObservacionIncidente
 class ObservacionIncidente(models.Model):
+    servicio = models.ForeignKey(
+        Servicio,
+        on_delete=models.CASCADE,
+        related_name="observaciones",
+        null=True,  # Opcional si no todas las observaciones están asociadas a un servicio
+        blank=True
+    )
     autor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     descripcion = models.TextField()
     tipo_observacion = models.CharField(max_length=100)
@@ -230,7 +245,6 @@ class ObservacionIncidente(models.Model):
 
     def __str__(self):
         return f"Observacion {self.id} - {self.tipo_observacion}"
-
 
 # Modelo Enlace
 class Enlace(models.Model):
