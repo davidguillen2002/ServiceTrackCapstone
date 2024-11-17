@@ -7,56 +7,76 @@ from django.contrib.auth.hashers import make_password
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ServiceTrack.settings')
 django.setup()
 
-from ServiceTrack.models import Rol, Usuario, Equipo, Servicio, Categoria, Guia, ObservacionIncidente, Enlace, Medalla, Reto, RegistroPuntos, RetoUsuario
+from ServiceTrack.models import (
+    Rol, Usuario, Equipo, Servicio, Repuesto, Categoria, Guia,
+    ObservacionIncidente, Enlace, Medalla, Reto, RegistroPuntos, RetoUsuario
+)
 
 # Crear roles
-tecnico_rol = Rol.objects.get_or_create(nombre="tecnico")[0]
-admin_rol = Rol.objects.get_or_create(nombre="administrador")[0]
-cliente_rol = Rol.objects.get_or_create(nombre="cliente")[0]
+tecnico_rol, _ = Rol.objects.get_or_create(nombre="tecnico")
+admin_rol, _ = Rol.objects.get_or_create(nombre="administrador")
+cliente_rol, _ = Rol.objects.get_or_create(nombre="cliente")
 
-# Crear usuarios (técnicos, clientes y un administrador)
+# Crear un conjunto para las cédulas únicas
+cedulas_generadas = set()
+
+# Función para generar una cédula única
+def generar_cedula_unica():
+    while True:
+        cedula = f"{randint(100000000, 999999999)}"
+        if cedula not in cedulas_generadas:
+            cedulas_generadas.add(cedula)
+            return cedula
+
+# Crear usuarios (técnicos, clientes y administrador)
 tecnicos = []
 clientes = []
 
 # Crear técnicos
-for i in range(5):
-    tecnico = Usuario.objects.get_or_create(
-        nombre=f"Tecnico {i+1}",
-        username=f"tecnico{i+1}",
-        password=make_password("Monono123"),
-        rol=tecnico_rol,
-        cedula=f"111222333{i+1}",
-        correo=f"tecnico{i+1}@tech.com",
-        celular=f"09999999{i+1}",
-        puntos=randint(50, 200)
-    )[0]
-    tecnicos.append(tecnico)
+for i in range(20):  # Crear exactamente 20 técnicos
+    tecnico_data = {
+        "nombre": f"Técnico {i+1}",
+        "password": make_password("Monono123"),
+        "rol": tecnico_rol,
+        "cedula": generar_cedula_unica(),
+        "correo": f"tecnico{i+1}@tech.com",
+        "celular": f"09999999{i+1}",
+        "puntos": randint(50, 500),
+        "servicios_completados": randint(5, 50),
+        "calificacion_promedio": round(randint(3, 5) + randint(0, 99) / 100, 2),
+    }
+    tecnico, created = Usuario.objects.get_or_create(
+        username=f"tecnico{i+1}", defaults=tecnico_data
+    )
+    if created:
+        tecnicos.append(tecnico)
 
 # Crear clientes
-for i in range(5):
-    cliente = Usuario.objects.get_or_create(
-        nombre=f"Cliente {i+1}",
-        username=f"cliente{i+1}",
-        password=make_password("Monono123"),
-        rol=cliente_rol,
-        cedula=f"12345678{i}0",
-        correo=f"cliente{i+1}@gmail.com",
-        celular=f"09876543{i+1}",
-        puntos=0
-    )[0]
-    clientes.append(cliente)
+for i in range(20):  # Crear exactamente 20 clientes
+    cliente_data = {
+        "nombre": f"Cliente {i+1}",
+        "password": make_password("Monono123"),
+        "rol": cliente_rol,
+        "cedula": generar_cedula_unica(),
+        "correo": f"cliente{i+1}@gmail.com",
+        "celular": f"09876543{i+1}",
+    }
+    cliente, created = Usuario.objects.get_or_create(
+        username=f"cliente{i+1}", defaults=cliente_data
+    )
+    if created:
+        clientes.append(cliente)
 
-# Crear un administrador
-admin = Usuario.objects.get_or_create(
-    nombre="Administrador",
-    username="admin",
-    password=make_password("Monono123"),
-    rol=admin_rol,
-    cedula="1234567890",
-    correo="admin@service.com",
-    celular="0987654321",
-    puntos=0
-)[0]
+# Crear administrador
+admin_data = {
+    "nombre": "Administrador",
+    "password": make_password("Monono123"),
+    "rol": admin_rol,
+    "cedula": generar_cedula_unica(),
+    "correo": "admin@service.com",
+    "celular": "0987654321",
+}
+admin, created = Usuario.objects.get_or_create(username="admin", defaults=admin_data)
 
 # Crear equipos para cada cliente
 equipos = []
@@ -66,134 +86,71 @@ marcas_modelos = [
     ("Lenovo", "ThinkPad X1", "Laptop"),
     ("Apple", "MacBook Air", "Laptop"),
     ("Samsung", "Galaxy Tab S7", "Tablet"),
+    ("Asus", "ZenBook 14", "Laptop"),
+    ("Acer", "Aspire 7", "Laptop"),
 ]
 
 for cliente in clientes:
-    marca, modelo, tipo = choice(marcas_modelos)
-    equipo = Equipo.objects.get_or_create(
-        cliente=cliente,
-        marca=marca,
-        modelo=modelo,
-        anio=randint(2018, 2022),
-        tipo_equipo=tipo,
-        observaciones="Revisión periódica y mantenimiento preventivo"
-    )[0]
-    equipos.append(equipo)
+    for _ in range(randint(1, 3)):  # Cada cliente puede tener de 1 a 3 equipos
+        marca, modelo, tipo = choice(marcas_modelos)
+        equipo, created = Equipo.objects.get_or_create(
+            cliente=cliente,
+            marca=marca,
+            modelo=modelo,
+            anio=randint(2015, 2023),
+            tipo_equipo=tipo,
+            observaciones="Equipo asignado para prueba de carga",
+        )
+        if created:
+            equipos.append(equipo)
 
-# Crear servicios para los equipos
+# Servicios para los equipos
 servicios = []
 for equipo in equipos:
-    tecnico = choice(tecnicos)
-    fecha_inicio = date(2023, randint(1, 12), randint(1, 28))
-    fecha_fin = fecha_inicio + timedelta(days=randint(1, 7))
-    servicio = Servicio.objects.get_or_create(
-        equipo=equipo,
-        tecnico=tecnico,
-        fecha_inicio=fecha_inicio,
-        fecha_fin=fecha_fin,
-        estado=choice(["pendiente", "en_progreso", "completado"]),
-        calificacion=randint(1, 5),
-        comentario_cliente="Excelente servicio y atención al cliente.",
-        costo=round(randint(50, 200) + randint(0, 99) / 100, 2)
-    )[0]
-    servicios.append(servicio)
+    for _ in range(randint(1, 3)):  # Cada equipo puede tener de 1 a 3 servicios
+        tecnico = choice(tecnicos)
+        fecha_inicio = date(2023, randint(1, 12), randint(1, 28))
+        fecha_fin = fecha_inicio + timedelta(days=randint(1, 7))
+        servicio, created = Servicio.objects.get_or_create(
+            equipo=equipo,
+            tecnico=tecnico,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin if randint(0, 1) else None,
+            estado=choice(["pendiente", "en_progreso", "completado"]),
+            calificacion=randint(1, 5),
+            comentario_cliente="Prueba automatizada para registrar datos.",
+            diagnostico_inicial="Revisión inicial automática.",
+            costo=round(randint(50, 500) + randint(0, 99) / 100, 2),
+        )
+        if created:
+            servicios.append(servicio)
 
-# Crear categorías de guías
-categorias = ["Mantenimiento", "Reparación", "Instalación", "Actualización", "Diagnóstico"]
-categorias_obj = []
+        # Agregar repuestos asociados
+        for _ in range(randint(1, 5)):  # Cada servicio puede tener de 1 a 5 repuestos
+            Repuesto.objects.create(
+                nombre=f"Repuesto {_ + 1}",
+                descripcion="Descripción de prueba para el repuesto",
+                costo=round(randint(10, 200) + randint(0, 99) / 100, 2),
+                proveedor=f"Proveedor {_ + 1}",
+                cantidad=randint(1, 10),
+                servicio=servicio,
+            )
 
-for nombre in categorias:
-    categoria = Categoria.objects.get_or_create(nombre=nombre)[0]
-    categorias_obj.append(categoria)
+# Categorías de guías
+categorias = ["Mantenimiento", "Reparación", "Instalación", "Actualización", "Diagnóstico", "Optimización", "Seguridad"]
+categorias_obj = [Categoria.objects.get_or_create(nombre=categoria)[0] for categoria in categorias]
 
-# Crear guías técnicas
-guia_titulos = [
-    "Guía de Mantenimiento Preventivo para Laptops",
-    "Reparación de Pantalla Rota en HP Pavilion",
-    "Instalación de Memoria RAM en Dell Inspiron",
-    "Actualización de Sistema Operativo en MacBook",
-    "Diagnóstico de Fallas de Hardware en Lenovo ThinkPad"
-]
-
+# Guías Técnicas
 for i, categoria in enumerate(categorias_obj):
-    guia = Guia.objects.get_or_create(
-        titulo=guia_titulos[i],
-        descripcion="Instrucciones detalladas para realizar el procedimiento de manera segura y eficiente.",
-        categoria=categoria,
-        tipo_servicio="Servicio General",
-        equipo_marca=marcas_modelos[i][0],
-        equipo_modelo=marcas_modelos[i][1],
-        puntuacion=round(randint(3, 5) + randint(0, 99) / 100, 2)
-    )[0]
-
-# Crear observaciones o incidentes
-observacion_tipos = ["Error", "Observación", "Incidente"]
-estados = ["Abierto", "Cerrado", "En progreso"]
-
-for servicio in servicios:
-    for _ in range(randint(1, 3)):
-        tipo_observacion = choice(observacion_tipos)
-        estado = choice(estados)
-        observacion = ObservacionIncidente.objects.get_or_create(
-            autor=choice(tecnicos),
-            descripcion=f"Reporte de {tipo_observacion} en el servicio de {servicio.equipo.marca} {servicio.equipo.modelo}.",
-            tipo_observacion=tipo_observacion,
-            comentarios="Se recomienda revisar los detalles del incidente.",
-            estado=estado,
-            fecha_reportada=servicio.fecha_inicio,
-            fecha_fin=servicio.fecha_fin if estado == "Cerrado" else None
-        )[0]
-
-# Crear enlaces
-for i, guia in enumerate(Guia.objects.all()):
-    Enlace.objects.get_or_create(
-        servicio=servicios[i % len(servicios)],
-        enlace=f"http://manuales.com/manual_{guia.id}",
-        descripcion=f"Enlace a la guía de {guia.titulo} para más detalles."
-    )
-
-# Crear medallas
-medallas = [
-    {"nombre": "Medalla de Excelencia", "descripcion": "Por completar 10 servicios", "puntos_necesarios": 100},
-    {"nombre": "Medalla de Lealtad", "descripcion": "Por estar más de 1 año como usuario activo", "puntos_necesarios": 50},
-    {"nombre": "Medalla de Rapidez", "descripcion": "Por completar servicios en tiempo récord", "puntos_necesarios": 75},
-]
-
-for medalla_data in medallas:
-    medalla = Medalla.objects.get_or_create(
-        nombre=medalla_data["nombre"],
-        descripcion=medalla_data["descripcion"],
-        puntos_necesarios=medalla_data["puntos_necesarios"]
-    )[0]
-    choice(tecnicos).medallas.add(medalla)
-
-# Crear retos
-retos = [
-    {"nombre": "Completa 5 servicios", "descripcion": "Obtén puntos por completar 5 servicios", "puntos_otorgados": 20, "requisito": 5},
-    {"nombre": "Gana 100 puntos", "descripcion": "Obtén esta medalla al alcanzar 100 puntos", "puntos_otorgados": 100, "requisito": 100},
-]
-
-for reto_data in retos:
-    reto = Reto.objects.get_or_create(
-        nombre=reto_data["nombre"],
-        descripcion=reto_data["descripcion"],
-        puntos_otorgados=reto_data["puntos_otorgados"],
-        requisito=reto_data["requisito"]
-    )[0]
-    for tecnico in tecnicos:
-        RetoUsuario.objects.get_or_create(
-            usuario=tecnico,
-            reto=reto,
-            cumplido=bool(randint(0, 1)),
-            fecha_completado=date.today() - timedelta(days=randint(1, 30)) if bool(randint(0, 1)) else None
+    for _ in range(10):  # Muchas guías por categoría
+        Guia.objects.get_or_create(
+            titulo=f"Guía {categoria.nombre} {_+1}",
+            descripcion=f"Guía de {categoria.nombre} para equipos avanzados.",
+            categoria=categoria,
+            tipo_servicio="Servicio Especializado",
+            equipo_marca=choice(marcas_modelos)[0],
+            equipo_modelo=choice(marcas_modelos)[1],
+            puntuacion=round(randint(3, 5) + randint(0, 99) / 100, 2),
         )
 
-# Crear registros de puntos
-for tecnico in tecnicos:
-    RegistroPuntos.objects.create(
-        usuario=tecnico,
-        puntos_obtenidos=randint(10, 50),
-        descripcion="Completó un reto de gamificación."
-    )
-
-print("Datos de prueba completos y realistas cargados exitosamente.")
+print("Datos generados exitosamente con repuestos.")

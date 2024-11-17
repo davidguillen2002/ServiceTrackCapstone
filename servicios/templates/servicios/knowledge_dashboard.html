@@ -58,5 +58,68 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <h2>Servicios por Estado</h2>
+    <canvas id="servicesChart" width="400" height="200"></canvas>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('servicesChart').getContext('2d');
+        const labels = {{ labels|safe }};
+        const data = {{ data|safe }};
+        const backgroundColors = [
+            'rgba(75, 192, 192, 0.6)', // Color para el estado 1
+            'rgba(255, 159, 64, 0.6)', // Color para el estado 2
+            'rgba(153, 102, 255, 0.6)', // Color para el estado 3
+        ];
+        const borderColors = [
+            'rgba(75, 192, 192, 1)', // Borde para el estado 1
+            'rgba(255, 159, 64, 1)', // Borde para el estado 2
+            'rgba(153, 102, 255, 1)', // Borde para el estado 3
+        ];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Cantidad de Servicios',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Servicios por Estado'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Estado'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Cantidad'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

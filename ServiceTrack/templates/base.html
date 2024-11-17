@@ -22,7 +22,6 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         {% if user.rol.nombre == "administrador" %}
-                            <!-- Enlaces exclusivos para Administrador -->
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'admin_dashboard' %}">Dashboard</a>
                             </li>
@@ -41,9 +40,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'usuario-list' %}">Usuarios</a>
                             </li>
-
                         {% elif user.rol.nombre == "tecnico" %}
-                            <!-- Enlaces exclusivos para Técnicos -->
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'lista_equipos_tecnico' %}">Seguimiento de Equipos</a>
                             </li>
@@ -62,15 +59,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
                             </li>
-
                         {% elif user.rol.nombre == "cliente" %}
-                            <!-- Enlaces exclusivos para Clientes -->
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
                             </li>
                         {% endif %}
 
-                        <!-- Campanita de notificaciones al lado de Cerrar Sesión -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'lista_notificaciones' %}">
                                 <i class="bi bi-bell"></i>
@@ -80,7 +74,6 @@
                             </a>
                         </li>
 
-                        <!-- Enlace de Cerrar Sesión, común para todos los roles -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
                         </li>
@@ -100,5 +93,46 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- WebSocket Script -->
+    {% if user.is_authenticated %}
+    <script>
+        const socket = new WebSocket('ws://127.0.0.1:8001/ws/notificaciones/{{ user.id }}/');
+
+        // Manejar mensajes recibidos del WebSocket
+        socket.onmessage = function (e) {
+            console.log("Mensaje recibido:", e.data);
+            const data = JSON.parse(e.data);
+
+            // Actualiza la campana de notificaciones dinámicamente
+            const badge = document.querySelector(".bi-bell .badge");
+            if (badge) {
+                badge.textContent = parseInt(badge.textContent || 0) + 1;
+            } else {
+                const bellIcon = document.querySelector(".bi-bell");
+                const span = document.createElement("span");
+                span.classList.add("badge", "bg-danger");
+                span.textContent = 1;
+                bellIcon.appendChild(span);
+            }
+
+            // Mostrar una alerta con la notificación
+            alert(`Nueva notificación: ${data.mensaje}`);
+        };
+
+        // Mostrar mensaje en consola al establecer conexión
+        socket.onopen = function () {
+            console.log("Conexión WebSocket establecida.");
+        };
+
+        // Manejo de desconexión automática
+        socket.onclose = function () {
+            console.error("Conexión WebSocket cerrada.");
+            setTimeout(() => {
+                location.reload(); // Recargar la página para reintentar conexión
+            }, 5000);
+        };
+    </script>
+    {% endif %}
 </body>
 </html>
