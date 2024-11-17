@@ -3,33 +3,63 @@
 {% block title %}Registrar Servicio{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Registrar Nuevo Servicio</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Registrar Nuevo Servicio</h1>
 
     <form method="post">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="equipo" class="form-label">Equipo</label>
-            {{ form.equipo }}
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Datos del Servicio</h4>
+                <div class="mb-3">
+                    <label for="equipo" class="form-label">Equipo</label>
+                    {{ servicio_form.equipo }}
+                </div>
+                <div class="mb-3">
+                    <label for="tecnico" class="form-label">Técnico</label>
+                    {{ servicio_form.tecnico }}
+                </div>
+                <div class="mb-3">
+                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                    {{ servicio_form.fecha_inicio }}
+                </div>
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    {{ servicio_form.estado }}
+                </div>
+                <div class="mb-3">
+                    <label for="costo" class="form-label">Costo</label>
+                    {{ servicio_form.costo }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h4>Repuestos</h4>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    {{ repuesto_form.nombre }}
+                </div>
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    {{ repuesto_form.descripcion }}
+                </div>
+                <div class="mb-3">
+                    <label for="costo" class="form-label">Costo</label>
+                    {{ repuesto_form.costo }}
+                </div>
+                <div class="mb-3">
+                    <label for="cantidad" class="form-label">Cantidad</label>
+                    {{ repuesto_form.cantidad }}
+                </div>
+                <div class="mb-3">
+                    <label for="proveedor" class="form-label">Proveedor</label>
+                    {{ repuesto_form.proveedor }}
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="tecnico" class="form-label">Técnico</label>
-            {{ form.tecnico }}
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Registrar Servicio</button>
+            <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Cancelar</a>
         </div>
-        <div class="mb-3">
-            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-            {{ form.fecha_inicio }}
-        </div>
-        <div class="mb-3">
-            <label for="estado" class="form-label">Estado</label>
-            {{ form.estado }}
-        </div>
-        <div class="mb-3">
-            <label for="costo" class="form-label">Costo</label>
-            {{ form.costo }}
-        </div>
-        <button type="submit" class="btn btn-primary">Registrar Servicio</button>
-        <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

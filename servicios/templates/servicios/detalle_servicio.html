@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Servicio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Detalle del Servicio</h1>
+    <p><strong>Equipo:</strong> {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</p>
+    <p><strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}</p>
+    <p><strong>Técnico:</strong> {{ servicio.tecnico.nombre }}</p>
+    <p><strong>Estado:</strong> {{ servicio.estado }}</p>
+    <p><strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d M, Y" }}</p>
+    <p><strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin|date:"d M, Y" }}</p>
+    <p><strong>Diagnóstico Inicial:</strong> {{ servicio.diagnostico_inicial }}</p>
+    <p><strong>Calificación:</strong> {{ servicio.calificacion }}</p>
+    <p><strong>Comentarios del Cliente:</strong> {{ servicio.comentario_cliente }}</p>
+
+    <h2>Repuestos Utilizados</h2>
+    <ul>
+        {% for repuesto in repuestos %}
+            <li>
+                {{ repuesto.nombre }} ({{ repuesto.cantidad }} unidades, Costo: {{ repuesto.costo }} cada uno)
+                <br>
+                Proveedor: {{ repuesto.proveedor }}
+            </li>
+        {% empty %}
+            <p>No se han registrado repuestos.</p>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'lista_servicios' %}" class="btn btn-primary">Volver a la lista</a>
+</div>
+{% endblock %}

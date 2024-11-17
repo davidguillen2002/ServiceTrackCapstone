@@ -1,19 +1,22 @@
-<div class="service-list">
-    {% for servicio in servicios %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">{{ servicio.equipo.modelo }}</h5>
-                <p class="card-text">
-                    Cliente: {{ servicio.equipo.cliente.nombre }}<br>
-                    Técnico: {{ servicio.tecnico.nombre }}<br>
-                    Estado: {{ servicio.estado }}<br>
-                    Fecha de Inicio: {{ servicio.fecha_inicio }}<br>
-                    Fecha de Finalización: {{ servicio.fecha_fin }}
-                </p>
-                <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-primary">Ver Detalle</a>
-            </div>
-        </div>
-    {% empty %}
-        <p>No se encontraron servicios que coincidan con los criterios de búsqueda.</p>
-    {% endfor %}
+{% for servicio in servicios %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</h5>
+        <p class="card-text">
+            <strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}<br>
+            <strong>Técnico:</strong> {{ servicio.tecnico.nombre }}<br>
+            <strong>Estado:</strong>
+            <span class="badge {% if servicio.estado == 'pendiente' %}bg-warning{% elif servicio.estado == 'en_progreso' %}bg-primary{% else %}bg-success{% endif %}">
+                {{ servicio.estado|capfirst }}
+            </span><br>
+            <strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d M, Y" }}<br>
+            <strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin|default:"N/A" }}
+        </p>
+        <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-info">Ver Detalle</a>
+        <a href="{% url 'historial_servicios' servicio.equipo.id %}" class="btn btn-primary">Ver Historial</a>
+        <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-secondary">Actualizar</a>
+    </div>
 </div>
+{% empty %}
+<p>No se encontraron servicios.</p>
+{% endfor %}

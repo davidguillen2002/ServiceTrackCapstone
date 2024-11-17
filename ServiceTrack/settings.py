@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'authentication',
     'reportes',
     'notificaciones',
+    "channels",
 ]
 
 
@@ -78,8 +79,16 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ServiceTrack.wsgi.application'
+ASGI_APPLICATION = 'ServiceTrack.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Puerto por defecto de Redis
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
