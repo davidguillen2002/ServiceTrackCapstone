@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Historial de Reportes{% endblock %}
+
 {% block content %}
 <div class="container my-5">
     <h1>Historial de Reportes Generados</h1>
@@ -15,7 +16,7 @@
         <tbody>
             {% for reporte in reportes %}
             <tr>
-                <td>{{ reporte.fecha_generacion }}</td>
+                <td>{{ reporte.fecha_generacion|date:"d/m/Y H:i" }}</td>
                 <td>{{ reporte.tipo_reporte }}</td>
                 <td>{{ reporte.generado_por.nombre }}</td>
                 <td><a href="{{ reporte.archivo.url }}" class="btn btn-primary">Descargar</a></td>
