@@ -61,6 +61,9 @@
                             </li>
                         {% elif user.rol.nombre == "cliente" %}
                             <li class="nav-item">
+                                <a class="nav-link" href="{% url 'panel_cliente' %}">Mi Panel</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
                             </li>
                         {% endif %}
@@ -101,7 +104,6 @@
 
         // Manejar mensajes recibidos del WebSocket
         socket.onmessage = function (e) {
-            console.log("Mensaje recibido:", e.data);
             const data = JSON.parse(e.data);
 
             // Actualiza la campana de notificaciones dinámicamente
@@ -116,20 +118,18 @@
                 bellIcon.appendChild(span);
             }
 
-            // Mostrar una alerta con la notificación
+            // Mostrar una alerta opcional (puede ser reemplazado por UI dinámica)
             alert(`Nueva notificación: ${data.mensaje}`);
         };
 
-        // Mostrar mensaje en consola al establecer conexión
         socket.onopen = function () {
             console.log("Conexión WebSocket establecida.");
         };
 
-        // Manejo de desconexión automática
         socket.onclose = function () {
             console.error("Conexión WebSocket cerrada.");
             setTimeout(() => {
-                location.reload(); // Recargar la página para reintentar conexión
+                location.reload();
             }, 5000);
         };
     </script>

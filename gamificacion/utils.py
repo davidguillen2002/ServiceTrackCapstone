@@ -78,32 +78,30 @@ def asignar_medalla(usuario):
 
 
 def generar_recomendaciones_para_tecnico(tecnico):
-    """
-    Generates intelligent recommendations for a technician based on their performance.
-    """
     recomendaciones = []
 
-    # 1. Analyze average service time
+    # Análisis del tiempo promedio de servicio
     promedio_tiempo = tecnico.calcular_promedio_tiempo_servicio()
     if promedio_tiempo and promedio_tiempo > 7:
-        recomendaciones.append("Reduce el tiempo promedio de tus servicios a menos de 7 días para mejorar la eficiencia.")
+        recomendaciones.append("Reduce tu tiempo promedio de servicio para mejorar la eficiencia.")
 
-    # 2. Analyze low ratings
+    # Calificaciones bajas
     calificaciones_bajas = tecnico.servicios_con_baja_calificacion()
     if calificaciones_bajas > 5:
-        recomendaciones.append("Revisa los comentarios y calificaciones bajas. Mejora la calidad de tus servicios.")
+        recomendaciones.append("Revisa los servicios con calificaciones bajas y busca áreas de mejora.")
 
-    # 3. Identify recurring incident patterns
-    servicios_incidentes = Servicio.objects.filter(tecnico=tecnico, observaciones__isnull=False).count()
-    if servicios_incidentes > 3:
-        recomendaciones.append("Analiza los incidentes frecuentes en tus servicios y busca soluciones proactivas.")
+    # Patrones de incidentes
+    incidentes = Servicio.objects.filter(tecnico=tecnico, observaciones__isnull=False).count()
+    if incidentes > 3:
+        recomendaciones.append("Analiza los incidentes frecuentes para prevenir futuros problemas.")
 
-    # 4. Provide personalized growth suggestions
-    if tecnico.puntos < 100:
-        recomendaciones.append("Completa más servicios con buenas calificaciones para ganar más puntos y recompensas.")
+    # Nuevas recomendaciones basadas en desempeño general
+    if tecnico.puntos < 300:
+        recomendaciones.append("Completa más servicios con altas calificaciones para aumentar tu puntaje.")
+    elif tecnico.calificacion_promedio < 4:
+        recomendaciones.append("Apunta a un promedio de calificación de 4 o más para desbloquear retos premium.")
 
     return recomendaciones
-
 
 def asignar_retos_dinamicos(tecnico):
     """

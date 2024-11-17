@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Notificaciones de KPIs{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Notificaciones de KPIs</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Mensaje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notificacion in notificaciones %}
+            <tr>
+                <td>{{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                <td>{{ notificacion.tipo }}</td>
+                <td>{{ notificacion.mensaje }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'panel_reportes' %}" class="btn btn-secondary mt-3">Volver al Panel de Reportes</a>
+</div>
+{% endblock %}
