@@ -1,10 +1,10 @@
 # gamificacion/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg
 from ServiceTrack.models import Usuario, Medalla, Reto, RegistroPuntos, RetoUsuario, Guia, ObservacionIncidente, Servicio, Notificacion
 from .forms import GuiaForm, ObservacionIncidenteForm, RetoForm, MedallaForm
-from .utils import otorgar_puntos_por_servicio, verificar_retos, asignar_medalla
+from .utils import otorgar_puntos_por_servicio, verificar_retos, asignar_medalla, generar_recomendaciones_para_tecnico, asignar_retos_dinamicos
 from django import forms
 from django.contrib import messages
 
@@ -26,14 +26,11 @@ def otorgar_puntos_view(request):
             puntos = form.cleaned_data['puntos']
             descripcion = form.cleaned_data['descripcion']
 
-            # Otorgar puntos al usuario
             usuario.puntos += puntos
             usuario.save()
 
-            # Registrar en RegistroPuntos
             RegistroPuntos.objects.create(usuario=usuario, puntos_obtenidos=puntos, descripcion=descripcion)
 
-            # Update challenges and medals as needed
             verificar_retos(usuario)
             asignar_medalla(usuario)
 
@@ -47,10 +44,66 @@ def otorgar_puntos_view(request):
 @login_required
 def perfil_gamificacion(request):
     usuario = request.user
-    puntos = usuario.puntos  # Fetch points directly from the user's stored data
-    medallas = usuario.medallas.all()  # Fetch existing medals
+    if usuario.rol.nombre != "tecnico":
+        messages.error(request, "Acceso denegado.")
+        return redirect("home")
+
+    puntos = usuario.puntos
+    medallas = usuario.medallas.all()
+    recomendaciones = generar_recomendaciones_para_tecnico(usuario)
+    asignar_retos_dinamicos(usuario)
+
+    # Retos
+    retos_disponibles = Reto.objects.exclude(retousuario__usuario=usuario, retousuario__cumplido=True)
+    retos_completados = Reto.objects.filter(retousuario__usuario=usuario, retousuario__cumplido=True)
+
+    # Progreso gráfico de medallas
+    total_medallas = Medalla.objects.count()
+    progreso_medallas = round((medallas.count() / total_medallas) * 100, 2) if total_medallas > 0 else 0
+
+    # Calificación promedio
+    calificacion_promedio = Servicio.objects.filter(tecnico=usuario, estado='completado').aggregate(promedio=Avg('calificacion'))['promedio'] or 0
+
     return render(request, 'gamificacion/perfil_gamificacion.html', {
-        'usuario': usuario, 'puntos': puntos, 'medallas': medallas
+        'usuario': usuario,
+        'puntos': puntos,
+        'medallas': medallas,
+        'recomendaciones': recomendaciones,
+        'retos_disponibles': retos_disponibles,
+        'retos_completados': retos_completados,
+        'progreso_medallas': progreso_medallas,
+        'calificacion_promedio': round(calificacion_promedio, 2),
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    tecnicos = Usuario.objects.filter(rol__nombre="tecnico")
+    total_tecnicos = tecnicos.count()
+    total_puntos = RegistroPuntos.objects.aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
+    total_retos = Reto.objects.count()
+    total_medallas = Medalla.objects.count()
+
+    progreso_tecnicos = [
+        {
+            'nombre': tecnico.nombre,
+            'puntos_acumulados': RegistroPuntos.objects.filter(usuario=tecnico).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0,
+            'retos_completados': tecnico.retousuario_set.filter(cumplido=True).count(),
+            'medallas_desbloqueadas': tecnico.medallas.count(),
+            'calificacion_promedio': round(
+                Servicio.objects.filter(tecnico=tecnico, estado='completado').aggregate(promedio=Avg('calificacion'))['promedio'] or 0,
+                2
+            ),
+        }
+        for tecnico in tecnicos
+    ]
+
+    return render(request, 'gamificacion/admin_dashboard.html', {
+        'total_tecnicos': total_tecnicos,
+        'total_puntos': total_puntos,
+        'total_retos': total_retos,
+        'total_medallas': total_medallas,
+        'progreso_tecnicos': progreso_tecnicos,
     })
 
 @login_required
@@ -63,39 +116,6 @@ def retos_disponibles(request):
         'retos_pendientes': retos_pendientes,
         'retos_completados': retos_completados
     })
-
-@login_required
-@user_passes_test(is_admin)
-def admin_dashboard(request):
-    tecnicos = Usuario.objects.filter(rol__nombre="tecnico")
-    total_tecnicos = tecnicos.count()
-    total_puntos = RegistroPuntos.objects.aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
-    total_retos = Reto.objects.count()
-    total_medallas = Medalla.objects.count()
-
-    progreso_tecnicos = []
-    for tecnico in tecnicos:
-        retos_completados = tecnico.retousuario_set.filter(cumplido=True).count()
-        medallas_desbloqueadas = tecnico.medallas.count()
-        puntos_acumulados = RegistroPuntos.objects.filter(usuario=tecnico).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
-        calificacion_promedio = Servicio.objects.filter(tecnico=tecnico, estado='completado').aggregate(promedio=Sum('calificacion') / Count('calificacion'))['promedio'] or 0
-        progreso_tecnicos.append({
-            'nombre': tecnico.nombre,
-            'puntos_acumulados': puntos_acumulados,
-            'retos_completados': retos_completados,
-            'medallas_desbloqueadas': medallas_desbloqueadas,
-            'calificacion_promedio': round(calificacion_promedio, 2)
-        })
-
-    context = {
-        'total_tecnicos': total_tecnicos,
-        'total_puntos': total_puntos,
-        'total_retos': total_retos,
-        'total_medallas': total_medallas,
-        'progreso_tecnicos': progreso_tecnicos,
-    }
-
-    return render(request, 'gamificacion/admin_dashboard.html', context)
 
 @login_required
 def historial_puntos(request):
