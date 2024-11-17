@@ -1,0 +1,132 @@
+<!-- seguimiento/templates/seguimiento/panel_cliente.html -->
+{% extends "base.html" %}
+{% block title %}Panel del Cliente{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Panel del Cliente</h1>
+
+    <!-- Tabla de Servicios -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Equipo</th>
+                    <th>Estado</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha Estimada de Finalización</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</td>
+                    <td>
+                        <span class="badge
+                            {% if servicio.estado == 'completado' %}bg-success
+                            {% elif servicio.estado == 'en_progreso' %}bg-warning
+                            {% else %}bg-secondary{% endif %}">{{ servicio.estado|capfirst }}</span>
+                    </td>
+                    <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
+                    <td>{{ servicio.fecha_fin|default:"N/A"|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'detalle_equipo_cliente' servicio.equipo.id %}" class="btn btn-primary btn-sm">Ver Detalles</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mt-5">
+        <!-- Gráfico de Calificación -->
+        <div class="col-md-4">
+            <h5 class="text-center">Promedio de Calificaciones</h5>
+            <canvas id="calificacionChart" style="width:100%; height:250px;"></canvas>
+        </div>
+        <!-- Gráfico de Servicios Completados -->
+        <div class="col-md-4">
+            <h5 class="text-center">Servicios Completados</h5>
+            <canvas id="serviciosChart" style="width:100%; height:250px;"></canvas>
+        </div>
+        <!-- Gráfico de Costos Totales -->
+        <div class="col-md-4">
+            <h5 class="text-center">Costos Totales ($)</h5>
+            <canvas id="costosChart" style="width:100%; height:250px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Calificaciones
+    const calificacionCtx = document.getElementById('calificacionChart').getContext('2d');
+    new Chart(calificacionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Promedio Calificación', 'Restante'],
+            datasets: [{
+                data: [{{ promedio_calificacion|default:0 }}, 5 - {{ promedio_calificacion|default:0 }}],
+                backgroundColor: ['rgba(75, 192, 192, 0.5)', 'rgba(211, 211, 211, 0.5)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(211, 211, 211, 1)']
+            }]
+        },
+        options: { plugins: { legend: { position: 'top' } } }
+    });
+
+    // Gráfico de Servicios Completados
+    const serviciosCtx = document.getElementById('serviciosChart').getContext('2d');
+    new Chart(serviciosCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Servicios Completados'],
+            datasets: [{
+                data: [{{ servicios_completados }}],
+                backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                borderColor: 'rgba(153, 102, 255, 1)'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Gráfico de Costos Totales
+    const costosCtx = document.getElementById('costosChart').getContext('2d');
+    new Chart(costosCtx, {
+        type: 'bar',  // Cambiado de 'line' a 'bar'
+        data: {
+            labels: ['Costos Totales'],
+            datasets: [{
+                data: [{{ costo_total|default:0 }}],
+                backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                borderColor: 'rgba(255, 159, 64, 1)'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Dólares ($)'
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Análisis de Repuestos{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">Análisis de Repuestos</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Repuesto</th>
+                <th>Total de Uso</th>
+                <th>Tasa de Fallas (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repuesto in repuestos %}
+            <tr>
+                <td>{{ repuesto.nombre }}</td>
+                <td>{{ repuesto.total_uso }}</td>
+                <td>{{ repuesto.tasa_fallas|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'panel_reportes' %}" class="btn btn-secondary mt-3">Regresar al Panel de Reportes</a>
+</div>
+{% endblock %}

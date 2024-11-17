@@ -101,31 +101,20 @@ class Notificacion(models.Model):
 
     @classmethod
     def crear_notificacion(cls, usuario, tipo, mensaje):
-        """
-        Crea una notificación y envía un mensaje al WebSocket.
-        """
         notificacion = cls.objects.create(usuario=usuario, tipo=tipo, mensaje=mensaje)
-
-        # Enviar notificación al WebSocket
         channel_layer = get_channel_layer()
-        try:
-            async_to_sync(channel_layer.group_send)(
-                f"notificaciones_{usuario.id}",
-                {
-                    "type": "send_notification",
-                    "data": {
-                        "id": notificacion.id,
-                        "tipo": tipo,
-                        "mensaje": mensaje,
-                        "leido": notificacion.leido,
-                        "fecha_creacion": notificacion.fecha_creacion.strftime("%Y-%m-%d %H:%M:%S"),
-                    },
-                }
-            )
-            print(f"Mensaje enviado al grupo: notificaciones_{usuario.id}")
-        except Exception as e:
-            print(f"Error enviando mensaje al grupo WebSocket: {e}")
-
+        async_to_sync(channel_layer.group_send)(
+            f"notificaciones_{usuario.id}",
+            {
+                "type": "send_notification",
+                "data": {
+                    "id": notificacion.id,
+                    "tipo": tipo,
+                    "mensaje": mensaje,
+                    "fecha_creacion": notificacion.fecha_creacion.strftime("%Y-%m-%d %H:%M:%S"),
+                },
+            }
+        )
         return notificacion
 
     @staticmethod

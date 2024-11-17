@@ -3,15 +3,68 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from ServiceTrack.models import Usuario
+from ServiceTrack.models import Usuario, Servicio, Reto
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.hashers import make_password
 from django import forms
+from django.db.models import Avg, Count, F, Sum
 
 @login_required
 def dashboard_view(request):
-    """Vista del dashboard."""
-    return render(request, 'dashboard/knowledge_dashboard.html')
+    # Servicios completados por técnico
+    servicios_por_tecnico = list(
+        Servicio.objects.filter(estado='completado')
+        .values('tecnico__nombre')
+        .annotate(total=Count('id'))
+    )
+
+    # Servicios completados por mes
+    servicios_por_mes = list(
+        Servicio.objects.filter(estado='completado')
+        .annotate(mes=F('fecha_inicio__month'))
+        .values('mes')
+        .annotate(total=Count('id'))
+    )
+
+    # KPIs generales
+    tecnicos_kpis = Usuario.objects.filter(rol__nombre='tecnico').annotate(
+        total_servicios_completados=Count(
+            'tecnico_servicios', filter=F('tecnico_servicios__estado') == 'completado'
+        ),
+        puntuacion_clientes=Avg('tecnico_servicios__calificacion'),
+        tiempo_resolucion=Avg(
+            F('tecnico_servicios__fecha_fin') - F('tecnico_servicios__fecha_inicio')
+        ),
+    )
+
+    # Rendimiento de técnicos
+    tecnicos_rendimiento = Usuario.objects.filter(rol__nombre='tecnico').annotate(
+        servicios_realizados=Count('tecnico_servicios'),
+        rendimiento=(Count('tecnico_servicios', filter=F('tecnico_servicios__estado') == 'completado') * 100)
+        / Count('tecnico_servicios'),
+        total_puntos=Sum('puntos'),  # Renombrado para evitar conflictos
+        logros=Count('medallas'),
+    )
+
+    # Progreso general de técnicos
+    tecnicos_proceso = Usuario.objects.filter(rol__nombre='tecnico').annotate(
+        progreso_servicios=Count('tecnico_servicios', filter=F('tecnico_servicios__estado') == 'en_progreso'),
+        puntos_totales=Sum('puntos'),  # Renombrado para evitar conflictos
+        ultimo_logro=F('medallas__nombre'),
+    )
+
+    # Retos dinámicos
+    retos = Reto.objects.all()
+
+    context = {
+        'servicios_por_tecnico': servicios_por_tecnico,
+        'servicios_por_mes': servicios_por_mes,
+        'tecnicos_kpis': tecnicos_kpis,
+        'tecnicos_rendimiento': tecnicos_rendimiento,
+        'tecnicos_proceso': tecnicos_proceso,
+        'retos': retos,
+    }
+    return render(request, 'dashboard/dashboard.html', context)
 
 class UsuarioForm(forms.ModelForm):
     """Formulario personalizado para usuarios."""

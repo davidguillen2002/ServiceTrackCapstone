@@ -8,49 +8,49 @@
     <p class="text-center text-muted">Visualiza el rendimiento de los técnicos y los servicios en tiempo real.</p>
 
     <!-- Gráficas de rendimiento -->
-    <div class="row my-4">
-        <div class="col-md-6">
-            <h3 class="text-center">Rendimiento de los Técnicos</h3>
+    <div class="row justify-content-center my-4">
+        <div class="col-md-6 text-center">
+            <h3>Rendimiento de los Técnicos</h3>
             <canvas id="technicianPerformanceChart"></canvas>
         </div>
-        <div class="col-md-6">
-            <h3 class="text-center">Servicios Completados por Mes</h3>
+        <div class="col-md-6 text-center">
+            <h3>Servicios Completados por Mes</h3>
             <canvas id="monthlyCompletedServicesChart"></canvas>
         </div>
     </div>
 
     <!-- Tabla de KPIs -->
     <h2 class="mt-5">Indicadores Clave de Rendimiento (KPIs)</h2>
-    <table class="table table-striped mt-3">
+    <table class="table table-striped text-center mt-3">
         <thead class="table-dark">
             <tr>
                 <th>Técnico</th>
                 <th>Servicios Completados</th>
                 <th>Puntuación de Clientes</th>
-                <th>Tiempo Medio de Resolución (hrs)</th>
+                <th>Tiempo Medio de Resolución (días)</th>
             </tr>
         </thead>
         <tbody>
             {% for tecnico in tecnicos_kpis %}
                 <tr>
                     <td>{{ tecnico.nombre }}</td>
-                    <td>{{ tecnico.servicios_completados }}</td>
-                    <td>{{ tecnico.puntuacion_clientes }}</td>
-                    <td>{{ tecnico.tiempo_resolucion }}</td>
+                    <td>{{ tecnico.total_servicios_completados|default:"0" }}</td>
+                    <td>{{ tecnico.puntuacion_clientes|floatformat:2|default:"N/A" }}</td>
+                    <td>{{ tecnico.tiempo_resolucion.days|default:"N/A" }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <!-- Tabla de rendimiento de técnicos -->
-    <h2 class="mt-5">Rendimiento de los técnicos</h2>
-    <table class="table table-hover mt-3">
+    <h2 class="mt-5">Rendimiento de los Técnicos</h2>
+    <table class="table table-hover text-center mt-3">
         <thead class="table-dark">
             <tr>
                 <th>Técnico</th>
                 <th>Servicios Realizados</th>
                 <th>Rendimiento (%)</th>
-                <th>Puntos</th>
+                <th>Total Puntos</th>
                 <th>Logros</th>
             </tr>
         </thead>
@@ -59,37 +59,31 @@
                 <tr>
                     <td>{{ tecnico.nombre }}</td>
                     <td>{{ tecnico.servicios_realizados }}</td>
-                    <td>{{ tecnico.rendimiento }}%</td>
-                    <td>{{ tecnico.puntos }}</td>
-                    <td>{{ tecnico.logros }}</td>
+                    <td>{{ tecnico.rendimiento|floatformat:2|default:"0" }}%</td>
+                    <td>{{ tecnico.total_puntos|default:"0" }}</td>
+                    <td>{{ tecnico.logros|default:"0" }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Retos a conseguir -->
+    <!-- Retos dinámicos -->
     <h2 class="mt-5 text-center">Retos a conseguir</h2>
-    <p class="text-center text-muted">Aprende cómo solucionar problemas de conexión en dispositivos técnicos.</p>
     <div class="row justify-content-center">
-        <div class="col-md-6 mb-3">
+        {% for reto in retos %}
+        <div class="col-md-4 mb-3">
             <div class="card text-center shadow-sm p-3">
-                <p>Completa 10 Servicios en una Semana</p>
-                <p><strong>Recompensa:</strong> 500 puntos</p>
-                <button class="btn btn-dark">Ver Reto</button>
+                <h5 class="fw-bold">{{ reto.nombre }}</h5>
+                <p>{{ reto.descripcion }}</p>
+                <p><strong>Recompensa:</strong> {{ reto.puntos_otorgados }} puntos</p>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <div class="card text-center shadow-sm p-3">
-                <p>Alcanza un Rendimiento del 90%</p>
-                <p><strong>Recompensa:</strong> 700 puntos</p>
-                <button class="btn btn-dark">Ver Reto</button>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- Proceso General de Técnicos -->
+    <!-- Progreso general de técnicos -->
     <h2 class="mt-5">Proceso General de Técnicos</h2>
-    <table class="table table-hover mt-3">
+    <table class="table table-hover text-center mt-3">
         <thead class="table-dark">
             <tr>
                 <th>Técnico</th>
@@ -102,57 +96,37 @@
             {% for tecnico in tecnicos_proceso %}
                 <tr>
                     <td>{{ tecnico.nombre }}</td>
-                    <td>{{ tecnico.progreso_servicios }}</td>
-                    <td>{{ tecnico.puntos_totales }}</td>
-                    <td>{{ tecnico.ultimo_logro }}</td>
+                    <td>{{ tecnico.progreso_servicios|default:"0" }}</td>
+                    <td>{{ tecnico.puntos_totales|default:"0" }}</td>
+                    <td>{{ tecnico.ultimo_logro|default:"Sin logros" }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<!-- Scripts para cargar gráficas -->
+<!-- Gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Gráfica de Rendimiento de los Técnicos
-    var technicianPerformanceCtx = document.getElementById('technicianPerformanceChart').getContext('2d');
-    var technicianPerformanceChart = new Chart(technicianPerformanceCtx, {
+    const technicianPerformanceData = {{ servicios_por_tecnico|safe }};
+    const monthlyServicesData = {{ servicios_por_mes|safe }};
+
+    new Chart(document.getElementById('technicianPerformanceChart'), {
         type: 'bar',
         data: {
-            labels: ['Juan Pérez', 'María García', 'Pedro Ortiz'],
-            datasets: [{
-                label: 'Servicios Completados',
-                data: [45, 52, 38],
-                backgroundColor: '#007bff',
-            }]
+            labels: technicianPerformanceData.map(item => item.tecnico__nombre),
+            datasets: [{ label: 'Servicios Completados', data: technicianPerformanceData.map(item => item.total) }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            }
-        }
+        options: { responsive: true }
     });
 
-    // Gráfica de Servicios Completados por Mes
-    var monthlyCompletedServicesCtx = document.getElementById('monthlyCompletedServicesChart').getContext('2d');
-    var monthlyCompletedServicesChart = new Chart(monthlyCompletedServicesCtx, {
+    new Chart(document.getElementById('monthlyCompletedServicesChart'), {
         type: 'line',
         data: {
-            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-            datasets: [{
-                label: 'Servicios Completados',
-                data: [20, 25, 30, 28, 40, 35],
-                borderColor: '#28a745',
-                fill: false,
-            }]
+            labels: monthlyServicesData.map(item => `Mes ${item.mes}`),
+            datasets: [{ label: 'Servicios Completados', data: monthlyServicesData.map(item => item.total) }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            }
-        }
+        options: { responsive: true }
     });
 </script>
 {% endblock %}

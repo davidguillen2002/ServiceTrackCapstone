@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Análisis de Incidentes{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">Análisis de Incidentes</h1>
+
+    <!-- Tabla de incidentes -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Diagnóstico Inicial</th>
+                <th>Recuento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incidente in incidentes %}
+            <tr>
+                <td>{{ incidente.diagnostico_inicial }}</td>
+                <td>{{ incidente.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Gráfica -->
+    <h2 class="text-center mt-5">Gráfica de Incidentes</h2>
+    <canvas id="incidentChart" width="400" height="200"></canvas>
+
+    <a href="{% url 'panel_reportes' %}" class="btn btn-secondary mt-3">Regresar al Panel de Reportes</a>
+</div>
+
+<!-- Scripts para la gráfica -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('incidentChart').getContext('2d');
+    const incidentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ diagnosticos|safe }},
+            datasets: [{
+                label: 'Recuento de Incidentes',
+                data: {{ totales|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

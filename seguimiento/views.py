@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from ServiceTrack.models import Equipo, Servicio, Notificacion, Usuario
 from .forms import ServicioEstadoForm, ResenaForm
+from django.db import models
 
 # Helper to check if the user is a technician
 def is_tecnico(user):
@@ -93,4 +94,27 @@ def detalle_servicio_tecnico(request, servicio_id):
     servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
     return render(request, 'seguimiento/detalle_servicio_tecnico.html', {
         'servicio': servicio,
+    })
+
+
+@login_required
+@user_passes_test(is_cliente)
+def panel_cliente(request):
+    # Filtrar los servicios del cliente actual
+    servicios = Servicio.objects.filter(equipo__cliente=request.user)
+
+    # Calcular las estadísticas necesarias para el gráfico
+    promedio_calificacion = servicios.filter(estado='completado').aggregate(
+        models.Avg('calificacion')
+    )['calificacion__avg'] or 0
+    servicios_completados = servicios.filter(estado='completado').count()
+    costo_total = servicios.aggregate(
+        models.Sum('costo')
+    )['costo__sum'] or 0
+
+    return render(request, 'seguimiento/panel_cliente.html', {
+        'servicios': servicios,
+        'promedio_calificacion': round(promedio_calificacion, 2),  # Redondeamos para evitar decimales largos
+        'servicios_completados': servicios_completados,
+        'costo_total': round(costo_total, 2),  # Si es monetario, redondeamos a dos decimales
     })

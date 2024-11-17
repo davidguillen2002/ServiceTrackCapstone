@@ -1,17 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Panel de Reportes{% endblock %}
+
 {% block content %}
 <div class="container my-5">
-    <h1>Panel de Reportes</h1>
-    <p>Selecciona el formato para descargar el reporte de servicios completados:</p>
+    <h1 class="text-center">Panel de Reportes</h1>
+    <p class="text-center text-muted">Accede a diferentes opciones de reportes y análisis.</p>
 
-    {% if user.is_superuser or user.rol.nombre == "administrador" %}
-        <a href="{% url 'reporte_pdf' %}" class="btn btn-primary">Generar Reporte PDF Completo</a>
-        <a href="{% url 'reporte_excel' %}" class="btn btn-secondary">Generar Reporte Excel Completo</a>
-    {% elif user.rol.nombre == "tecnico" %}
-        <a href="{% url 'reporte_pdf' %}" class="btn btn-primary">Generar Reporte PDF Simplificado</a>
-        <a href="{% url 'reporte_excel' %}" class="btn btn-secondary">Generar Reporte Excel Simplificado</a>
-    {% endif %}
-    <a href="{% url 'historial_reportes' %}" class="btn btn-info mt-3">Ver Historial de Reportes</a>
+    <div class="row justify-content-center mt-5 g-3">
+        <!-- Botones de reportes principales -->
+        <div class="col-md-3">
+            <a href="{% url 'reporte_pdf' %}" class="btn btn-primary w-100 py-3">
+                Generar Reporte PDF
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'reporte_excel' %}" class="btn btn-secondary w-100 py-3">
+                Generar Reporte Excel
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-4 g-3">
+        <!-- Botones adicionales -->
+        <div class="col-md-3">
+            <a href="{% url 'historial_reportes' %}" class="btn btn-info w-100 py-3">
+                Ver Historial de Reportes
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'analizar_incidentes' %}" class="btn btn-warning w-100 py-3">
+                Análisis de Incidentes
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'notificaciones_kpis' %}" class="btn btn-danger w-100 py-3">
+                Notificaciones de KPIs
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'analizar_repuestos' %}" class="btn btn-success w-100 py-3">
+                Análisis de Repuestos
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}
