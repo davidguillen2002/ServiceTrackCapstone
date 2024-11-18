@@ -7,126 +7,204 @@
     <h1 class="text-center fw-bold">Panel de Control</h1>
     <p class="text-center text-muted">Visualiza el rendimiento de los técnicos y los servicios en tiempo real.</p>
 
-    <!-- Gráficas de rendimiento -->
+    <!-- Filtros -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-3">
+            <select name="mes" class="form-select">
+                <option value="">Seleccionar Mes</option>
+                {% for mes in meses %}
+                    <option value="{{ mes }}" {% if mes_filtrado == mes|stringformat:"d" %}selected{% endif %}>Mes {{ mes }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="tecnico" class="form-select">
+                <option value="">Seleccionar Técnico</option>
+                {% for tecnico in tecnicos_kpis %}
+                    <option value="{{ tecnico.id }}" {% if tecnico_filtrado == tecnico.id|stringformat:"d" %}selected{% endif %}>{{ tecnico.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary">Aplicar Filtros</button>
+        </div>
+    </form>
+
+    <!-- Gráficas -->
     <div class="row justify-content-center my-4">
         <div class="col-md-6 text-center">
-            <h3>Rendimiento de los Técnicos</h3>
-            <canvas id="technicianPerformanceChart"></canvas>
+            <h3>Servicios Completados por Técnico</h3>
+            {% if servicios_por_tecnico %}
+                <canvas id="technicianPerformanceChart"></canvas>
+            {% else %}
+                <p>No hay datos disponibles para el gráfico de rendimiento.</p>
+            {% endif %}
         </div>
         <div class="col-md-6 text-center">
-            <h3>Servicios Completados por Mes</h3>
-            <canvas id="monthlyCompletedServicesChart"></canvas>
+            <h3>Proporción de Estados de Servicios</h3>
+            {% if estados_servicios %}
+                <canvas id="serviceStatesChart"></canvas>
+            {% else %}
+                <p>No hay datos disponibles para el gráfico de estados de servicios.</p>
+            {% endif %}
         </div>
     </div>
 
     <!-- Tabla de KPIs -->
     <h2 class="mt-5">Indicadores Clave de Rendimiento (KPIs)</h2>
-    <table class="table table-striped text-center mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Técnico</th>
-                <th>Servicios Completados</th>
-                <th>Puntuación de Clientes</th>
-                <th>Tiempo Medio de Resolución (días)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tecnico in tecnicos_kpis %}
+    {% if tecnicos_kpis %}
+        <table class="table table-striped text-center mt-3">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ tecnico.nombre }}</td>
-                    <td>{{ tecnico.total_servicios_completados|default:"0" }}</td>
-                    <td>{{ tecnico.puntuacion_clientes|floatformat:2|default:"N/A" }}</td>
-                    <td>{{ tecnico.tiempo_resolucion.days|default:"N/A" }}</td>
+                    <th>Técnico</th>
+                    <th>Servicios Completados</th>
+                    <th>Puntuación de Clientes</th>
+                    <th>Tiempo Medio de Resolución (días)</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for tecnico in tecnicos_kpis %}
+                    <tr>
+                        <td>{{ tecnico.nombre }}</td>
+                        <td>{{ tecnico.total_servicios_completados|default:"0" }}</td>
+                        <td>{{ tecnico.puntuacion_clientes|floatformat:2|default:"N/A" }}</td>
+                        <td>{{ tecnico.tiempo_resolucion.days|default:"N/A" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">No hay datos de KPI disponibles.</p>
+    {% endif %}
 
     <!-- Tabla de rendimiento de técnicos -->
     <h2 class="mt-5">Rendimiento de los Técnicos</h2>
-    <table class="table table-hover text-center mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Técnico</th>
-                <th>Servicios Realizados</th>
-                <th>Rendimiento (%)</th>
-                <th>Total Puntos</th>
-                <th>Logros</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tecnico in tecnicos_rendimiento %}
+    {% if tecnicos_rendimiento %}
+        <table class="table table-hover text-center mt-3">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ tecnico.nombre }}</td>
-                    <td>{{ tecnico.servicios_realizados }}</td>
-                    <td>{{ tecnico.rendimiento|floatformat:2|default:"0" }}%</td>
-                    <td>{{ tecnico.total_puntos|default:"0" }}</td>
-                    <td>{{ tecnico.logros|default:"0" }}</td>
+                    <th>Técnico</th>
+                    <th>Servicios Realizados</th>
+                    <th>Rendimiento (%)</th>
+                    <th>Total Puntos</th>
+                    <th>Logros</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for tecnico in tecnicos_rendimiento %}
+                    <tr>
+                        <td>{{ tecnico.nombre }}</td>
+                        <td>{{ tecnico.servicios_realizados }}</td>
+                        <td>{{ tecnico.rendimiento|floatformat:2|default:"0" }}%</td>
+                        <td>{{ tecnico.total_puntos|default:"0" }}</td>
+                        <td>{{ tecnico.logros|default:"0" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">No hay datos de rendimiento disponibles.</p>
+    {% endif %}
 
     <!-- Retos dinámicos -->
     <h2 class="mt-5 text-center">Retos a conseguir</h2>
     <div class="row justify-content-center">
-        {% for reto in retos %}
-        <div class="col-md-4 mb-3">
-            <div class="card text-center shadow-sm p-3">
-                <h5 class="fw-bold">{{ reto.nombre }}</h5>
-                <p>{{ reto.descripcion }}</p>
-                <p><strong>Recompensa:</strong> {{ reto.puntos_otorgados }} puntos</p>
-            </div>
-        </div>
-        {% endfor %}
+        {% if retos %}
+            {% for reto in retos %}
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center shadow-sm p-3">
+                        <h5 class="fw-bold">{{ reto.nombre }}</h5>
+                        <p>{{ reto.descripcion }}</p>
+                        <p><strong>Recompensa:</strong> {{ reto.puntos_otorgados }} puntos</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No hay retos disponibles en este momento.</p>
+        {% endif %}
     </div>
 
     <!-- Progreso general de técnicos -->
-    <h2 class="mt-5">Proceso General de Técnicos</h2>
-    <table class="table table-hover text-center mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Técnico</th>
-                <th>Progreso de Servicios</th>
-                <th>Puntos Totales</th>
-                <th>Último Logro</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tecnico in tecnicos_proceso %}
+    <h2 class="mt-5">Progreso General de Técnicos</h2>
+    {% if tecnicos_proceso %}
+        <table class="table table-hover text-center mt-3">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ tecnico.nombre }}</td>
-                    <td>{{ tecnico.progreso_servicios|default:"0" }}</td>
-                    <td>{{ tecnico.puntos_totales|default:"0" }}</td>
-                    <td>{{ tecnico.ultimo_logro|default:"Sin logros" }}</td>
+                    <th>Técnico</th>
+                    <th>Progreso de Servicios</th>
+                    <th>Puntos Totales</th>
+                    <th>Último Logro</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for tecnico in tecnicos_proceso %}
+                    <tr>
+                        <td>{{ tecnico.nombre }}</td>
+                        <td>{{ tecnico.progreso_servicios|default:"0" }}</td>
+                        <td>{{ tecnico.puntos_totales|default:"0" }}</td>
+                        <td>{{ tecnico.ultimo_logro|default:"Sin logros" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">No hay progreso disponible para los técnicos.</p>
+    {% endif %}
 </div>
 
 <!-- Gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Servicios por técnico
     const technicianPerformanceData = {{ servicios_por_tecnico|safe }};
-    const monthlyServicesData = {{ servicios_por_mes|safe }};
+    if (technicianPerformanceData.length > 0) {
+        const technicianNames = technicianPerformanceData.map(item => item.tecnico__nombre);
+        const technicianTotals = technicianPerformanceData.map(item => item.total);
 
-    new Chart(document.getElementById('technicianPerformanceChart'), {
-        type: 'bar',
-        data: {
-            labels: technicianPerformanceData.map(item => item.tecnico__nombre),
-            datasets: [{ label: 'Servicios Completados', data: technicianPerformanceData.map(item => item.total) }]
-        },
-        options: { responsive: true }
-    });
+        new Chart(document.getElementById('technicianPerformanceChart'), {
+            type: 'bar',
+            data: {
+                labels: technicianNames,
+                datasets: [{
+                    label: 'Servicios Completados',
+                    data: technicianTotals,
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
 
-    new Chart(document.getElementById('monthlyCompletedServicesChart'), {
-        type: 'line',
-        data: {
-            labels: monthlyServicesData.map(item => `Mes ${item.mes}`),
-            datasets: [{ label: 'Servicios Completados', data: monthlyServicesData.map(item => item.total) }]
-        },
-        options: { responsive: true }
-    });
+    // Proporción de estados de servicios
+    const serviceStatesData = {{ estados_servicios|safe }};
+    if (serviceStatesData.length > 0) {
+        const stateLabels = serviceStatesData.map(item => item.estado);
+        const stateTotals = serviceStatesData.map(item => item.total);
+
+        new Chart(document.getElementById('serviceStatesChart'), {
+            type: 'pie',
+            data: {
+                labels: stateLabels,
+                datasets: [{
+                    label: 'Proporción de Estados',
+                    data: stateTotals,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
 </script>
 {% endblock %}

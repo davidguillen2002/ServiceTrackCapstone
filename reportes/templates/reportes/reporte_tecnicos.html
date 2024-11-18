@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Panel de Reportes para Técnicos{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">Panel de Reportes para Técnicos</h1>
+    <p class="text-center text-muted">Revisa y exporta tu información.</p>
+
+    <!-- KPIs -->
+    <div class="row text-center mt-5">
+        <div class="col-md-4">
+            <h5>Total de Servicios Completados</h5>
+            <h3>{{ total_servicios }}</h3>
+        </div>
+        <div class="col-md-4">
+            <h5>Promedio de Calificación</h5>
+            <h3>{{ promedio_calificacion }}</h3>
+        </div>
+        <div class="col-md-4">
+            <h5>Tiempo Promedio de Resolución (días)</h5>
+            <h3>{{ tiempo_promedio_resolucion }}</h3>
+        </div>
+    </div>
+
+    <!-- Exportar Reportes -->
+    <div class="row justify-content-center mt-4 g-3">
+        <div class="col-md-3">
+            <a href="{% url 'reporte_pdf_tecnico' %}" class="btn btn-primary w-100 py-3">
+                Exportar PDF
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'reporte_excel_tecnico' %}" class="btn btn-secondary w-100 py-3">
+                Exportar Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabla de Servicios -->
+    <div class="mt-5">
+        <h3>Servicios Realizados</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Equipo</th>
+                    <th>Estado</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Finalización</th>
+                    <th>Calificación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.equipo }}</td>
+                    <td>{{ servicio.estado }}</td>
+                    <td>{{ servicio.fecha_inicio }}</td>
+                    <td>{{ servicio.fecha_fin|default:"N/A" }}</td>
+                    <td>{{ servicio.calificacion|default:"N/A" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
