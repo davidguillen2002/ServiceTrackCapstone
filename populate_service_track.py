@@ -124,6 +124,8 @@ for equipo in equipos:
             comentario_cliente="Prueba automatizada para registrar datos.",
             diagnostico_inicial="Revisión inicial automática.",
             costo=round(randint(50, 500) + randint(0, 99) / 100, 2),
+            codigo_entrega=str(randint(100000, 999999)),  # Generar código de entrega
+            entrega_confirmada=False,  # Estado inicial de confirmación
         )
         if created:
             servicios.append(servicio)

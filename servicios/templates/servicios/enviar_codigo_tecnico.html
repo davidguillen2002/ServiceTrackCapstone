@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Enviar Código al Técnico{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Enviar Código al Técnico</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="codigo_entrega" class="form-label">Código de Entrega</label>
+            <input type="text" name="codigo_entrega" id="codigo_entrega" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Código</button>
+    </form>
+</div>
+{% endblock %}

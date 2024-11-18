@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Técnico{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center fw-bold">Dashboard Técnico</h1>
+    <p class="text-center text-muted">Revisa tu rendimiento y estadísticas personales.</p>
+
+    <!-- Filtros -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-3">
+            <select name="mes" class="form-select">
+                <option value="">Seleccionar Mes</option>
+                {% for mes in meses %}
+                    <option value="{{ mes }}" {% if mes_filtrado == mes|stringformat:"d" %}selected{% endif %}>Mes {{ mes }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
+    <!-- KPIs -->
+    <div class="row text-center my-4">
+        <div class="col-md-4">
+            <h5>Total de Servicios Completados</h5>
+            <h3>{{ total_servicios }}</h3>
+        </div>
+        <div class="col-md-4">
+            <h5>Promedio de Calificación</h5>
+            <h3>{{ promedio_calificacion|floatformat:2 }}</h3>
+        </div>
+        <div class="col-md-4">
+            <h5>Servicios en Progreso</h5>
+            <h3>{{ servicios_en_progreso }}</h3>
+        </div>
+    </div>
+
+    <!-- Gráfico de Progreso Mensual -->
+    <h2 class="mt-5 text-center">Progreso Mensual</h2>
+    <div class="d-flex justify-content-center my-4">
+        <canvas id="monthlyProgressChart" style="max-height: 400px;"></canvas>
+    </div>
+
+    <!-- Gráfico de Tiempos de Resolución -->
+    <h2 class="mt-5 text-center">Tiempos de Resolución por Servicio</h2>
+    <div class="d-flex justify-content-center my-4">
+        <canvas id="resolutionTimeChart" style="max-height: 400px;"></canvas>
+    </div>
+
+    <!-- Servicios Realizados -->
+    <h2 class="mt-5">Servicios Realizados</h2>
+    <table class="table table-hover text-center mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Equipo</th>
+                <th>Estado</th>
+                <th>Fecha de Inicio</th>
+                <th>Fecha de Finalización</th>
+                <th>Calificación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.equipo }}</td>
+                    <td>{{ servicio.estado }}</td>
+                    <td>{{ servicio.fecha_inicio }}</td>
+                    <td>{{ servicio.fecha_fin|default:"N/A" }}</td>
+                    <td>{{ servicio.calificacion|default:"N/A" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Gráficas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Progreso Mensual
+    const monthlyProgressData = {{ servicios_por_dia|safe }};
+    if (monthlyProgressData.length > 0) {
+        const days = monthlyProgressData.map(item => item.fecha);
+        const completedServices = monthlyProgressData.map(item => item.total);
+
+        const ctx1 = document.getElementById('monthlyProgressChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Servicios Completados',
+                    data: completedServices,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#FF9800',
+                    pointBorderColor: '#FF9800',
+                    pointHoverBackgroundColor: '#FF5722',
+                    pointHoverBorderColor: '#FF5722',
+                    tension: 0.4, // Hace el gráfico más suave
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `Servicios: ${tooltipItem.raw}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Días del Mes' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Cantidad de Servicios' } }
+                }
+            }
+        });
+    } else {
+        console.error("No hay datos para mostrar en el gráfico de progreso mensual.");
+    }
+
+    // Gráfico de Tiempos de Resolución
+    const resolutionTimeData = {{ tiempos_resolucion_data|safe }};
+    if (resolutionTimeData.length > 0) {
+        const sortedData = resolutionTimeData.sort((a, b) => a.tiempo - b.tiempo); // Ordenar por tiempo
+        const serviceLabels = sortedData.map(item => `Servicio ${item.servicio}`);
+        const resolutionTimes = sortedData.map(item => item.tiempo);
+
+        const ctx2 = document.getElementById('resolutionTimeChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: serviceLabels,
+                datasets: [{
+                    label: 'Horas de Resolución',
+                    data: resolutionTimes,
+                    backgroundColor: resolutionTimes.map((_, index) =>
+                        index % 2 === 0 ? 'rgba(33, 150, 243, 0.7)' : 'rgba(255, 87, 34, 0.7)'
+                    ),
+                    borderColor: resolutionTimes.map((_, index) =>
+                        index % 2 === 0 ? 'rgba(33, 150, 243, 1)' : 'rgba(255, 87, 34, 1)'
+                    ),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${tooltipItem.raw.toFixed(2)} horas`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Servicios (Ordenados por Tiempo)' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Horas' } }
+                }
+            }
+        });
+    } else {
+        console.error("No hay datos para mostrar en el gráfico de tiempos de resolución.");
+    }
+</script>
+{% endblock %}

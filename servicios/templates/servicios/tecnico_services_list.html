@@ -3,16 +3,27 @@
 {% block title %}Mis Servicios{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-5">
     <h1>Mis Servicios</h1>
-    <p>Selecciona un servicio para ver las guías recomendadas.</p>
+    <p>Selecciona un servicio para ver más opciones.</p>
     <ul class="list-group">
         {% for service in services %}
             <li class="list-group-item">
                 <h5>{{ service.equipo.marca }} {{ service.equipo.modelo }} ({{ service.equipo.anio }})</h5>
                 <p><strong>Fecha de Inicio:</strong> {{ service.fecha_inicio|date:"d/m/Y" }}</p>
                 <p><strong>Estado:</strong> {{ service.estado }}</p>
-                <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías Recomendadas</a>
+                <p><strong>Entrega Confirmada:</strong>
+                    {% if service.entrega_confirmada %}
+                        Sí
+                    {% else %}
+                        No
+                    {% endif %}
+                </p>
+                <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías</a>
+                <a href="{% url 'detalle_servicio' service.id %}" class="btn btn-outline-info btn-sm">Detalles</a>
+                {% if not service.entrega_confirmada %}
+                    <a href="{% url 'confirmar_entrega' service.id %}" class="btn btn-outline-success btn-sm">Confirmar Entrega</a>
+                {% endif %}
             </li>
         {% empty %}
             <li class="list-group-item text-center">No tienes servicios registrados.</li>

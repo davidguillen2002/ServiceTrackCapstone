@@ -14,4 +14,10 @@ urlpatterns = [
     path("eliminar_servicio/<int:servicio_id>/", views.eliminar_servicio, name="eliminar_servicio"),
     path("actualizar_servicio/<int:servicio_id>/", views.actualizar_servicio, name="actualizar_servicio"),  # Nueva URL para actualizar servicio
     path('equipo/<int:equipo_id>/historial/', views.historial_servicios, name='historial_servicios'),
+    path('servicio/<int:servicio_id>/confirmar_entrega/', views.confirmar_entrega, name='confirmar_entrega'),
+    path('usuarios/equipo/<int:equipo_id>/actualizar_estado/', views.actualizar_estado_equipo_tecnico,
+         name='actualizar_estado_equipo_tecnico'),
+    path('mis_servicios_cliente/', views.lista_servicios_cliente, name='lista_servicios_cliente'),
+path('enviar_codigo_tecnico/<int:servicio_id>/', views.enviar_codigo_tecnico, name='enviar_codigo_tecnico'),
+
 ]
