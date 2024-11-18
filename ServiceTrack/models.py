@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+import random
 
 
 # Manager para el modelo Usuario
@@ -119,19 +120,15 @@ class Notificacion(models.Model):
 
     @staticmethod
     def obtener_notificaciones_por_rol(usuario):
-        """
-        Devuelve las notificaciones filtradas por el rol del usuario.
-
-        - Técnicos: Todas las notificaciones relacionadas con su trabajo.
-        - Administradores: Notificaciones de tipo "nuevo_servicio" o "servicio_completado".
-        - Otros roles: Ninguna notificación (ajustable según necesidades).
-        """
         if usuario.rol.nombre == "tecnico":
             return Notificacion.objects.filter(usuario=usuario)
         elif usuario.rol.nombre == "administrador":
             return Notificacion.objects.filter(tipo__in=["nuevo_servicio", "servicio_completado"])
+        elif usuario.rol.nombre == "cliente":
+            return Notificacion.objects.filter(usuario=usuario)
         else:
             return Notificacion.objects.none()
+
 
 # Modelo Equipo
 class Equipo(models.Model):
@@ -170,12 +167,18 @@ class Servicio(models.Model):
     comentario_cliente = models.TextField(null=True, blank=True)
     diagnostico_inicial = models.TextField(null=True, blank=True)
     costo = models.DecimalField(max_digits=10, decimal_places=2)
+    codigo_entrega = models.CharField(max_length=6, null=True, blank=True)  # Código de validación único
+    entrega_confirmada = models.BooleanField(default=False)  # Estado de confirmación de entrega
 
     class Meta:
         ordering = ['-fecha_inicio']
 
     def __str__(self):
         return f"Servicio {self.id} - {self.equipo}"
+
+    def generar_codigo_entrega(self):
+        self.codigo_entrega = str(random.randint(100000, 999999))  # Generar código de 6 dígitos
+        self.save()
 
 class Repuesto(models.Model):
     nombre = models.CharField(max_length=100)

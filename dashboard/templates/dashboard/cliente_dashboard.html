@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Cliente{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center fw-bold">Dashboard Cliente</h1>
+    <p class="text-center text-muted">Visualiza el estado de tus equipos y servicios.</p>
+
+    <!-- Filtros -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-3">
+            <select name="mes" class="form-select">
+                <option value="">Seleccionar Mes</option>
+                {% for mes in meses %}
+                    <option value="{{ mes }}" {% if mes_filtrado == mes|stringformat:"d" %}selected{% endif %}>Mes {{ mes }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary">Aplicar Filtros</button>
+        </div>
+    </form>
+
+    <!-- KPIs -->
+    <div class="row text-center my-4">
+        <div class="col-md-4">
+            <h5>Total de Equipos Registrados</h5>
+            <h3>{{ total_equipos }}</h3>
+        </div>
+        <div class="col-md-4">
+            <h5>Costos Totales ($)</h5>
+            <h3>{{ costos_totales }}</h3>
+        </div>
+    </div>
+
+    <!-- Gráfico de Estados de Servicios -->
+    <h2 class="mt-5 text-center">Estado de los Servicios en el Mes</h2>
+    <div class="d-flex justify-content-center my-4">
+        <canvas id="serviceStatusBarChart" style="max-height: 400px;"></canvas>
+    </div>
+
+    <!-- Equipos Registrados -->
+    <h2 class="mt-5">Tus Equipos</h2>
+    <table class="table table-hover text-center mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipo in equipos %}
+                <tr>
+                    <td>{{ equipo.id }}</td>
+                    <td>{{ equipo.marca }}</td>
+                    <td>{{ equipo.modelo }}</td>
+                    <td>{{ equipo.tipo_equipo }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Scripts para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const serviceStatusData = {{ estados_servicios|safe }};
+    const ctx = document.getElementById('serviceStatusBarChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Estados de Servicios'],
+            datasets: [
+                {
+                    label: 'Pendiente',
+                    data: [serviceStatusData.pendiente],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'En Progreso',
+                    data: [serviceStatusData.en_progreso],
+                    backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Completado',
+                    data: [serviceStatusData.completado],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, position: 'top' },
+            },
+            scales: {
+                x: { stacked: true, title: { display: true, text: 'Estados' } },
+                y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Cantidad' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

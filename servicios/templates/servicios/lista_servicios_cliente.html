@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Servicios{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Mis Servicios</h1>
+    {% if servicios %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Equipo</th>
+                <th>Técnico</th>
+                <th>Estado</th>
+                <th>Fecha de Inicio</th>
+                <th>Entrega Confirmada</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.equipo }}</td>
+                <td>{{ servicio.tecnico }}</td>
+                <td>{{ servicio.estado }}</td>
+                <td>{{ servicio.fecha_inicio }}</td>
+                <td>{{ servicio.entrega_confirmada|yesno:"Sí,No" }}</td>
+                <td>
+                    {% if not servicio.entrega_confirmada %}
+                    <a href="{% url 'enviar_codigo_tecnico' servicio.id %}" class="btn btn-sm btn-success">
+                        Enviar Código
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+        <p>No tienes servicios registrados.</p>
+    {% endif %}
+</div>
+{% endblock %}
