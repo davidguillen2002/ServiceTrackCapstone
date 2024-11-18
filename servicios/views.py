@@ -3,10 +3,11 @@ from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
 from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo
+from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import ServicioForm, RepuestoForm
+from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 
@@ -18,6 +19,29 @@ def is_tecnico(user):
 def is_admin(user):
     return user.rol.nombre == "administrador"
 
+# Confirmar Entrega (El técnico valida el código proporcionado por el cliente)
+@login_required
+@user_passes_test(is_tecnico)
+def confirmar_entrega(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
+
+    if request.method == "POST":
+        form = ConfirmarEntregaForm(request.POST)
+        if form.is_valid():
+            codigo = form.cleaned_data['codigo_entrega']
+            if servicio.codigo_entrega == codigo:
+                servicio.entrega_confirmada = True
+                servicio.save()
+                messages.success(request, "La entrega ha sido confirmada exitosamente.")
+                return redirect('tecnico_services_list')
+            else:
+                messages.error(request, "El código ingresado es incorrecto.")
+    else:
+        form = ConfirmarEntregaForm()
+
+    return render(request, 'servicios/confirmar_entrega.html', {'form': form, 'servicio': servicio})
+
+# Registrar Servicio (Envío del código al cliente)
 @login_required
 @user_passes_test(is_admin)
 def registrar_servicio(request):
@@ -26,30 +50,17 @@ def registrar_servicio(request):
         repuesto_form = RepuestoForm(request.POST)
         if servicio_form.is_valid() and repuesto_form.is_valid():
             servicio = servicio_form.save(commit=False)
-
-            # Asignar el mejor técnico
-            tecnicos = Usuario.objects.filter(rol__nombre='tecnico').annotate(
-                rendimiento=ExpressionWrapper(
-                    Coalesce(F('calificacion_promedio'), 0.0) * Coalesce(F('servicios_completados'), 1),
-                    output_field=FloatField()
-                )
-            )
-            mejor_tecnico = tecnicos.order_by('-rendimiento').first()
-            servicio.tecnico = mejor_tecnico
+            servicio.generar_codigo_entrega()  # Genera un código único
             servicio.save()
 
-            # Guardar repuesto asociado
-            repuesto = repuesto_form.save(commit=False)
-            repuesto.servicio = servicio
-            repuesto.save()
-
-            # Crear notificación al técnico
+            # Enviar notificación al cliente
             Notificacion.crear_notificacion(
-                usuario=mejor_tecnico,
-                tipo='nuevo_servicio',
-                mensaje=f"Nuevo servicio asignado al equipo {servicio.equipo.marca} {servicio.equipo.modelo}."
+                usuario=servicio.equipo.cliente,
+                tipo="codigo_entrega",
+                mensaje=f"Su código de entrega para el servicio del equipo {servicio.equipo.marca} {servicio.equipo.modelo} es: {servicio.codigo_entrega}."
             )
 
+            messages.success(request, "Servicio registrado y código enviado al cliente.")
             return redirect("lista_servicios")
     else:
         servicio_form = ServicioForm()
@@ -236,4 +247,63 @@ def detalle_servicio(request, servicio_id):
     return render(request, 'servicios/detalle_servicio.html', {
         'servicio': servicio,
         'repuestos': repuestos
+    })
+
+@login_required
+@user_passes_test(lambda u: u.rol.nombre == "tecnico")
+def actualizar_estado_equipo_tecnico(request, equipo_id):
+    servicio = get_object_or_404(Servicio, equipo_id=equipo_id, tecnico=request.user)
+
+    if not servicio.entrega_confirmada:
+        messages.error(request, "No puede cambiar el estado hasta que la entrega sea confirmada.")
+        return redirect('detalle_servicio', servicio_id=servicio.id)
+
+    if request.method == 'POST':
+        form = ServicioEstadoForm(request.POST, instance=servicio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "El estado del servicio ha sido actualizado.")
+            return redirect('lista_equipos_tecnico')
+    else:
+        form = ServicioEstadoForm(instance=servicio)
+
+    return render(request, 'servicios/actualizar_estado_equipo_tecnico.html', {'form': form, 'servicio': servicio})
+
+@login_required
+def lista_servicios_cliente(request):
+    """
+    Muestra los servicios relacionados con los equipos del cliente autenticado.
+    """
+    if request.user.rol.nombre != "cliente":
+        return redirect("home")  # Redirige si no es cliente
+
+    servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
+
+    return render(request, "servicios/lista_servicios_cliente.html", {
+        "servicios": servicios,
+    })
+
+@login_required
+def enviar_codigo_tecnico(request, servicio_id):
+    """
+    Vista para que el cliente envíe el código de entrega al técnico.
+    """
+    servicio = get_object_or_404(Servicio, id=servicio_id, equipo__cliente=request.user)
+
+    if request.method == "POST":
+        codigo_ingresado = request.POST.get('codigo_entrega')
+        if codigo_ingresado == servicio.codigo_entrega:
+            # Enviar notificación al técnico
+            Notificacion.crear_notificacion(
+                usuario=servicio.tecnico,
+                tipo="codigo_entrega",
+                mensaje=f"El cliente ha confirmado el código de entrega para el servicio del equipo {servicio.equipo.marca} {servicio.equipo.modelo}: {codigo_ingresado}."
+            )
+            messages.success(request, "Código enviado exitosamente al técnico.")
+            return redirect('lista_servicios_cliente')
+        else:
+            messages.error(request, "El código ingresado es incorrecto.")
+
+    return render(request, 'servicios/enviar_codigo_tecnico.html', {
+        'servicio': servicio
     })

@@ -20,67 +20,73 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        {% if user.rol.nombre == "administrador" %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}">Gamificación</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_servicios' %}">Servicios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'usuario-list' %}">Usuarios</a>
-                            </li>
-                        {% elif user.rol.nombre == "tecnico" %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_equipos_tecnico' %}">Seguimiento de Equipos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'perfil_gamificacion' %}">Mi Gamificación</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'retos_disponibles' %}">Retos Disponibles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'historial_puntos' %}">Historial de Puntos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
-                            </li>
-                        {% elif user.rol.nombre == "cliente" %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'panel_cliente' %}">Mi Panel</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
-                            </li>
-                        {% endif %}
-
+                {% if user.is_authenticated %}
+                    {% if user.rol.nombre == "administrador" %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_notificaciones' %}">
-                                <i class="bi bi-bell"></i>
-                                {% if notificaciones_no_leidas > 0 %}
-                                    <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
-                                {% endif %}
-                            </a>
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                            <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}">Gamificación</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'usuario-list' %}">Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_servicios' %}">Servicios</a>
+                        </li>
+                    {% elif user.rol.nombre == "tecnico" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'tecnico_dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'perfil_gamificacion' %}">Mi Gamificación</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'retos_disponibles' %}">Retos Disponibles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'tecnico_services_list' %}">Mis Servicios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_reportes_tecnicos' %}">Reportes</a>
+                        </li>
+                    {% elif user.rol.nombre == "cliente" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'cliente_dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_cliente' %}">Panel Seguimiento</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_servicios_cliente' %}">Mis Servicios</a>
                         </li>
                     {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'lista_notificaciones' %}">
+                            <i class="bi bi-bell"></i>
+                            {% if notificaciones_no_leidas > 0 %}
+                                <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                    </li>
+                {% endif %}
                 </ul>
             </div>
         </div>
@@ -102,7 +108,6 @@
     <script>
         const socket = new WebSocket('ws://127.0.0.1:8001/ws/notificaciones/{{ user.id }}/');
 
-        // Manejar mensajes recibidos del WebSocket
         socket.onmessage = function (e) {
             const data = JSON.parse(e.data);
 
@@ -118,7 +123,6 @@
                 bellIcon.appendChild(span);
             }
 
-            // Mostrar una alerta opcional (puede ser reemplazado por UI dinámica)
             alert(`Nueva notificación: ${data.mensaje}`);
         };
 
@@ -126,11 +130,9 @@
             console.log("Conexión WebSocket establecida.");
         };
 
+        // Eliminar reconexión automática con reload
         socket.onclose = function () {
             console.error("Conexión WebSocket cerrada.");
-            setTimeout(() => {
-                location.reload();
-            }, 5000);
         };
     </script>
     {% endif %}

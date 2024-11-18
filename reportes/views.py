@@ -7,7 +7,7 @@ from ServiceTrack.models import Servicio, HistorialReporte, Notificacion, Usuari
 from datetime import datetime
 import pandas as pd
 import io
-from django.db.models import Avg, Count, Sum, F
+from django.db.models import Avg, Count, Sum, F, ExpressionWrapper, DurationField
 
 # Helper para verificar roles
 def is_admin(user):
@@ -152,3 +152,97 @@ def analizar_repuestos(request):
     ).order_by('-total_uso')
 
     return render(request, 'reportes/analisis_repuestos.html', {'repuestos': repuestos})
+
+@login_required
+@user_passes_test(lambda u: u.rol.nombre == "tecnico")
+def panel_reportes_tecnicos(request):
+    """
+    Vista principal del panel de reportes para técnicos.
+    Muestra su progreso en servicios y calificaciones obtenidas.
+    """
+    usuario = request.user
+    servicios = Servicio.objects.filter(tecnico=usuario, estado='completado')
+
+    # KPIs específicos para el técnico
+    total_servicios = servicios.count()
+    promedio_calificacion = servicios.aggregate(Avg('calificacion'))['calificacion__avg'] or 0
+
+    # Calcular tiempo promedio de resolución en días
+    servicios_con_tiempo = servicios.annotate(
+        dias_resolucion=ExpressionWrapper(
+            F('fecha_fin') - F('fecha_inicio'),
+            output_field=DurationField()
+        )
+    ).aggregate(
+        promedio=Avg('dias_resolucion')
+    )
+
+    tiempo_promedio_resolucion = (
+        servicios_con_tiempo['promedio'].days if servicios_con_tiempo['promedio'] else None
+    )
+
+    context = {
+        'total_servicios': total_servicios,
+        'promedio_calificacion': round(promedio_calificacion, 2),
+        'tiempo_promedio_resolucion': tiempo_promedio_resolucion if tiempo_promedio_resolucion else "N/A",
+        'servicios': servicios,
+    }
+
+    return render(request, 'reportes/reporte_tecnicos.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.rol.nombre == "tecnico")
+def generar_reporte_pdf_tecnico(request):
+    """
+    Generar reporte en PDF para técnicos con información limitada a sus servicios.
+    """
+    usuario = request.user
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+    p.drawString(100, 800, "Reporte de Servicios Completados")
+    p.drawString(100, 780, f"Técnico: {usuario.nombre}")
+    p.drawString(100, 760, f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+
+    servicios = Servicio.objects.filter(tecnico=usuario, estado='completado')
+
+    # KPIs del técnico
+    total_servicios = servicios.count()
+    promedio_calificacion = servicios.aggregate(Avg('calificacion'))['calificacion__avg'] or 0
+
+    y = 720
+    p.drawString(100, y, f"Total de Servicios Completados: {total_servicios}")
+    y -= 20
+    p.drawString(100, y, f"Promedio de Calificación: {round(promedio_calificacion, 2)}")
+    y -= 40
+
+    for servicio in servicios:
+        texto = f"Servicio {servicio.id} - Equipo: {servicio.equipo}, Calificación: {servicio.calificacion}"
+        p.drawString(100, y, texto)
+        y -= 20
+        if y < 100:
+            p.showPage()
+            y = 750
+
+    p.save()
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf')
+
+
+@login_required
+@user_passes_test(lambda u: u.rol.nombre == "tecnico")
+def generar_reporte_excel_tecnico(request):
+    """
+    Generar reporte en Excel para técnicos con información limitada a sus servicios.
+    """
+    usuario = request.user
+    servicios = Servicio.objects.filter(tecnico=usuario, estado='completado')
+    data = servicios.values('id', 'equipo__marca', 'fecha_inicio', 'fecha_fin', 'calificacion')
+
+    df = pd.DataFrame(list(data))
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="reporte_servicios_tecnico_{datetime.now().strftime("%Y%m%d")}.xlsx"'
+    with io.BytesIO() as buffer:
+        df.to_excel(buffer, index=False)
+        file_content = buffer.getvalue()
+
+    return HttpResponse(file_content, content_type='application/vnd.ms-excel')

@@ -10,3 +10,10 @@ class RepuestoForm(forms.ModelForm):
     class Meta:
         model = Repuesto
         fields = ['nombre', 'descripcion', 'costo', 'proveedor', 'cantidad']
+
+class ConfirmarEntregaForm(forms.Form):
+    codigo_entrega = forms.CharField(
+        max_length=6,
+        label="Código de Entrega",
+        widget=forms.TextInput(attrs={'placeholder': 'Ingrese el código recibido'})
+    )
