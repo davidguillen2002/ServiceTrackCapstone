@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Puntos{% endblock %}
+
+{% block content %}
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4">📜 Historial de Puntos</h1>
+
+    <!-- Tabla de Historial de Puntos -->
+    <div class="card shadow-lg animate__animated animate__fadeInUp">
+        <div class="card-body">
+            <h4 class="card-title text-center mb-4">📊 Actividad Reciente</h4>
+            {% if page_obj.object_list %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">📅 Fecha</th>
+                            <th scope="col">⭐ Puntos Obtenidos</th>
+                            <th scope="col">📖 Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro in page_obj.object_list %}
+                        <tr class="animate__animated animate__fadeInUp">
+                            <td>{{ registro.fecha|date:"d/m/Y H:i" }}</td>
+                            <td class="fw-bold text-success">{{ registro.puntos_obtenidos }}</td>
+                            <td>{{ registro.descripcion }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <nav aria-label="Page navigation example" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                            &laquo; Anterior
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                            Siguiente &raquo;
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% else %}
+            <p class="text-center text-muted">😔 Aún no tienes puntos registrados. ¡Completa retos y actividades para ganar puntos!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botón para regresar -->
+    <div class="text-center mt-4">
+        <a href="{% url 'perfil_gamificacion' %}" class="btn btn-outline-primary btn-lg animate__animated animate__bounceIn">
+            <i class="bi bi-arrow-left-circle"></i> Regresar a Mi Perfil
+        </a>
+    </div>
+</div>
+
+<!-- Scripts de Animación -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rows = document.querySelectorAll("tbody tr");
+        let delay = 0.2;
+
+        rows.forEach((row) => {
+            row.style.animationDelay = `${delay}s`;
+            row.classList.add("animate__fadeInUp");
+            delay += 0.1;
+        });
+    });
+</script>
+{% endblock %}

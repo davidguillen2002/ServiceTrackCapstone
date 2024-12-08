@@ -4,8 +4,10 @@ from . import views
 urlpatterns = [
     # Vistas para técnicos
     path('perfil/', views.perfil_gamificacion, name='perfil_gamificacion'),
-    path('retos/', views.retos_disponibles, name='retos_disponibles'),
-    path('historial-puntos/', views.historial_puntos, name='historial_puntos'),
+    path('retos/', views.explorar_retos, name='explorar_retos'),
+    path('nuevo-ranking-global/', views.nuevo_ranking_global, name='nuevo_ranking_global'),
+    path('historial-puntos-paginado/', views.historial_puntos_paginated, name='historial_puntos_paginated'),
+    path('recompensas/', views.recompensas_disponibles, name='recompensas_disponibles'),
 
     # Panel de administración
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard_gamificacion'),

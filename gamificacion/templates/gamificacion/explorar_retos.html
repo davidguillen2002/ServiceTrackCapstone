@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Explora tus Retos{% endblock %}
+
+{% block content %}
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4 animate__animated animate__fadeInDown">🌟 Nivel {{ usuario.nivel }}: Tus Retos 🌟</h1>
+
+    <!-- Botón para regresar al perfil -->
+    <div class="text-center mb-4 animate__animated animate__zoomIn">
+        <a href="{% url 'perfil_gamificacion' %}" class="btn btn-info animate__animated animate__tada">Volver al Perfil</a>
+    </div>
+
+    <!-- Resumen del progreso -->
+    <div class="card mb-4 shadow-lg animate__animated animate__lightSpeedInLeft">
+        <div class="card-body">
+            <h4 class="text-center">🎯 Tu Progreso General</h4>
+            <div class="progress progress-striped" style="height: 40px; border-radius: 20px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                     role="progressbar"
+                     style="width: {{ progreso_retos }}%;"
+                     aria-valuenow="{{ progreso_retos }}"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                     {{ progreso_retos }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retos pendientes -->
+    <div class="card mb-4 shadow-lg animate__animated animate__lightSpeedInRight">
+        <div class="card-body">
+            <h4 class="text-center">🚀 Retos Actuales</h4>
+            <div class="row">
+                {% for reto_usuario in retos_pendientes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <a href="{{ reto_usuario.servicios_url }}" class="text-success text-decoration-none">
+                                    {{ reto_usuario.reto.nombre }}
+                                </a>
+                            </h5>
+                            <p>{{ reto_usuario.reto.descripcion }}</p>
+                            <p class="text-muted">Meta: {{ reto_usuario.reto.valor_objetivo }}</p>
+                            <div class="progress mb-3">
+                                <div class="progress-bar progress-bar-striped bg-warning"
+                                     role="progressbar"
+                                     style="width: {{ reto_usuario.progreso }}%;"
+                                     aria-valuenow="{{ reto_usuario.progreso }}"
+                                     aria-valuemin="0" aria-valuemax="100">
+                                     {{ reto_usuario.progreso }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No tienes retos pendientes.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Retos completados -->
+    <div class="card mb-4 shadow-lg animate__animated animate__jackInTheBox">
+        <div class="card-body">
+            <h4 class="text-center">🏅 Retos Completados</h4>
+            <div class="row">
+                {% for reto_usuario in retos_completados %}
+                <div class="col-md-4 mb-4 animate__animated animate__pulse">
+                    <div class="card h-100 bg-light shadow">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ reto_usuario.reto.nombre }}</h5>
+                            <p>{{ reto_usuario.reto.descripcion }}</p>
+                            <span class="badge bg-success">✔️ Completado</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-muted text-center animate__animated animate__fadeIn">¡Comienza a completar retos para ver tus logros aquí!</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Animar la barra de progreso general
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        const targetWidth = parseInt(progressBar.getAttribute('aria-valuenow'), 10) || 0;
+        progressBar.style.width = '0%';
+        let currentWidth = 0;
+        const interval = setInterval(() => {
+            currentWidth++;
+            progressBar.style.width = `${currentWidth}%`;
+            progressBar.textContent = `${currentWidth}%`;
+            if (currentWidth >= targetWidth) {
+                clearInterval(interval);
+            }
+        }, 20);
+    }
+});
+</script>
+{% endblock %}

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -74,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'notificaciones.context_processors.notificaciones_no_leidas',
+                'ServiceTrack.context_processors.gamificacion_context',
             ],
         },
     },
@@ -160,3 +162,5 @@ MESSAGE_TAGS = {
 
 AUTH_USER_MODEL = 'ServiceTrack.Usuario'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

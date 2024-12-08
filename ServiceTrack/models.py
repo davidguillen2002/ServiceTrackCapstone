@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db.models import Avg
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import random
-
+from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 
 # Manager para el modelo Usuario
 class UsuarioManager(BaseUserManager):
@@ -45,6 +47,9 @@ class Rol(models.Model):
 
 # Modelo Usuario
 class Usuario(AbstractBaseUser, PermissionsMixin):
+    """
+    Modelo personalizado de usuario con campos de gamificación.
+    """
     nombre = models.CharField(max_length=100)
     username = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=255)
@@ -52,31 +57,289 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     cedula = models.CharField(max_length=20, unique=True)
     correo = models.EmailField(max_length=100)
     celular = models.CharField(max_length=20)
-    puntos = models.IntegerField(default=0)  # Solo los técnicos usan puntos
-    medallas = models.ManyToManyField('Medalla', blank=True, related_name="tecnico")  # Medallas asociadas a técnicos
-    servicios_completados = models.IntegerField(default=0)
-    calificacion_promedio = models.FloatField(default=0.0)
 
+    # Campos de gamificación
+    puntos = models.IntegerField(default=0, help_text="Puntos acumulados por el usuario.")
+    experiencia = models.IntegerField(default=0, help_text="Experiencia actual del usuario.")
+    nivel = models.IntegerField(default=1, help_text="Nivel actual del usuario.")
+    servicios_completados = models.IntegerField(default=0, help_text="Total de servicios completados.")
+    calificacion_promedio = models.FloatField(default=0.0, help_text="Calificación promedio acumulada.")
+
+    # Relación con medallas
+    medallas = models.ManyToManyField('Medalla', blank=True, related_name="tecnicos")
+
+    # Campos adicionales para autenticación
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    # Manager
     objects = UsuarioManager()
 
+    # Configuración del modelo
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.nombre
 
+    # Métodos de lógica del modelo
+    def calcular_experiencia_nivel_siguiente(self):
+        """
+        Calcula la experiencia necesaria para alcanzar el siguiente nivel.
+        Si ya está en el nivel máximo, retorna 0.
+        """
+        if self.nivel >= 5:
+            return 0
+        return 100 * self.nivel
+
+    def subir_nivel(self):
+        """
+        Verifica si el usuario tiene suficiente experiencia para subir de nivel y ajusta los valores.
+        Se asegura de que no se exceda del nivel máximo permitido.
+        """
+        from gamificacion.notifications import notificar_tecnico  # Importación local para evitar el ciclo
+
+        experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
+
+        while self.experiencia >= experiencia_requerida and self.nivel < 5:  # Limitar al nivel máximo permitido
+            self.experiencia -= experiencia_requerida
+            self.nivel += 1
+            experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
+
+            # Notificar al usuario sobre el nuevo nivel
+            notificar_tecnico(
+                usuario=self,
+                mensaje=f"¡Felicidades {self.nombre}, alcanzaste el nivel {self.nivel}! 🎉",
+                tipo="info"
+            )
+
+            # Asignar retos del nuevo nivel
+            self.asignar_retos_por_nivel()
+
+        if self.nivel >= 5:  # Si alcanza el nivel máximo, ajusta la experiencia sobrante
+            self.experiencia = min(self.experiencia, 0)
+
+        self.save()
+
+
+    def calcular_progreso_nivel(self):
+        """
+        Calcula el porcentaje de progreso hacia el siguiente nivel.
+        """
+        experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
+        return round((self.experiencia / experiencia_requerida) * 100, 2)
+
+    def otorgar_experiencia(usuario, cantidad):
+        """
+        Otorga experiencia al usuario, verifica si sube de nivel y ajusta retos asociados.
+        """
+
+        from gamificacion.notifications import notificar_tecnico  # Importación local para evitar el ciclo
+
+        usuario.experiencia += cantidad
+        while usuario.experiencia >= usuario.calcular_experiencia_nivel_siguiente() and usuario.nivel < 5:
+            exceso = usuario.experiencia - usuario.calcular_experiencia_nivel_siguiente()
+            usuario.nivel += 1
+            usuario.experiencia = exceso
+
+            # Notificar al usuario
+            notificar_tecnico(
+                usuario=usuario,
+                mensaje=f"¡Felicidades {usuario.nombre}, alcanzaste el nivel {usuario.nivel}! 🎉",
+                tipo="info"
+            )
+            usuario.asignar_retos_por_nivel()  # Asignar retos nuevos para el nivel actual
+
+        if usuario.nivel >= 5:
+            usuario.experiencia = max(usuario.experiencia, 0)  # Ajustar experiencia si alcanza el nivel máximo
+        else:
+            notificar_tecnico(
+                usuario=usuario,
+                mensaje=f"¡Felicidades {usuario.nombre}, alcanzaste el nivel {usuario.nivel}! 🎉",
+                tipo="info"
+            )
+
+        usuario.save()
+
+    def servicios_con_baja_calificacion(self):
+        """
+        Retorna el número de servicios con una calificación menor a 3.
+        """
+        return Servicio.objects.filter(tecnico=self, calificacion__lt=3).count()
+
     def calcular_promedio_tiempo_servicio(self):
+        """
+        Calcula el tiempo promedio que el usuario tarda en completar un servicio.
+        """
         servicios = Servicio.objects.filter(tecnico=self, estado="completado")
         if servicios.exists():
             total_dias = sum((servicio.fecha_fin - servicio.fecha_inicio).days for servicio in servicios if servicio.fecha_fin)
             return total_dias / servicios.count()
         return None
 
-    def servicios_con_baja_calificacion(self):
-        return Servicio.objects.filter(tecnico=self, calificacion__lt=3).count()
+    def actualizar_calificacion_promedio(self):
+        """
+        Actualiza la calificación promedio basada en servicios completados.
+        """
+        promedio = (
+            Servicio.objects.filter(tecnico=self, estado="completado")
+            .aggregate(promedio=Avg("calificacion"))["promedio"]
+            or 0
+        )
+        self.calificacion_promedio = round(promedio, 2)
+        self.save()
+
+    def asignar_medalla(self, medalla):
+        """
+        Asigna una medalla al usuario si cumple con los requisitos.
+        """
+        if not self.medallas.filter(id=medalla.id).exists():
+            self.medallas.add(medalla)
+            self.save()
+
+    def limpiar_medallas(self):
+        """
+        Remueve medallas si el usuario ya no cumple con los requisitos.
+        """
+        for medalla in self.medallas.all():
+            if self.puntos < medalla.puntos_necesarios:
+                self.medallas.remove(medalla)
+
+    def puntos_totales(self):
+        """
+        Calcula el total de puntos obtenidos por el usuario.
+        """
+        return self.puntos
+
+    def retos_actuales(self):
+        """
+        Retorna los retos asignados al usuario que corresponden a su nivel actual.
+        """
+        return RetoUsuario.objects.filter(
+            usuario=self,
+            reto__nivel=self.nivel,
+            cumplido=False
+        )
+
+    def verificar_y_subir_nivel(self):
+        """
+        Verifica si el usuario tiene suficiente experiencia para subir de nivel.
+        """
+        from gamificacion.notifications import notificar_tecnico  # Importación local para evitar el ciclo
+
+        experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
+
+        while self.experiencia >= experiencia_requerida:
+            exceso_experiencia = self.experiencia - experiencia_requerida
+
+            # Incrementar nivel
+            self.nivel += 1
+            self.experiencia = exceso_experiencia
+
+            # Asignar nuevos retos para el nivel actual
+            self.asignar_retos_por_nivel()
+
+            # Notificar al usuario
+            notificar_tecnico(
+                usuario=self,
+                mensaje=f"¡Felicidades {self.nombre}, alcanzaste el nivel {self.nivel}! 🎉",
+                tipo="info"
+            )
+
+            experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
+
+        self.save()
+
+    def asignar_retos_por_nivel(self):
+        """
+        Asigna retos específicos al usuario según su nivel actual.
+        Crea retos para el nivel actual del usuario y los asocia con él si no existen.
+        """
+        # Diccionario de retos por nivel
+        retos_por_nivel = {
+            1: [
+                {"nombre": "Primer Servicio", "descripcion": "Completa tu primer servicio exitosamente.",
+                 "puntos_otorgados": 50, "criterio": "servicios", "valor_objetivo": 1},
+                {"nombre": "Calificación Inicial", "descripcion": "Obtén una calificación promedio mínima de 3.",
+                 "puntos_otorgados": 30, "criterio": "calificaciones", "valor_objetivo": 3},
+                {"nombre": "Acumula Puntos Básicos", "descripcion": "Acumula al menos 100 puntos.",
+                 "puntos_otorgados": 20, "criterio": "puntos", "valor_objetivo": 100},
+            ],
+            2: [
+                {"nombre": "Servicio Rápido", "descripcion": "Completa 10 servicios en menos de 7 días.",
+                 "puntos_otorgados": 100, "criterio": "servicios", "valor_objetivo": 10},
+                {"nombre": "Calificación Excelente", "descripcion": "Obtén una calificación promedio de al menos 4.",
+                 "puntos_otorgados": 50, "criterio": "calificaciones", "valor_objetivo": 4},
+                {"nombre": "Puntos Progresivos", "descripcion": "Acumula 200 puntos.", "puntos_otorgados": 40,
+                 "criterio": "puntos", "valor_objetivo": 200},
+            ],
+            3: [
+                {"nombre": "Avance Profesional", "descripcion": "Completa 20 servicios exitosos.",
+                 "puntos_otorgados": 150, "criterio": "servicios", "valor_objetivo": 20},
+                {"nombre": "Calificación Sobresaliente",
+                 "descripcion": "Obtén una calificación promedio de al menos 4.5.", "puntos_otorgados": 70,
+                 "criterio": "calificaciones", "valor_objetivo": 4.5},
+                {"nombre": "Puntos Avanzados", "descripcion": "Acumula 500 puntos.", "puntos_otorgados": 80,
+                 "criterio": "puntos", "valor_objetivo": 500},
+            ],
+            4: [
+                {"nombre": "Técnico Experto", "descripcion": "Completa 30 servicios exitosos.", "puntos_otorgados": 200,
+                 "criterio": "servicios", "valor_objetivo": 30},
+                {"nombre": "Calificación Perfecta", "descripcion": "Obtén una calificación promedio de 4.6.",
+                 "puntos_otorgados": 100, "criterio": "calificaciones", "valor_objetivo": 4.6},
+                {"nombre": "Puntos Máximos", "descripcion": "Acumula 1000 puntos.", "puntos_otorgados": 120,
+                 "criterio": "puntos", "valor_objetivo": 1000},
+            ],
+            5: [
+                {"nombre": "Maestro Técnico", "descripcion": "Completa 50 servicios exitosos.", "puntos_otorgados": 300,
+                 "criterio": "servicios", "valor_objetivo": 50},
+                {"nombre": "Excelencia Continua",
+                 "descripcion": "Mantén una calificación promedio de 4.8 o más en los últimos 10 servicios.",
+                 "puntos_otorgados": 150, "criterio": "calificaciones", "valor_objetivo": 4.8},
+                {"nombre": "Dominio Total", "descripcion": "Acumula 2000 puntos.", "puntos_otorgados": 200,
+                 "criterio": "puntos", "valor_objetivo": 2000},
+            ],
+        }
+
+        # Obtener retos para el nivel actual del usuario
+        retos_nivel = retos_por_nivel.get(self.nivel, [])
+
+        for reto_data in retos_nivel:
+            # Crear o recuperar el reto existente
+            reto, created = Reto.objects.get_or_create(
+                nombre=reto_data["nombre"],
+                defaults={
+                    "descripcion": reto_data["descripcion"],
+                    "puntos_otorgados": reto_data["puntos_otorgados"],
+                    "criterio": reto_data["criterio"],
+                    "valor_objetivo": reto_data["valor_objetivo"],
+                    "nivel": self.nivel
+                }
+            )
+
+            # Asociar el reto al usuario si no está ya asignado
+            RetoUsuario.objects.get_or_create(
+                usuario=self,
+                reto=reto,
+                defaults={"cumplido": False, "progreso": 0}
+            )
+
+            if created:
+                print(f"[INFO] Reto '{reto.nombre}' creado para nivel {self.nivel}.")
+            else:
+                print(f"[INFO] Reto '{reto.nombre}' ya existe.")
+
+    def clean(self):
+        if Usuario.objects.filter(correo=self.correo).exclude(id=self.id).exists():
+            raise ValidationError("El correo ya está registrado.")
+        if not self.celular.isdigit() or len(self.celular) < 10:
+            raise ValidationError("El número de celular debe tener al menos 10 dígitos.")
+        super().clean()
+
+    class Meta:
+        ordering = ['-nivel', '-puntos']
+        verbose_name = "Usuario"
+        verbose_name_plural = "Usuarios"
 
 class Notificacion(models.Model):
     TIPO_NOTIFICACION = [
@@ -93,6 +356,7 @@ class Notificacion(models.Model):
     mensaje = models.TextField()
     fecha_creacion = models.DateTimeField(default=timezone.now)
     leido = models.BooleanField(default=False)
+    extra_data = models.JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ['-fecha_creacion']
@@ -180,6 +444,10 @@ class Servicio(models.Model):
         self.codigo_entrega = str(random.randint(100000, 999999))  # Generar código de 6 dígitos
         self.save()
 
+    @property
+    def esta_completado(self):
+        return self.estado == "completado"
+
 class Repuesto(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
@@ -248,45 +516,177 @@ class Enlace(models.Model):
         return f"Enlace {self.id} para Servicio {self.servicio.id}"
 
 
-# Modelos para Gamificación
-
 class Medalla(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     icono = models.ImageField(upload_to='medallas/', null=True, blank=True)
     puntos_necesarios = models.IntegerField()
+    retos_asociados = models.ManyToManyField('Reto', blank=True, related_name='medallas_asociadas')
+    nivel_requerido = models.IntegerField(default=1, help_text="Nivel mínimo requerido para obtener esta medalla.")  # Nuevo campo
 
-    def __str__(self):
-        return self.nombre
+    def asignar_si_cumple(self, usuario):
+        """
+        Verifica si un usuario cumple con los requisitos para esta medalla
+        y la asigna si no la tiene.
+        """
+        retos_cumplidos = all(
+            RetoUsuario.objects.filter(usuario=usuario, reto=reto, cumplido=True).exists()
+            for reto in self.retos_asociados.all()
+        )
 
+        if (
+            retos_cumplidos
+            and usuario.puntos >= self.puntos_necesarios
+            and usuario.nivel >= self.nivel_requerido
+            and not usuario.medallas.filter(id=self.id).exists()
+        ):
+            usuario.medallas.add(self)
+            usuario.save()
+
+            # Registrar el logro en el historial de puntos
+            RegistroPuntos.objects.create(
+                usuario=usuario,
+                puntos_obtenidos=0,
+                descripcion=f"Medalla obtenida: {self.nombre}"
+            )
+
+            # Notificar al usuario
+            Notificacion.crear_notificacion(
+                usuario=usuario,
+                tipo="reconocimiento",
+                mensaje=f"¡Felicidades! Has obtenido la medalla: {self.nombre}"
+            )
 
 class Reto(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     puntos_otorgados = models.IntegerField()
-    requisito = models.IntegerField(help_text="Ejemplo: cantidad de servicios completados o puntos a alcanzar")
+    nivel = models.IntegerField(
+        default=1,
+        help_text="Nivel asociado al reto. Define el nivel necesario para desbloquear este reto."
+    )  # Nuevo campo para nivel
+    criterio = models.CharField(
+        max_length=50,
+        choices=[
+            ('puntos', 'Alcanzar cierta cantidad de puntos'),
+            ('servicios', 'Completar una cantidad de servicios'),
+            ('calificaciones', 'Lograr una calificación promedio mínima'),
+        ],
+        help_text="Define cómo se valida el cumplimiento del reto."
+    )
+    valor_objetivo = models.IntegerField(help_text="Ejemplo: 500 puntos, 10 servicios, o calificación promedio de 4")
     completado_por = models.ManyToManyField('Usuario', through='RetoUsuario', related_name='retos_completados')
 
-    def __str__(self):
-        return self.nombre
+    def clean(self):
+        """
+        Validación del modelo Reto.
+        """
+        if self.puntos_otorgados <= 0:
+            raise ValidationError("Los puntos otorgados deben ser mayores que 0.")
+        if self.valor_objetivo <= 0:
+            raise ValidationError("El valor objetivo debe ser mayor que 0.")
+        if self.nivel <= 0:
+            raise ValidationError("El nivel debe ser mayor que 0.")
+        super().clean()
 
+    def validar_cumplimiento(self, usuario):
+        """
+        Verifica si un usuario cumple con el criterio del reto.
+        """
+        if self.criterio == 'puntos' and usuario.puntos >= self.valor_objetivo:
+            return True
+        elif self.criterio == 'servicios' and usuario.servicios_completados >= self.valor_objetivo:
+            return True
+        elif self.criterio == 'calificaciones' and usuario.calificacion_promedio >= self.valor_objetivo:
+            return True
+        return False
+
+    def __str__(self):
+        return f"Reto: {self.nombre} (Nivel: {self.nivel}, Objetivo: {self.valor_objetivo})"
 
 class RetoUsuario(models.Model):
-    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
-    reto = models.ForeignKey('Reto', on_delete=models.CASCADE)
-    fecha_completado = models.DateTimeField(null=True, blank=True)
+    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name="retos_usuario")
+    reto = models.ForeignKey('Reto', on_delete=models.CASCADE, related_name="retos_asignados")
     cumplido = models.BooleanField(default=False)
+    progreso = models.FloatField(default=0, help_text="Progreso actual del usuario en el reto (en %).")
+    cantidad_actual = models.FloatField(default=0, help_text="Progreso absoluto en el reto.")
+    fecha_completado = models.DateTimeField(null=True, blank=True)
 
+    def actualizar_progreso(self):
+        """
+        Actualiza el progreso basado en el criterio del reto.
+        """
+        if self.reto.criterio == "puntos":
+            self.cantidad_actual = min(self.usuario.puntos, self.reto.valor_objetivo)
+            self.progreso = min((self.cantidad_actual / self.reto.valor_objetivo) * 100, 100)
+        elif self.reto.criterio == "servicios":
+            self.cantidad_actual = Servicio.objects.filter(tecnico=self.usuario, estado="completado").count()
+            self.progreso = min((self.cantidad_actual / self.reto.valor_objetivo) * 100, 100)
+        elif self.reto.criterio == "calificaciones":
+            promedio_calificacion = (
+                Servicio.objects.filter(tecnico=self.usuario, estado="completado")
+                .aggregate(promedio=Avg("calificacion"))["promedio"] or 0
+            )
+            self.cantidad_actual = round(promedio_calificacion, 2)
+            self.progreso = 100 if promedio_calificacion >= self.reto.valor_objetivo else 0
+        else:
+            self.progreso = 0
+
+        self.save()
+
+    def verificar_cumplimiento(self):
+        """
+        Verifica si el reto está completo y actualiza su estado.
+        """
+        if self.progreso >= 100 and not self.cumplido:
+            self.cumplido = True
+            self.fecha_completado = now()
+            self.save()
+
+            # Otorgar puntos al usuario
+            self.otorgar_puntos_usuario()
+
+            # Asignar medallas relacionadas al reto
+            for medalla in self.reto.medallas_asociadas.all():
+                medalla.asignar_si_cumple(self.usuario)
+
+    def otorgar_puntos_usuario(self):
+        """
+        Otorga los puntos del reto al usuario si está cumplido.
+        """
+        self.usuario.puntos += self.reto.puntos_otorgados
+        self.usuario.save()
+
+        # Registrar los puntos otorgados
+        RegistroPuntos.objects.create(
+            usuario=self.usuario,
+            puntos_obtenidos=self.reto.puntos_otorgados,
+            descripcion=f"Reto completado: {self.reto.nombre}"
+        )
+
+    def es_cercano_a_completar(self):
+        """
+        Retorna True si el progreso está por encima del 75%.
+        """
+        return self.progreso >= 75
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['usuario', 'reto'], name='unique_usuario_reto')
+        ]
+
+    def __str__(self):
+        return f"{self.usuario.nombre} - {self.reto.nombre} (Progreso: {self.progreso}%)"
 
 class RegistroPuntos(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True)  # Relación explícita
     puntos_obtenidos = models.IntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField()
 
     def __str__(self):
         return f"{self.usuario} - {self.puntos_obtenidos} puntos en {self.fecha}"
-
 
 # Modelo HistorialReporte
 class HistorialReporte(models.Model):
@@ -297,3 +697,20 @@ class HistorialReporte(models.Model):
 
     def __str__(self):
         return f"{self.tipo_reporte} generado por {self.generado_por} el {self.fecha_generacion}"
+
+# Modelo Recompensa
+class Recompensa(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=50, choices=[
+        ('herramienta', 'Herramienta nueva'),
+        ('bono', 'Bono de desempeño'),
+        ('capacitacion', 'Curso de capacitación'),
+        ('reconocimiento', 'Reconocimiento oficial'),
+    ])
+    valor = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Valor monetario o equivalente")
+    puntos_necesarios = models.IntegerField(default=0, help_text="Puntos necesarios para obtener esta recompensa")
+    redimido = models.BooleanField(default=False)
+    descripcion = models.TextField(null=True, blank=True, help_text="Detalles adicionales sobre la recompensa")
+
+    def __str__(self):
+        return f"{self.tipo} para {self.usuario.nombre} - {'Redimido' if self.redimido else 'Disponible'}"

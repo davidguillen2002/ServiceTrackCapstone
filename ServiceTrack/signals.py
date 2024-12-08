@@ -2,11 +2,19 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from ServiceTrack.models import Servicio
-from gamificacion.utils import otorgar_puntos_por_servicio, verificar_retos, asignar_medalla
+from gamificacion.utils import otorgar_puntos_por_servicio, verificar_y_asignar_medallas_y_retos
 
 @receiver(post_save, sender=Servicio)
 def actualizar_gamificacion(sender, instance, **kwargs):
-    if instance.estado == 'completado' and instance.fecha_fin:  # Trigger only when the service is marked completed
-        otorgar_puntos_por_servicio(instance.tecnico)
-        verificar_retos(instance.tecnico)
-        asignar_medalla(instance.tecnico)
+    """
+    Actualiza la gamificación del técnico cuando un servicio es completado.
+    """
+    try:
+        if instance.esta_completado and instance.tecnico:
+            # Otorgar puntos al técnico
+            otorgar_puntos_por_servicio(instance.tecnico)
+            # Verificar retos y asignar medallas asociadas
+            verificar_y_asignar_medallas_y_retos(instance.tecnico)
+    except Exception as e:
+        # Registro del error para depuración
+        print(f"Error en actualizar_gamificacion para servicio {instance.id}: {e}")
