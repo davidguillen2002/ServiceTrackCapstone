@@ -9,12 +9,17 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg animate__animated animate__fadeInDown">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">ServiceTrack</a>
+            <a class="navbar-brand" href="{% url 'home' %}">🌟 ServiceTrack</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,86 +27,63 @@
                 <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     {% if user.rol.nombre == "administrador" %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}">Gamificación</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'panel_reportes' %}">Reportes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'usuario-list' %}">Usuarios</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_servicios' %}">Servicios</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'base_conocimiento' %}"><i class="bi bi-book"></i> Base de Conocimientos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}"><i class="bi bi-star"></i> Gamificación</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'panel_reportes' %}"><i class="bi bi-bar-chart"></i> Reportes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'usuario-list' %}"><i class="bi bi-people"></i> Usuarios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'lista_servicios' %}"><i class="bi bi-tools"></i> Servicios</a></li>
                     {% elif user.rol.nombre == "tecnico" %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'tecnico_dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'perfil_gamificacion' %}">Mi Gamificación</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'retos_disponibles' %}">Retos Disponibles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'base_conocimiento' %}">Base de Conocimientos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'tecnico_services_list' %}">Mis Servicios</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'panel_reportes_tecnicos' %}">Reportes</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'tecnico_dashboard' %}"><i class="bi bi-speedometer"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'perfil_gamificacion' %}"><i class="bi bi-star"></i> Mi Gamificación</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'explorar_retos' %}"><i class="bi bi-trophy"></i> Retos Disponibles</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'base_conocimiento' %}"><i class="bi bi-book"></i> Base de Conocimientos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'tecnico_services_list' %}"><i class="bi bi-tools"></i> Mis Servicios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'panel_reportes_tecnicos' %}"><i class="bi bi-bar-chart"></i> Reportes</a></li>
                     {% elif user.rol.nombre == "cliente" %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'cliente_dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'panel_cliente' %}">Panel Seguimiento</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_equipos_cliente' %}">Mis Equipos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_servicios_cliente' %}">Mis Servicios</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'cliente_dashboard' %}"><i class="bi bi-speedometer"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'panel_cliente' %}"><i class="bi bi-box-arrow-in-right"></i> Panel Seguimiento</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'lista_equipos_cliente' %}"><i class="bi bi-laptop"></i> Mis Equipos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'lista_servicios_cliente' %}"><i class="bi bi-tools"></i> Mis Servicios</a></li>
                     {% endif %}
 
+                    <!-- Notificaciones -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'lista_notificaciones' %}">
+                        <a class="nav-link position-relative" href="{% url 'lista_notificaciones' %}">
                             <i class="bi bi-bell"></i>
                             {% if notificaciones_no_leidas > 0 %}
-                                <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ notificaciones_no_leidas }}
+                                </span>
                             {% endif %}
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
-                    </li>
+                    <!-- Cerrar Sesión -->
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
                 {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
+    <!-- Contenedor de notificaciones dinámicas -->
+    <div id="notificaciones-container" data-notificaciones='{{ notificaciones|safe }}'></div>
+
     <main class="flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-dark text-white text-center py-3">
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3 animate__animated animate__fadeInUp">
         <p class="mb-0">© 2024 ServiceTrack. Todos los derechos reservados.</p>
+        <small>Sigue aprendiendo y alcanzando tus objetivos 🚀</small>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Notificaciones Dinámicas -->
+    <script src="{% static 'js/notificaciones.js' %}"></script>
 
     <!-- WebSocket Script -->
     {% if user.is_authenticated %}
@@ -123,14 +105,25 @@
                 bellIcon.appendChild(span);
             }
 
-            alert(`Nueva notificación: ${data.mensaje}`);
+            // Mostrar la notificación en el contenedor dinámico
+            const container = document.getElementById("notificaciones-container");
+            const alerta = document.createElement("div");
+            alerta.className = `alert alert-${data.tipo} fade show alert-dismissible shadow-lg`;
+            alerta.role = "alert";
+            alerta.innerHTML = `
+                <strong>Notificación:</strong> ${data.mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            container.appendChild(alerta);
+
+            // Desaparecer automáticamente después de 5 segundos
+            setTimeout(() => alerta.remove(), 5000);
         };
 
         socket.onopen = function () {
             console.log("Conexión WebSocket establecida.");
         };
 
-        // Eliminar reconexión automática con reload
         socket.onclose = function () {
             console.error("Conexión WebSocket cerrada.");
         };
