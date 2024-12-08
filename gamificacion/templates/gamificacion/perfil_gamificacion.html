@@ -1,127 +1,260 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 
-{% block title %}Perfil Gamificación{% endblock %}
+{% block title %}Mi Perfil Gamificado{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Perfil Gamificación</h1>
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4 animate__animated animate__fadeInDown">🎮 Mi Perfil</h1>
 
-    <!-- Progreso Actual -->
-    <div class="card mb-4 shadow-sm">
+        <!-- Animaciones de notificaciones -->
+        <div id="animaciones-container" class="mb-4">
+            {% for animacion in animaciones %}
+            <div class="alert alert-{{ animacion.tipo }} animate__animated animate__{{ animacion.animacion }}">
+                <strong>{{ animacion.mensaje }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+
+    <!-- Botones de Navegación -->
+    <div class="mb-4 text-center animate__animated animate__zoomIn">
+        <a href="{% url 'explorar_retos' %}" class="btn btn-outline-primary btn-lg mx-2 animate__animated animate__tada">
+            <i class="bi bi-trophy"></i> Explorar Retos
+        </a>
+        <a href="{% url 'historial_puntos_paginated' %}" class="btn btn-outline-secondary btn-lg mx-2 animate__animated animate__tada">
+            <i class="bi bi-clock-history"></i> Ver Mis Puntos
+        </a>
+        <a href="{% url 'nuevo_ranking_global' %}" class="btn btn-outline-info btn-lg mx-2 animate__animated animate__tada">
+            <i class="bi bi-bar-chart-fill"></i> Tabla de Posiciones
+        </a>
+        <a href="{% url 'recompensas_disponibles' %}" class="btn btn-outline-success btn-lg mx-2 animate__animated animate__tada">
+            <i class="bi bi-gift"></i> Recompensas
+        </a>
+    </div>
+
+    <!-- Información del Usuario -->
+    <div class="card mb-4 shadow-lg animate__animated animate__lightSpeedInLeft">
+        <div class="card-body text-center">
+            <h4>Hola, <span class="text-primary fw-bold">{{ usuario.nombre }}</span> 🎉</h4>
+            <p class="text-muted">Tu Nivel: <span class="badge bg-primary fs-5 animate__animated animate__rubberBand">{{ usuario.nivel }}</span></p>
+        </div>
+    </div>
+
+    <!-- Barra de Progreso del Nivel -->
+    <div class="card mb-4 shadow-lg animate__animated animate__lightSpeedInRight">
         <div class="card-body">
-            <h4>Progreso Actual</h4>
-            <div class="progress" style="height: 25px;">
+            <h4 class="text-center mb-3">📈 Avance al Próximo Nivel</h4>
+            <div class="progress progress-personalizada">
                 <div
-                    id="progress-bar"
-                    class="progress-bar"
+                    class="progress-bar progress-bar-striped progress-bar-animated"
                     role="progressbar"
-                    style="width: 0%;"
-                    aria-valuenow="0"
+                    style="width: {{ progreso_nivel }}%;"
+                    aria-valuenow="{{ progreso_nivel }}"
                     aria-valuemin="0"
                     aria-valuemax="100">
-                    0 / 100
+                    {{ experiencia_actual }} / {{ experiencia_requerida }} XP
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Calificación Promedio -->
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4 shadow-lg animate__animated animate__bounceInUp">
         <div class="card-body text-center">
-            <h4>Calificación Promedio</h4>
-            <div class="display-4 text-primary" id="calificacion-promedio">N/A</div>
-            <div id="estrellas-calificacion"></div>
+            <h4>⭐ Tu Calificación Promedio</h4>
+            <div class="display-4 text-primary fw-bold animate__animated animate__heartBeat">{{ calificacion_promedio }}</div>
+            <div id="estrellas-calificacion" class="mt-3 d-flex justify-content-center"></div>
         </div>
     </div>
 
-    <!-- Recomendaciones -->
-    <div class="card mb-4 shadow-sm">
+    <!-- Medallas -->
+    <div class="card mb-4 shadow-lg animate__animated animate__jackInTheBox">
         <div class="card-body">
-            <h4>Recomendaciones</h4>
-            <div id="recomendaciones" class="row">
-                {% for recomendacion in recomendaciones %}
-                <div class="col-md-6 mb-3">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <i class="bi bi-lightbulb text-warning"></i>
-                            {{ recomendacion }}
-                        </div>
+            <h4 class="text-center mb-4">🏅 Logros del Nivel {{ usuario.nivel }}</h4>
+            <div class="d-flex flex-wrap justify-content-center">
+                {% for medalla in medallas_nivel %}
+                <div
+                    class="card m-2 shadow-lg text-center medalla-card"
+                    style="width: 180px; border: 2px solid {% if medalla in medallas_usuario %}#ffc107{% else %}#ccc{% endif %};"
+                    data-desbloqueada="{% if medalla in medallas_usuario %}true{% else %}false{% endif %}">
+                    <div class="d-flex justify-content-center align-items-center medalla-contenedor">
+                        {% if medalla.icono %}
+                        <img src="{{ medalla.icono.url }}"
+                             class="img-fluid medalla-icono {% if medalla not in medallas_usuario %}grayscale{% endif %}"
+                             alt="{{ medalla.nombre }}">
+                        {% else %}
+                        <div class="medalla-placeholder">🏅</div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold">{{ medalla.nombre }}</h6>
+                        <p class="text-muted small">{{ medalla.descripcion }}</p>
                     </div>
                 </div>
                 {% empty %}
-                <div class="col-md-12">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <p>No tienes recomendaciones por ahora. ¡Sigue así!</p>
-                        </div>
-                    </div>
-                </div>
+                <p class="text-muted text-center">🏅 No tienes logros disponibles en este nivel.</p>
                 {% endfor %}
             </div>
         </div>
     </div>
 
     <!-- Retos Disponibles -->
-    <div class="card shadow-sm">
+    <div class="card mb-4 shadow-lg animate__animated animate__fadeInUpBig">
         <div class="card-body">
-            <h4>Retos Disponibles</h4>
-            <div class="row" id="retos-disponibles">
-                {% for reto in retos_disponibles %}
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ reto.nombre }}</h5>
-                            <p class="card-text">
-                                {{ reto.descripcion }}<br>
-                                <small class="text-muted">Requisito: {{ reto.requisito }} puntos</small>
+            <h4 class="text-center mb-4">🚀 Retos en Curso</h4>
+            <div class="row">
+                {% for reto_usuario in retos_disponibles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-lg animate__animated animate__pulse" style="border: 2px solid #28a745;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold text-success">
+                                <a href="{{ reto_usuario.servicios_url }}" class="text-success text-decoration-none">
+                                    {{ reto_usuario.reto.nombre }}
+                                </a>
+                            </h5>
+                            <p class="card-text">{{ reto_usuario.reto.descripcion }}</p>
+                            <p class="small text-muted">
+                                Criterio: {{ reto_usuario.reto.criterio }} - Objetivo: {{ reto_usuario.reto.valor_objetivo }}
                             </p>
-                            <span class="badge bg-success">{{ reto.puntos_otorgados }} Puntos</span>
+                            <div class="progress progress-reto">
+                                <div
+                                    class="progress-bar progress-bar-striped progress-bar-animated"
+                                    role="progressbar"
+                                    style="width: {{ reto_usuario.progreso }}%;"
+                                    aria-valuenow="{{ reto_usuario.progreso }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                    {{ reto_usuario.progreso|floatformat:2 }}%
+                                </div>
+                            </div>
+                            <span class="badge bg-success fs-6 animate__animated animate__flipInX">
+                                {{ reto_usuario.reto.puntos_otorgados }} Puntos
+                            </span>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <div class="col-md-12">
-                    <p>No hay retos disponibles en este momento. ¡Mantente atento!</p>
+                <div class="col-12">
+                    <p class="text-muted text-center animate__animated animate__fadeOut">
+                        🎯 No hay retos disponibles en este momento. ¡Pronto habrá más!
+                    </p>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+
+    <!-- Recomendaciones por IA -->
+    <div class="card mb-4 shadow-lg animate__animated animate__fadeInUp">
+        <div class="card-body">
+            <h4 class="text-center mb-4">🧐 Recomendaciones Personalizadas</h4>
+            <ul class="list-group list-group-flush">
+                {% for recomendacion in recomendaciones %}
+                <li class="list-group-item">
+                    <i class="bi bi-lightbulb text-warning"></i> {{ recomendacion }}
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted text-center">🧐 No hay recomendaciones disponibles en este momento.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 
+<!-- Estilos -->
+<style>
+.progress-personalizada {
+    height: 50px;
+    border-radius: 25px;
+    overflow: hidden;
+}
+.progress-reto {
+    height: 20px;
+    border-radius: 10px;
+}
+.medalla-icono {
+    max-width: 80%;
+    max-height: 100%;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease-in-out;
+}
+.medalla-card[data-desbloqueada="true"] .medalla-icono {
+    filter: none;
+}
+.card:hover {
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+</style>
+
+<!-- Scripts -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Datos simulados (se reemplazarían con valores del backend)
-        const progresoActual = {{ usuario.puntos|default:0 }};
-        const calificacionPromedio = {{ usuario.calificacion_promedio|default:0 }};
-        const recomendaciones = {{ recomendaciones|safe }};
-
-        // Actualizar barra de progreso
-        const progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progresoActual}%`;
-        progressBar.setAttribute("aria-valuenow", progresoActual);
-        progressBar.textContent = `${progresoActual} / 100`;
-
-        // Establecer color según porcentaje
-        if (progresoActual < 50) {
-            progressBar.classList.add("bg-danger");
-        } else if (progresoActual < 80) {
-            progressBar.classList.add("bg-warning");
-        } else {
-            progressBar.classList.add("bg-success");
-        }
-
-        // Actualizar calificación promedio
-        const calificacionPromedioEl = document.getElementById("calificacion-promedio");
-        calificacionPromedioEl.textContent = `${calificacionPromedio.toFixed(1)} de 5`;
-
-        // Mostrar estrellas
-        const estrellasCalificacion = document.getElementById("estrellas-calificacion");
-        for (let i = 1; i <= 5; i++) {
-            const starIcon = document.createElement("i");
-            starIcon.classList.add("bi", i <= calificacionPromedio ? "bi-star-fill text-warning" : "bi-star text-muted");
-            estrellasCalificacion.appendChild(starIcon);
-        }
+document.addEventListener("DOMContentLoaded", function () {
+    // Animar las barras de progreso
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const targetWidth = parseInt(bar.getAttribute('aria-valuenow'), 10) || 0;
+        bar.style.width = '0%';
+        let width = 0;
+        const interval = setInterval(() => {
+            width++;
+            bar.style.width = `${width}%`;
+            if (width >= targetWidth) {
+                clearInterval(interval);
+            }
+        }, 20);
     });
+
+    // Generar estrellas animadas según la calificación promedio
+    const calificacionPromedio = parseFloat("{{ calificacion_promedio|default:0 }}");
+    const estrellas = document.getElementById("estrellas-calificacion");
+
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("i");
+        star.className = "bi bi-star"; // Clase base para todas las estrellas
+        star.style.fontSize = "2rem"; // Tamaño de las estrellas
+        star.style.margin = "0 5px"; // Separación entre estrellas
+        star.style.transition = "color 0.5s, transform 0.5s"; // Transiciones suaves
+        estrellas.appendChild(star);
+
+        // Animar llenado de estrellas
+        setTimeout(() => {
+            if (i <= Math.floor(calificacionPromedio)) {
+                star.className = "bi bi-star-fill text-warning"; // Llenar estrellas enteras
+            } else if (i - calificacionPromedio < 1) {
+                star.className = "bi bi-star-half text-warning"; // Estrella mitad si aplica
+            } else {
+                star.className = "bi bi-star text-muted"; // Estrellas vacías
+            }
+            star.style.transform = "scale(1.2)"; // Animación de escala
+            setTimeout(() => {
+                star.style.transform = "scale(1)"; // Volver al tamaño original
+            }, 500);
+        }, i * 300); // Retraso progresivo para cada estrella
+    }
+
+    // Mostrar animaciones para retos completados y medallas obtenidas
+    const animaciones = {{ animaciones|safe }};
+    const animacionesContainer = document.createElement('div');
+    animacionesContainer.classList.add('fixed-top', 'p-3', 'animate__animated');
+    document.body.appendChild(animacionesContainer);
+
+    animaciones.forEach((animacion, index) => {
+        const delay = index * 500; // Retraso entre animaciones
+        setTimeout(() => {
+            const notificacion = document.createElement('div');
+            notificacion.className = `alert alert-${animacion.tipo} animate__${animacion.animacion}`;
+            notificacion.innerHTML = `<i class="bi bi-info-circle"></i> ${animacion.mensaje}`;
+            animacionesContainer.appendChild(notificacion);
+
+            // Quitar la notificación después de 5 segundos
+            setTimeout(() => {
+                notificacion.classList.add('animate__fadeOut');
+                setTimeout(() => notificacion.remove(), 1000);
+            }, 5000);
+        }, delay);
+    });
+});
 </script>
 {% endblock %}
