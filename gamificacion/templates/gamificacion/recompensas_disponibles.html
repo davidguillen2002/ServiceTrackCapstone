@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}🎁 Recompensas Disponibles{% endblock %}
+
+{% block content %}
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4 animate__animated animate__fadeInDown">🎁 Recompensas Disponibles</h1>
+
+    <!-- Navigation -->
+    <div class="text-center mb-4 animate__animated animate__zoomIn">
+        <a href="{% url 'perfil_gamificacion' %}" class="btn btn-info animate__animated animate__tada">Volver al Perfil</a>
+    </div>
+
+    <p class="text-center">Recompensas basadas en tu nivel actual: <strong>Nivel {{ nivel_actual }}</strong></p>
+
+    <!-- Recompensas disponibles -->
+    <div class="card mb-4 shadow-lg animate__animated animate__fadeInUp">
+        <div class="card-body">
+            <h4 class="text-center mb-4">🎯 Recompensas que puedes redimir ahora</h4>
+            <div class="row">
+                {% if recompensas_disponibles %}
+                    {% for recompensa in recompensas_disponibles %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-lg animate__animated animate__zoomIn">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-primary fw-bold">
+                                    {{ recompensa.tipo }} <i class="bi bi-gift-fill"></i>
+                                </h5>
+                                <p class="card-text">
+                                    <span class="fw-bold">Valor:</span> {{ recompensa.valor }}<br>
+                                    <span class="fw-bold">Descripción:</span> {{ recompensa.descripcion }}<br>
+                                    <span class="fw-bold">Requiere:</span> {{ recompensa.puntos_necesarios }} puntos
+                                </p>
+                                <button class="btn btn-success btn-lg mt-3 animate__animated animate__pulse">
+                                    <i class="bi bi-check-circle"></i> Redimir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">🚫 No hay recompensas disponibles para redimir.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recompensas potenciales -->
+    <div class="card mb-4 shadow-lg animate__animated animate__fadeInUp">
+        <div class="card-body">
+            <h4 class="text-center mb-4">🔮 Recompensas Potenciales</h4>
+            <div class="row">
+                {% for recompensa in recompensas_potenciales %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-lg animate__animated animate__fadeInUp">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-info fw-bold">
+                                {{ recompensa.tipo }} <i class="bi bi-star-fill"></i>
+                            </h5>
+                            <p class="card-text">
+                                <span class="fw-bold">Valor:</span> {{ recompensa.valor }}<br>
+                                <span class="fw-bold">Descripción:</span> {{ recompensa.descripcion }}<br>
+                                <span class="fw-bold">Requiere:</span> {{ recompensa.puntos_necesarios }} puntos
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const cards = document.querySelectorAll(".card");
+        cards.forEach(card => {
+            card.addEventListener("mouseover", () => {
+                card.classList.add("animate__pulse");
+            });
+            card.addEventListener("mouseout", () => {
+                card.classList.remove("animate__pulse");
+            });
+        });
+    });
+</script>
+{% endblock %}

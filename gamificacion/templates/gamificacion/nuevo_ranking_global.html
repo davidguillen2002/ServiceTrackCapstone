@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Ranking Global{% endblock %}
+
+{% block content %}
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4 animate__animated animate__fadeInDown">🏆 Ranking Global de Técnicos 🏆</h1>
+
+    <!-- Tabla de Ranking -->
+    <div class="card shadow-lg animate__animated animate__zoomIn">
+        <div class="card-body">
+            <h4 class="card-title text-center mb-4 animate__animated animate__fadeInUp">🔝 Mejores Técnicos</h4>
+            {% if tecnicos %}
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle text-center animate__animated animate__fadeIn">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">🥇 Posición</th>
+                            <th scope="col">👤 Técnico</th>
+                            <th scope="col">🎮 Nivel</th>
+                            <th scope="col">⭐ Puntos Totales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tecnico in tecnicos %}
+                        <tr class="animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter|add:"0.2" }}s;">
+                            <th scope="row">
+                                {% if forloop.counter == 1 %}
+                                <span class="badge bg-warning text-dark fs-5">🥇</span>
+                                {% elif forloop.counter == 2 %}
+                                <span class="badge bg-secondary text-light fs-5">🥈</span>
+                                {% elif forloop.counter == 3 %}
+                                <span class="badge bg-danger text-light fs-5">🥉</span>
+                                {% else %}
+                                <span class="badge bg-info text-dark fs-5">{{ forloop.counter }}</span>
+                                {% endif %}
+                            </th>
+                            <td class="fw-bold">
+                                <i class="bi bi-person-circle text-primary"></i> {{ tecnico.nombre }}
+                            </td>
+                            <td class="text-primary fw-bold">
+                                <i class="bi bi-controller"></i> {{ tecnico.nivel }}
+                            </td>
+                            <td class="text-success fw-bold">
+                                <i class="bi bi-star-fill"></i> {{ tecnico.puntos_totales }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">😔 No hay técnicos registrados en el ranking aún. ¡Sé el primero en aparecer aquí!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botón para regresar -->
+    <div class="text-center mt-4 animate__animated animate__fadeInUp">
+        <a href="{% url 'perfil_gamificacion' %}" class="btn btn-outline-primary btn-lg animate__animated animate__pulse">
+            <i class="bi bi-arrow-left-circle"></i> Regresar a Mi Perfil
+        </a>
+    </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+.table-hover tbody tr:hover {
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+</style>
+
+<!-- Scripts de Animaciones -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll("tbody tr");
+    let delay = 0.2;
+
+    rows.forEach((row) => {
+        row.style.animationDelay = `${delay}s`;
+        row.classList.add("animate__fadeInUp");
+        delay += 0.1;
+    });
+});
+</script>
+{% endblock %}

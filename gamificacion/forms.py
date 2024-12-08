@@ -37,12 +37,13 @@ class ObservacionIncidenteForm(forms.ModelForm):
 class RetoForm(forms.ModelForm):
     class Meta:
         model = Reto
-        fields = ['nombre', 'descripcion', 'puntos_otorgados', 'requisito']
+        fields = ['nombre', 'descripcion', 'puntos_otorgados', 'criterio', 'valor_objetivo']
         labels = {
             'nombre': 'Nombre del reto',
             'descripcion': 'Descripción del reto',
             'puntos_otorgados': 'Puntos a otorgar',
-            'requisito': 'Requisito para completar',
+            'criterio': 'Criterio de cumplimiento',
+            'valor_objetivo': 'Valor objetivo (puntos, servicios, calificación promedio)',
         }
 
     def clean_puntos_otorgados(self):
@@ -51,11 +52,11 @@ class RetoForm(forms.ModelForm):
             raise forms.ValidationError("Los puntos otorgados deben ser mayores que cero.")
         return puntos
 
-    def clean_requisito(self):
-        requisito = self.cleaned_data.get("requisito")
-        if requisito <= 0:
-            raise forms.ValidationError("El requisito debe ser mayor que cero.")
-        return requisito
+    def clean_valor_objetivo(self):
+        valor_objetivo = self.cleaned_data.get("valor_objetivo")
+        if valor_objetivo <= 0:
+            raise forms.ValidationError("El valor objetivo debe ser mayor que cero.")
+        return valor_objetivo
 
 
 class MedallaForm(forms.ModelForm):
@@ -68,3 +69,9 @@ class MedallaForm(forms.ModelForm):
             'icono': 'Ícono de la medalla',
             'puntos_necesarios': 'Puntos necesarios para desbloquear',
         }
+
+    def clean_puntos_necesarios(self):
+        puntos = self.cleaned_data.get("puntos_necesarios")
+        if puntos <= 0:
+            raise forms.ValidationError("Los puntos necesarios deben ser mayores que cero.")
+        return puntos
