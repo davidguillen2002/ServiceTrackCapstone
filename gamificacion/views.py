@@ -8,7 +8,7 @@ from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 
 from ServiceTrack.models import Usuario, Medalla, Reto, RegistroPuntos, RetoUsuario, Guia, ObservacionIncidente, \
-    Servicio, Recompensa
+    Servicio, Recompensa, RetoCliente
 from .forms import GuiaForm, ObservacionIncidenteForm, RetoForm, MedallaForm
 from .utils import (
     otorgar_puntos_por_servicio,
@@ -289,6 +289,26 @@ def recompensas_disponibles(request):
         'nivel_actual': nivel_actual,
     })
 
+@login_required
+def perfil_cliente(request):
+    usuario = request.user
+
+    if usuario.rol.nombre != "cliente":
+        messages.error(request, "Acceso denegado.")
+        return redirect("home")
+
+    # Calcular progreso y notificaciones
+    usuario.verificar_y_actualizar_nivel_cliente()
+    puntos_restantes = usuario.calcular_proximo_nivel_cliente() - usuario.puntos_cliente
+    progreso_nivel = (usuario.puntos_cliente / usuario.calcular_proximo_nivel_cliente()) * 100
+    retos = RetoCliente.objects.filter(cliente=usuario, cumplido=False)
+
+    return render(request, "gamificacion/perfil_cliente.html", {
+        "usuario": usuario,
+        "puntos_restantes": puntos_restantes,
+        "progreso_nivel": round(progreso_nivel, 2),  # Redondear para mejor visualización
+        "retos": retos,
+    })
 
 # CRUD para Observaciones de Incidentes
 @login_required

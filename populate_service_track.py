@@ -46,7 +46,7 @@ from ServiceTrack.models import (
     Reto,
     Recompensa,
     RetoUsuario,
-    RegistroPuntos,
+    RegistroPuntos, RetoCliente,
 )
 
 # Crear roles
@@ -135,10 +135,124 @@ for nombre in tecnico_nombres:
 
         tecnico.save()
 
+# Crear recompensas asociadas a los niveles
+recompensas_por_nivel = {
+    1: [
+        {
+            "tipo": "herramienta",
+            "descripcion": "Descuento en tu próximo servicio técnico.",
+            "valor": 10.00,
+            "puntos_necesarios": 50,
+        },
+        {
+            "tipo": "reconocimiento",
+            "descripcion": "Certificado de cliente destacado nivel 1.",
+            "puntos_necesarios": 30,
+        },
+        {
+            "tipo": "bono",
+            "descripcion": "Bono de bienvenida por tu primer servicio.",
+            "valor": 15.00,
+            "puntos_necesarios": 40,
+        },
+    ],
+    2: [
+        {
+            "tipo": "herramienta",
+            "descripcion": "Kit básico de mantenimiento preventivo.",
+            "valor": 25.00,
+            "puntos_necesarios": 100,
+        },
+        {
+            "tipo": "capacitacion",
+            "descripcion": "Acceso a un curso básico de mantenimiento preventivo.",
+            "puntos_necesarios": 150,
+        },
+        {
+            "tipo": "bono",
+            "descripcion": "Bono de fidelidad para servicios premium.",
+            "valor": 20.00,
+            "puntos_necesarios": 120,
+        },
+    ],
+    3: [
+        {
+            "tipo": "herramienta",
+            "descripcion": "Herramienta avanzada para reparación.",
+            "valor": 50.00,
+            "puntos_necesarios": 300,
+        },
+        {
+            "tipo": "capacitacion",
+            "descripcion": "Curso avanzado en reparación de equipos electrónicos.",
+            "puntos_necesarios": 200,
+        },
+        {
+            "tipo": "reconocimiento",
+            "descripcion": "Certificado de cliente experto.",
+            "puntos_necesarios": 250,
+        },
+    ],
+}
+
+# Crear retos asociados a los niveles
+retos_por_nivel = {
+    1: [
+        {
+            "nombre": "Primer Servicio Solicitado",
+            "descripcion": "Solicita tu primer servicio.",
+            "puntos_otorgados": 50,
+        },
+        {
+            "nombre": "Califica un Servicio",
+            "descripcion": "Califica un servicio completado.",
+            "puntos_otorgados": 30,
+        },
+        {
+            "nombre": "Tres Servicios Solicitados",
+            "descripcion": "Solicita tres servicios en total.",
+            "puntos_otorgados": 100,
+        },
+    ],
+    2: [
+        {
+            "nombre": "Cinco Servicios Solicitados",
+            "descripcion": "Solicita cinco servicios en total.",
+            "puntos_otorgados": 150,
+        },
+        {
+            "nombre": "Recomienda a un Amigo",
+            "descripcion": "Recomienda el servicio a un amigo que solicite un servicio.",
+            "puntos_otorgados": 100,
+        },
+        {
+            "nombre": "Servicio Premium Solicitado",
+            "descripcion": "Solicita un servicio de categoría premium.",
+            "puntos_otorgados": 200,
+        },
+    ],
+    3: [
+        {
+            "nombre": "Diez Servicios Solicitados",
+            "descripcion": "Solicita diez servicios en total.",
+            "puntos_otorgados": 300,
+        },
+        {
+            "nombre": "Alta Calificación Promedio",
+            "descripcion": "Obtén una calificación promedio de 4.5 o superior.",
+            "puntos_otorgados": 200,
+        },
+        {
+            "nombre": "Programa un Mantenimiento",
+            "descripcion": "Programa un servicio de mantenimiento preventivo.",
+            "puntos_otorgados": 250,
+        },
+    ],
+}
+
 # Crear clientes masivos con nombres reales
 fake = Faker("es_ES")  # Generar nombres en español
 cliente_nombres = [fake.name() for _ in range(200)]  # Generar 200 nombres reales
-
 clientes = []
 for nombre in cliente_nombres:
     username = nombre.lower().replace(" ", "_").replace(".", "")
@@ -150,10 +264,82 @@ for nombre in cliente_nombres:
         "cedula": generar_cedula_ecuador(),
         "correo": f"{username}@gmail.com",
         "celular": f"098{randint(1000000, 9999999)}",
+        "puntos_cliente": randint(0, 199),  # Puntos iniciales limitados a un máximo de 199
+        "nivel_cliente": 1,  # Todos empiezan en nivel 1
     }
     cliente, created = Usuario.objects.get_or_create(username=username, defaults=cliente_data)
     if created:
         clientes.append(cliente)
+
+# Asignar recompensas según el nivel del cliente
+for cliente in clientes:
+    nivel_actual = cliente.nivel_cliente
+    if nivel_actual in recompensas_por_nivel:
+        for recompensa_data in recompensas_por_nivel[nivel_actual]:
+            Recompensa.objects.get_or_create(
+                usuario=cliente,
+                tipo=recompensa_data["tipo"],
+                descripcion=recompensa_data["descripcion"],
+                valor=recompensa_data.get("valor"),
+                puntos_necesarios=recompensa_data["puntos_necesarios"],
+                redimido=False,
+            )
+
+# Crear y asignar retos según el nivel del cliente
+for cliente in clientes:
+    nivel_actual = cliente.nivel_cliente
+    if nivel_actual in retos_por_nivel:
+        for reto_data in retos_por_nivel[nivel_actual]:
+            RetoCliente.objects.get_or_create(
+                cliente=cliente,
+                nombre=reto_data["nombre"],
+                descripcion=reto_data["descripcion"],
+                puntos_otorgados=reto_data["puntos_otorgados"],
+                cumplido=False,
+                progreso=0,
+            )
+
+# Verificar progreso de retos y recompensas para clientes
+for cliente in clientes:
+    retos_pendientes = RetoCliente.objects.filter(cliente=cliente, cumplido=False)
+    for reto in retos_pendientes:
+        # Simular progreso de retos
+        if reto.nombre == "Primer Servicio Solicitado":
+            reto.progreso = 100 if cliente.servicios_solicitados >= 1 else 0
+        elif reto.nombre == "Califica un Servicio":
+            reto.progreso = 100 if Servicio.objects.filter(equipo__cliente=cliente,
+                                                           calificacion__isnull=False).exists() else 0
+        elif reto.nombre == "Tres Servicios Solicitados":
+            reto.progreso = min(100, (cliente.servicios_solicitados / 3) * 100)
+        elif reto.nombre == "Cinco Servicios Solicitados":
+            reto.progreso = min(100, (cliente.servicios_solicitados / 5) * 100)
+        elif reto.nombre == "Recomienda a un Amigo":
+            reto.progreso = 100 if cliente.recomendaciones_exitosas >= 1 else 0
+        elif reto.nombre == "Servicio Premium Solicitado":
+            reto.progreso = 100 if Servicio.objects.filter(equipo__cliente=cliente, categoria="premium").exists() else 0
+        elif reto.nombre == "Diez Servicios Solicitados":
+            reto.progreso = min(100, (cliente.servicios_solicitados / 10) * 100)
+        elif reto.nombre == "Alta Calificación Promedio":
+            reto.progreso = 100 if cliente.calificacion_promedio >= 4.5 else 0
+        elif reto.nombre == "Programa un Mantenimiento":
+            reto.progreso = 100 if Servicio.objects.filter(equipo__cliente=cliente, tipo_servicio="mantenimiento").exists() else 0
+
+        # Marcar como cumplido si progreso es 100%
+        if reto.progreso >= 100:
+            reto.cumplido = True
+            cliente.puntos_cliente += reto.puntos_otorgados
+            cliente.save()
+        reto.save()
+
+    # Actualizar nivel del cliente basado en puntos acumulados
+    cliente.verificar_y_actualizar_nivel_cliente()
+
+# Resumen de clientes
+print(f"Clientes creados: {Usuario.objects.filter(rol=roles['cliente']).count()}")
+for cliente in clientes[:5]:  # Mostrar solo los primeros 5 clientes
+    print(f"Cliente: {cliente.nombre}, Nivel: {cliente.nivel_cliente}, Puntos: {cliente.puntos_cliente}")
+    print(f"Retos cumplidos: {RetoCliente.objects.filter(cliente=cliente, cumplido=True).count()}")
+    print(f"Recompensas disponibles: {Recompensa.objects.filter(usuario=cliente, redimido=False).count()}")
 
 # Crear equipos masivos con variedad de marcas reales
 equipos = []

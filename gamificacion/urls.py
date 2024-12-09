@@ -13,6 +13,9 @@ urlpatterns = [
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard_gamificacion'),
     path('otorgar-puntos/', views.otorgar_puntos_view, name='otorgar_puntos'),
 
+    #Vistas para clientes
+    path("perfil_cliente/", views.perfil_cliente, name="perfil_cliente"),
+
     # CRUD para Guías
     path('guias/', views.lista_guias, name='lista_guias'),
     path('guias/crear/', views.crear_guia, name='crear_guia'),

@@ -68,6 +68,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     # Relación con medallas
     medallas = models.ManyToManyField('Medalla', blank=True, related_name="tecnicos")
 
+    # Campos para clientes
+    servicios_solicitados = models.IntegerField(default=0, help_text="Número total de servicios solicitados por el cliente.")
+    puntos_cliente = models.IntegerField(default=0, help_text="Puntos acumulados como cliente.")
+    nivel_cliente = models.IntegerField(default=1, help_text="Nivel actual del cliente.")
+    recompenzas_disponibles = models.ManyToManyField('Recompensa', blank=True, related_name="clientes")
+
     # Campos adicionales para autenticación
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -81,6 +87,27 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.nombre
+
+    def calcular_proximo_nivel_cliente(self):
+        """
+        Calcula los puntos necesarios para que el cliente suba de nivel.
+        """
+        return self.nivel_cliente * 200
+
+    def verificar_y_actualizar_nivel_cliente(self):
+        """
+        Actualiza el nivel del cliente si cumple con los puntos necesarios.
+        """
+        while self.puntos_cliente >= self.calcular_proximo_nivel_cliente():
+            self.puntos_cliente -= self.calcular_proximo_nivel_cliente()
+            self.nivel_cliente += 1
+            # Notificar al cliente sobre el nuevo nivel
+            Notificacion.crear_notificacion(
+                usuario=self,
+                tipo="nivel_cliente",
+                mensaje=f"¡Felicidades {self.nombre}, has alcanzado el nivel {self.nivel_cliente}! 🎉"
+            )
+        self.save()
 
     # Métodos de lógica del modelo
     def calcular_experiencia_nivel_siguiente(self):
@@ -677,6 +704,25 @@ class RetoUsuario(models.Model):
 
     def __str__(self):
         return f"{self.usuario.nombre} - {self.reto.nombre} (Progreso: {self.progreso}%)"
+
+class RetoCliente(models.Model):
+    cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="retos_cliente")
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    cumplido = models.BooleanField(default=False)
+    progreso = models.FloatField(default=0.0)
+    puntos_otorgados = models.IntegerField()
+
+    def actualizar_progreso(self, progreso):
+        """
+        Actualiza el progreso del reto.
+        """
+        self.progreso = min(100, self.progreso + progreso)
+        if self.progreso >= 100 and not self.cumplido:
+            self.cumplido = True
+            self.cliente.puntos_cliente += self.puntos_otorgados
+            self.cliente.save()
+        self.save()
 
 class RegistroPuntos(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
