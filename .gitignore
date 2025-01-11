@@ -1,3 +1,7 @@
 # Exclude Python cache files
 __pycache__/
+<<<<<<< HEAD
 *.pyc
+=======
+*.pyc
+>>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a

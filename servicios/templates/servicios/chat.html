@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Chat con IA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Chat con IA</h1>
+
+    <!-- Contenedor del historial del chat -->
+    <div id="chatbox" class="chatbox">
+        {% for chat in chat_history %}
+            <div class="message user">
+                <strong>Tú:</strong> {{ chat.user_message }}
+            </div>
+            <div class="message bot">
+                <strong>Bot:</strong> {{ chat.bot_response }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Formulario de entrada para enviar preguntas -->
+    <form id="chat-form" method="post">
+        {% csrf_token %}
+        <div class="input-group mt-4">
+            <input type="text" id="message" name="message" class="form-control" placeholder="Escribe tu mensaje..." required>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+    </form>
+</div>
+
+<!-- Estilos para el chat -->
+<style>
+    .chatbox {
+        border: 1px solid #ddd;
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        margin-bottom: 20px;
+    }
+    .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    .user {
+        background-color: #d1e7ff;
+        text-align: right;
+    }
+    .bot {
+        background-color: #e9ecef;
+        text-align: left;
+    }
+</style>
+
+<!-- Script para enviar mensajes dinámicamente con AJAX -->
+<script>
+    document.getElementById('chat-form').onsubmit = function(event) {
+        event.preventDefault();
+        const messageInput = document.getElementById('message');
+        const message = messageInput.value;
+
+        fetch("", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `message=${message}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            const chatbox = document.getElementById('chatbox');
+
+            // Agregar mensaje del usuario
+            chatbox.innerHTML += `
+                <div class='message user'>
+                    <strong>Tú:</strong> ${message}
+                </div>`;
+
+            // Agregar respuesta del bot
+            chatbox.innerHTML += `
+                <div class='message bot'>
+                    <strong>Bot:</strong> ${data.response}
+                </div>`;
+
+            // Limpiar el campo de entrada
+            messageInput.value = "";
+            chatbox.scrollTop = chatbox.scrollHeight;
+        });
+    };
+</script>
+{% endblock %}
