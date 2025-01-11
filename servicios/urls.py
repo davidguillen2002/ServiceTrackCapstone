@@ -18,6 +18,7 @@ urlpatterns = [
     path('usuarios/equipo/<int:equipo_id>/actualizar_estado/', views.actualizar_estado_equipo_tecnico,
          name='actualizar_estado_equipo_tecnico'),
     path('mis_servicios_cliente/', views.lista_servicios_cliente, name='lista_servicios_cliente'),
-path('enviar_codigo_tecnico/<int:servicio_id>/', views.enviar_codigo_tecnico, name='enviar_codigo_tecnico'),
+    path('enviar_codigo_tecnico/<int:servicio_id>/', views.enviar_codigo_tecnico, name='enviar_codigo_tecnico'),
+    path('chat/', views.chat, name='chat'),
 
 ]

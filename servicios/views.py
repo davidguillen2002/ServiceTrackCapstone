@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
-from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo
+from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage
 from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides
 from django.http import JsonResponse
@@ -10,6 +10,10 @@ from django.template.loader import render_to_string
 from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm
 from django.contrib import messages
 from django.core.paginator import Paginator
+from openai import OpenAI, RateLimitError
+from django.conf import settings
+
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 # Función para verificar si el usuario es técnico
 def is_tecnico(user):
@@ -166,12 +170,43 @@ def register_service(request, service_id):
 
 @login_required
 @user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
+def chat(request):
+    chat_history = ChatMessage.objects.all().order_by('created_at')
+    response_text = None
+
+    if request.method == "POST":
+        user_message = request.POST.get('message', '')
+
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o-mini",
+                store=True,
+                messages=[
+                    {"role": "user", "content": user_message}
+                ]
+            )
+            response_text = completion.choices[0].message.content
+
+        except RateLimitError:
+            response_text = "Créditos insuficientes, contacte a administración."
+
+        # Guardar en la base de datos solo si la respuesta es válida
+        if response_text != "Créditos insuficientes, contacte a administración.":
+            ChatMessage.objects.create(user_message=user_message, bot_response=response_text)
+
+        return JsonResponse({"response": response_text})
+
+    return render(request, 'servicios/chat.html', {"chat_history": chat_history})
+
+
+# BASE DE CONOCIMIENTO
+@login_required
+@user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
 def base_conocimiento(request):
     query = request.GET.get('q', '')
     categoria_filtro = request.GET.get('categoria', '')
     tipo_servicio_filtro = request.GET.get('tipo_servicio', '')
 
-    # Filtrar guías con los criterios de búsqueda
     guias = Guia.objects.all()
     if query:
         guias = guias.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
@@ -180,12 +215,10 @@ def base_conocimiento(request):
     if tipo_servicio_filtro:
         guias = guias.filter(tipo_servicio__icontains=tipo_servicio_filtro)
 
-    # Si es una solicitud AJAX, devolver solo el HTML con los resultados
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('servicios/guia_list.html', {'guias': guias})
         return JsonResponse({'html': html})
 
-    # En caso contrario, renderizar la página completa
     categorias = Categoria.objects.all()
     tipos_servicio = Guia.objects.values_list('tipo_servicio', flat=True).distinct()
 
