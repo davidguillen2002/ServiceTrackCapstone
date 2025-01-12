@@ -2,15 +2,27 @@ import json
 
 import pandas as pd
 from django.db.models import Count, Min, Sum
-from ServiceTrack.models import Usuario, Servicio, Reto, RetoUsuario, RegistroPuntos, Medalla, ObservacionIncidente
+from ServiceTrack.models import Usuario, Servicio, Reto, RetoUsuario, RegistroPuntos, Medalla, ObservacionIncidente, Temporada, EstadisticaTemporada, Recompensa
 from django.utils.timezone import now
 from .notifications import notificar_tecnico, notificar_tecnico_con_animacion
 import joblib
 import os
 
+import json
+import pandas as pd
+from django.db.models import Sum, Avg
+from ServiceTrack.models import (
+    RegistroPuntos, RetoUsuario, Temporada, ObservacionIncidente
+)
+from django.utils.timezone import now
+import joblib
+import os
+
+
 def generar_recomendaciones_con_ia(tecnico):
     """
     Genera recomendaciones personalizadas para un técnico utilizando un modelo de aprendizaje automático.
+    Incluye análisis basado en temporada actual y progreso en retos.
     """
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -48,14 +60,25 @@ def generar_recomendaciones_con_ia(tecnico):
         "puntos_totales": puntos_totales,
     }], columns=columnas_modelo)
 
+    recomendaciones = []
+    temporada_actual = Temporada.obtener_temporada_actual()
+
+    if not temporada_actual:
+        recomendaciones.append("No hay una temporada activa. Completa tus objetivos en el próximo periodo.")
+        return recomendaciones
+
     try:
         # Generar predicción
         prediccion = modelo.predict(datos_tecnico)
         etiqueta_prediccion = int(prediccion[0])  # Convertir la predicción a entero
 
-        # Determinar retos completados y pendientes del nivel actual
-        retos_cumplidos = RetoUsuario.objects.filter(usuario=tecnico, cumplido=True, reto__nivel=tecnico.nivel).count()
-        retos_disponibles = RetoUsuario.objects.filter(usuario=tecnico, reto__nivel=tecnico.nivel).count()
+        # Determinar retos cumplidos y pendientes del nivel actual y temporada activa
+        retos_cumplidos = RetoUsuario.objects.filter(
+            usuario=tecnico, cumplido=True, reto__nivel=tecnico.nivel, reto__temporada=temporada_actual
+        ).count()
+        retos_disponibles = RetoUsuario.objects.filter(
+            usuario=tecnico, cumplido=False, reto__nivel=tecnico.nivel, reto__temporada=temporada_actual
+        ).count()
 
         # Generar texto según retos cumplidos y disponibles
         if retos_cumplidos >= 2:
@@ -64,24 +87,16 @@ def generar_recomendaciones_con_ia(tecnico):
             texto_recomendacion = "Estás en camino, completa otro reto para desbloquear beneficios adicionales."
         else:
             texto_recomendacion = "Aún tienes retos pendientes. ¡Empieza con uno simple para acumular experiencia rápidamente!"
+        recomendaciones.append(texto_recomendacion)
 
     except ValueError as ve:
         print(f"Error al mapear la etiqueta de predicción: {ve}")
-        texto_recomendacion = "Revisión manual requerida."
+        recomendaciones.append("Revisión manual requerida.")
     except Exception as e:
         print(f"Error al generar predicciones: {e}")
         return ["Error al generar recomendaciones con IA."]
 
-    # Generar recomendaciones personalizadas para retos del nivel actual
-    retos_pendientes = RetoUsuario.objects.filter(
-        usuario=tecnico,
-        cumplido=False,
-        reto__nivel=tecnico.nivel  # Filtrar retos solo del nivel actual
-    ).select_related('reto')
-
-    recomendaciones = []
-
-    # Recomendaciones basadas en desempeño
+    # Recomendaciones personalizadas basadas en desempeño
     if tecnico.calificacion_promedio and tecnico.calificacion_promedio < 4:
         recomendaciones.append("Trabaja en mejorar tus calificaciones para alcanzar un promedio de 4 o más.")
     elif tecnico.calificacion_promedio and tecnico.calificacion_promedio >= 4:
@@ -92,33 +107,22 @@ def generar_recomendaciones_con_ia(tecnico):
     else:
         recomendaciones.append("¡Impresionante! Estás acumulando puntos rápidamente. Considera apoyar a otros técnicos.")
 
-    # Recomendaciones basadas en retos disponibles
-    if retos_disponibles > 0:
-        recomendaciones.append(f"Tienes {retos_disponibles} retos disponibles. Selecciona uno para progresar.")
-    else:
-        recomendaciones.append("¡Has completado todos tus retos disponibles! Considera enfocarte en nuevas metas.")
+    # Recomendaciones basadas en retos pendientes del nivel actual y temporada activa
+    retos_pendientes = RetoUsuario.objects.filter(
+        usuario=tecnico,
+        cumplido=False,
+        reto__nivel=tecnico.nivel,
+        reto__temporada=temporada_actual
+    ).select_related('reto')
 
-    # Agregar recomendaciones específicas para retos pendientes
-    for reto in retos_pendientes:
-        progreso = reto.progreso or 0  # Manejar progreso nulo
-        try:
-            if progreso < reto.reto.valor_objetivo / 2:
-                recomendaciones.append(
-                    f"Enfócate en el reto '{reto.reto.nombre}', aún puedes avanzar significativamente."
-                )
-            else:
-                recomendaciones.append(
-                    f"Estás cerca de completar el reto '{reto.reto.nombre}'. ¡No te detengas ahora!"
-                )
-        except AttributeError as e:
-            print(f"Error al procesar el reto '{reto.reto.nombre}': {e}")
-            recomendaciones.append(f"Considera revisar el reto '{reto.reto.nombre}'.")
-
-    # Añadir la recomendación general generada
-    recomendaciones.append(texto_recomendacion)
+    for reto_usuario in retos_pendientes:
+        progreso = reto_usuario.progreso or 0  # Manejar progreso nulo
+        if progreso < 50:
+            recomendaciones.append(f"Enfócate en el reto '{reto_usuario.reto.nombre}', aún puedes avanzar significativamente.")
+        else:
+            recomendaciones.append(f"Estás cerca de completar el reto '{reto_usuario.reto.nombre}'. ¡No te detengas ahora!")
 
     return recomendaciones
-
 
 def otorgar_puntos_por_servicio(usuario):
     """
@@ -164,6 +168,10 @@ from django.utils.timezone import now
 from ServiceTrack.models import RegistroPuntos, RetoUsuario, Medalla
 from gamificacion.notifications import notificar_tecnico, notificar_tecnico_con_animacion
 
+
+from django.utils.timezone import now
+from ServiceTrack.models import RegistroPuntos, RetoUsuario, Medalla, Recompensa
+from gamificacion.notifications import notificar_tecnico, notificar_tecnico_con_animacion
 
 def verificar_y_asignar_medallas_y_retos(usuario):
     """
@@ -216,8 +224,12 @@ def verificar_y_asignar_medallas_y_retos(usuario):
 
     # Verificar progreso de retos pendientes
     retos = RetoUsuario.objects.filter(usuario=usuario, cumplido=False)
+    experiencia_total = 0  # Acumular la experiencia proporcional
+
     for reto_usuario in retos:
         reto_usuario.actualizar_progreso()
+        experiencia_total += (reto_usuario.progreso / 100) * reto_usuario.reto.puntos_otorgados  # Progresión proporcional
+
         if reto_usuario.progreso >= 100 and not reto_usuario.cumplido:
             reto_usuario.cumplido = True
             reto_usuario.fecha_completado = now()
@@ -244,14 +256,23 @@ def verificar_y_asignar_medallas_y_retos(usuario):
                 descripcion=f"Reto completado: {reto_usuario.reto.nombre}"
             )
 
-    # Evitar exceso de puntos y ajustar niveles si corresponde
+    # Sincronizar experiencia del usuario
+    if usuario.experiencia < experiencia_total:
+        usuario.experiencia = experiencia_total
+
+    # Verificar si el usuario tiene experiencia suficiente para subir de nivel
     experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
     while usuario.experiencia >= experiencia_requerida and usuario.nivel < 5:
-        usuario.experiencia -= experiencia_requerida
-        usuario.nivel += 1
-        experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
+        exceso_experiencia = usuario.experiencia - experiencia_requerida
 
-        # Notificar sobre el nuevo nivel alcanzado
+        # Incrementar nivel y reiniciar experiencia
+        usuario.nivel += 1
+        usuario.experiencia = exceso_experiencia
+
+        # Asignar nuevos retos para el nivel actual
+        usuario.asignar_retos_por_nivel()
+
+        # Crear notificación para el técnico con animación
         notificar_tecnico_con_animacion(
             usuario,
             f"¡Felicidades {usuario.nombre}, has alcanzado el nivel {usuario.nivel}! 🎉",
@@ -263,6 +284,8 @@ def verificar_y_asignar_medallas_y_retos(usuario):
             "mensaje": f"¡Felicidades {usuario.nombre}, has alcanzado el nivel {usuario.nivel}! 🎉",
             "animacion": "tada",
         })
+
+        experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
 
     # Ajustar experiencia sobrante si se alcanza el nivel máximo
     if usuario.nivel >= 5:
@@ -373,4 +396,86 @@ def limpiar_duplicados_retousuario():
     # Eliminar retos asignados a usuarios en niveles incorrectos
     for usuario in Usuario.objects.filter(rol__nombre="tecnico"):
         RetoUsuario.objects.filter(usuario=usuario).exclude(reto__nivel=usuario.nivel).delete()
+
+def finalizar_temporada():
+    """
+    Finaliza la temporada activa y configura la próxima temporada.
+    """
+    fecha_actual = now().date()
+    temporada_actual = Temporada.obtener_temporada_actual()
+
+    if not temporada_actual:
+        print("No hay temporada activa para finalizar.")
+        return
+
+    # Registrar estadísticas de todos los usuarios
+    usuarios = Usuario.objects.all()
+
+    for usuario in usuarios:
+        EstadisticaTemporada.objects.create(
+            usuario=usuario,
+            temporada=temporada_actual,
+            puntos_totales=usuario.puntos,
+            nivel_alcanzado=usuario.nivel,
+            retos_completados=usuario.retos_usuario.filter(cumplido=True).count(),
+        )
+
+        # Reiniciar datos del usuario
+        usuario.puntos = 0
+        usuario.nivel = 1
+        usuario.experiencia = 0
+        usuario.medallas.clear()
+        usuario.save()
+
+    # Cerrar temporada actual
+    temporada_actual.activa = False
+    temporada_actual.save()
+
+    # Activar la siguiente temporada
+    siguiente_temporada = Temporada.objects.filter(fecha_inicio__gte=fecha_actual).first()
+    if siguiente_temporada:
+        siguiente_temporada.activa = True
+        siguiente_temporada.save()
+        print(f"Nueva temporada '{siguiente_temporada.nombre}' activada.")
+    else:
+        # Crear automáticamente temporadas para el próximo año
+        Temporada.crear_temporadas_anuales()
+        print("Se crearon nuevas temporadas para el siguiente año.")
+
+def verificar_y_asignar_recompensas(usuario, temporada_actual):
+    """
+    Asigna recompensas a los usuarios que han cumplido retos en la temporada actual.
+    """
+    # Obtener retos cumplidos por el usuario en la temporada actual
+    retos_cumplidos = RetoUsuario.objects.filter(
+        usuario=usuario,
+        cumplido=True,
+        reto__temporada=temporada_actual
+    )
+
+    for reto_usuario in retos_cumplidos:
+        # Verificar si ya existe una recompensa asociada al reto cumplido
+        recompensa_existente = Recompensa.objects.filter(
+            usuario=usuario,
+            reto=reto_usuario.reto
+        ).exists()
+
+        if not recompensa_existente:
+            # Crear y asignar recompensa
+            Recompensa.objects.create(
+                usuario=usuario,
+                reto=reto_usuario.reto,
+                temporada=temporada_actual,
+                tipo="herramienta",  # Cambia según corresponda
+                puntos_necesarios=reto_usuario.reto.valor_objetivo,
+                descripcion=f"Recompensa por completar el reto '{reto_usuario.reto.nombre}'",
+                valor=50.00  # Ajusta el valor según corresponda
+            )
+
+            # Notificar al usuario
+            notificar_tecnico(
+                usuario=usuario,
+                mensaje=f"¡Has obtenido una recompensa por el reto '{reto_usuario.reto.nombre}'! 🎉",
+                tipo="success"
+            )
 

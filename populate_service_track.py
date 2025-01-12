@@ -46,7 +46,7 @@ from ServiceTrack.models import (
     Reto,
     Recompensa,
     RetoUsuario,
-    RegistroPuntos, RetoCliente,
+    RegistroPuntos, Temporada,
 )
 
 # Crear roles
@@ -135,6 +135,16 @@ for nombre in tecnico_nombres:
 
         tecnico.save()
 
+# Crear la temporada inicial
+temporada_1, _ = Temporada.objects.get_or_create(
+    nombre="Temporada 1",
+    fecha_inicio=date(2025, 1, 1),
+    fecha_fin=date(2025, 12, 31),
+    activa=True
+)
+print(f"Temporada creada: {temporada_1.nombre} (Activa: {temporada_1.activa})")
+
+
 # Crear recompensas asociadas a los niveles
 recompensas_por_nivel = {
     1: [
@@ -195,61 +205,6 @@ recompensas_por_nivel = {
     ],
 }
 
-# Crear retos asociados a los niveles
-retos_por_nivel = {
-    1: [
-        {
-            "nombre": "Primer Servicio Solicitado",
-            "descripcion": "Solicita tu primer servicio.",
-            "puntos_otorgados": 50,
-        },
-        {
-            "nombre": "Califica un Servicio",
-            "descripcion": "Califica un servicio completado.",
-            "puntos_otorgados": 30,
-        },
-        {
-            "nombre": "Tres Servicios Solicitados",
-            "descripcion": "Solicita tres servicios en total.",
-            "puntos_otorgados": 100,
-        },
-    ],
-    2: [
-        {
-            "nombre": "Cinco Servicios Solicitados",
-            "descripcion": "Solicita cinco servicios en total.",
-            "puntos_otorgados": 150,
-        },
-        {
-            "nombre": "Recomienda a un Amigo",
-            "descripcion": "Recomienda el servicio a un amigo que solicite un servicio.",
-            "puntos_otorgados": 100,
-        },
-        {
-            "nombre": "Servicio Premium Solicitado",
-            "descripcion": "Solicita un servicio de categoría premium.",
-            "puntos_otorgados": 200,
-        },
-    ],
-    3: [
-        {
-            "nombre": "Diez Servicios Solicitados",
-            "descripcion": "Solicita diez servicios en total.",
-            "puntos_otorgados": 300,
-        },
-        {
-            "nombre": "Alta Calificación Promedio",
-            "descripcion": "Obtén una calificación promedio de 4.5 o superior.",
-            "puntos_otorgados": 200,
-        },
-        {
-            "nombre": "Programa un Mantenimiento",
-            "descripcion": "Programa un servicio de mantenimiento preventivo.",
-            "puntos_otorgados": 250,
-        },
-    ],
-}
-
 # Crear clientes masivos con nombres reales
 fake = Faker("es_ES")  # Generar nombres en español
 cliente_nombres = [fake.name() for _ in range(200)]  # Generar 200 nombres reales
@@ -264,82 +219,10 @@ for nombre in cliente_nombres:
         "cedula": generar_cedula_ecuador(),
         "correo": f"{username}@gmail.com",
         "celular": f"098{randint(1000000, 9999999)}",
-        "puntos_cliente": randint(0, 199),  # Puntos iniciales limitados a un máximo de 199
-        "nivel_cliente": 1,  # Todos empiezan en nivel 1
     }
     cliente, created = Usuario.objects.get_or_create(username=username, defaults=cliente_data)
     if created:
         clientes.append(cliente)
-
-# Asignar recompensas según el nivel del cliente
-for cliente in clientes:
-    nivel_actual = cliente.nivel_cliente
-    if nivel_actual in recompensas_por_nivel:
-        for recompensa_data in recompensas_por_nivel[nivel_actual]:
-            Recompensa.objects.get_or_create(
-                usuario=cliente,
-                tipo=recompensa_data["tipo"],
-                descripcion=recompensa_data["descripcion"],
-                valor=recompensa_data.get("valor"),
-                puntos_necesarios=recompensa_data["puntos_necesarios"],
-                redimido=False,
-            )
-
-# Crear y asignar retos según el nivel del cliente
-for cliente in clientes:
-    nivel_actual = cliente.nivel_cliente
-    if nivel_actual in retos_por_nivel:
-        for reto_data in retos_por_nivel[nivel_actual]:
-            RetoCliente.objects.get_or_create(
-                cliente=cliente,
-                nombre=reto_data["nombre"],
-                descripcion=reto_data["descripcion"],
-                puntos_otorgados=reto_data["puntos_otorgados"],
-                cumplido=False,
-                progreso=0,
-            )
-
-# Verificar progreso de retos y recompensas para clientes
-for cliente in clientes:
-    retos_pendientes = RetoCliente.objects.filter(cliente=cliente, cumplido=False)
-    for reto in retos_pendientes:
-        # Simular progreso de retos
-        if reto.nombre == "Primer Servicio Solicitado":
-            reto.progreso = 100 if cliente.servicios_solicitados >= 1 else 0
-        elif reto.nombre == "Califica un Servicio":
-            reto.progreso = 100 if Servicio.objects.filter(equipo__cliente=cliente,
-                                                           calificacion__isnull=False).exists() else 0
-        elif reto.nombre == "Tres Servicios Solicitados":
-            reto.progreso = min(100, (cliente.servicios_solicitados / 3) * 100)
-        elif reto.nombre == "Cinco Servicios Solicitados":
-            reto.progreso = min(100, (cliente.servicios_solicitados / 5) * 100)
-        elif reto.nombre == "Recomienda a un Amigo":
-            reto.progreso = 100 if cliente.recomendaciones_exitosas >= 1 else 0
-        elif reto.nombre == "Servicio Premium Solicitado":
-            reto.progreso = 100 if Servicio.objects.filter(equipo__cliente=cliente, categoria="premium").exists() else 0
-        elif reto.nombre == "Diez Servicios Solicitados":
-            reto.progreso = min(100, (cliente.servicios_solicitados / 10) * 100)
-        elif reto.nombre == "Alta Calificación Promedio":
-            reto.progreso = 100 if cliente.calificacion_promedio >= 4.5 else 0
-        elif reto.nombre == "Programa un Mantenimiento":
-            reto.progreso = 100 if Servicio.objects.filter(equipo__cliente=cliente, tipo_servicio="mantenimiento").exists() else 0
-
-        # Marcar como cumplido si progreso es 100%
-        if reto.progreso >= 100:
-            reto.cumplido = True
-            cliente.puntos_cliente += reto.puntos_otorgados
-            cliente.save()
-        reto.save()
-
-    # Actualizar nivel del cliente basado en puntos acumulados
-    cliente.verificar_y_actualizar_nivel_cliente()
-
-# Resumen de clientes
-print(f"Clientes creados: {Usuario.objects.filter(rol=roles['cliente']).count()}")
-for cliente in clientes[:5]:  # Mostrar solo los primeros 5 clientes
-    print(f"Cliente: {cliente.nombre}, Nivel: {cliente.nivel_cliente}, Puntos: {cliente.puntos_cliente}")
-    print(f"Retos cumplidos: {RetoCliente.objects.filter(cliente=cliente, cumplido=True).count()}")
-    print(f"Recompensas disponibles: {Recompensa.objects.filter(usuario=cliente, redimido=False).count()}")
 
 # Crear equipos masivos con variedad de marcas reales
 equipos = []
@@ -402,11 +285,17 @@ for tecnico in tecnicos:
     # Cada técnico tendrá un servicio completado y el resto en estados diferentes
     servicios_creados = []
 
-    # Crear un servicio completado
-    equipo = choice(equipos)
-    fecha_inicio = date.today() - timedelta(days=randint(30, 365))  # Servicio en el último año
-    fecha_fin = fecha_inicio + timedelta(days=randint(1, 15))  # Servicio dura entre 1 y 15 días
-    calificacion = 3  # Calificación fija en 3
+    # Obtener la temporada actual
+    temporada_actual = Temporada.obtener_temporada_actual()
+    if temporada_actual:
+        # Crear un servicio completado dentro del rango de fechas de la temporada actual
+        equipo = choice(equipos)
+        fecha_inicio = temporada_actual.fecha_inicio + timedelta(days=randint(0, (
+                    temporada_actual.fecha_fin - temporada_actual.fecha_inicio).days - 15))  # Inicio dentro del rango
+        fecha_fin = fecha_inicio + timedelta(days=randint(1, 15))  # Servicio dura entre 1 y 15 días
+        calificacion = 3  # Calificación fija en 3
+    else:
+        print("No hay una temporada activa para ajustar las fechas del servicio.")
 
     servicio_completado = Servicio(
         equipo=equipo,
@@ -729,16 +618,17 @@ medallas_por_nivel = {
 # Crear y asignar medallas y retos automáticamente
 for nivel, medallas in medallas_por_nivel.items():
     for medalla_data in medallas:
-        retos_data = medalla_data["retos"]  # No eliminar el campo del diccionario
+        retos_data = medalla_data["retos"]  # Obtener los retos asociados a la medalla
         medalla, created = Medalla.objects.get_or_create(
             nombre=medalla_data["nombre"],
             descripcion=medalla_data["descripcion"],
             puntos_necesarios=medalla_data["puntos_necesarios"],
             nivel_requerido=medalla_data["nivel_requerido"],
             icono=medalla_data["icono"],
+            temporada=temporada_1,  # Asignar la medalla a la Temporada 1
         )
         if created:
-            print(f"Medalla '{medalla.nombre}' creada para nivel {nivel}.")
+            print(f"Medalla '{medalla.nombre}' creada para Nivel {nivel}, Temporada {medalla.temporada.nombre}.")
 
         # Crear y asociar retos a la medalla
         for reto_data in retos_data:
@@ -749,108 +639,75 @@ for nivel, medallas in medallas_por_nivel.items():
                 criterio=reto_data["criterio"],
                 valor_objetivo=reto_data["valor_objetivo"],
                 nivel=nivel,
+                temporada=temporada_1,  # Asociar el reto también a la Temporada 1
             )
             medalla.retos_asociados.add(reto)
         medalla.save()
 
-print("Medallas y retos creados correctamente.")
+print("Medallas y retos creados y asociados correctamente a Temporada 1.")
 
-# Crear recompensas específicas por nivel para técnicos
-recompensas_por_nivel = {
-    1: [
-        {"tipo": "herramienta", "valor": 50.00, "puntos_necesarios": 100, "descripcion": "Juego de destornilladores básico."},
-        {"tipo": "capacitacion", "valor": 0.00, "puntos_necesarios": 120, "descripcion": "Acceso a un curso básico de reparaciones."},
-        {"tipo": "reconocimiento", "valor": 0.00, "puntos_necesarios": 80, "descripcion": "Certificado de técnico en entrenamiento."},
-    ],
-    2: [
-        {"tipo": "herramienta", "valor": 100.00, "puntos_necesarios": 200, "descripcion": "Multímetro digital profesional."},
-        {"tipo": "capacitacion", "valor": 0.00, "puntos_necesarios": 220, "descripcion": "Curso avanzado de diagnóstico y reparación."},
-        {"tipo": "reconocimiento", "valor": 0.00, "puntos_necesarios": 180, "descripcion": "Placa de reconocimiento al mérito técnico."},
-    ],
-    3: [
-        {"tipo": "herramienta", "valor": 200.00, "puntos_necesarios": 300, "descripcion": "Set completo de herramientas de precisión."},
-        {"tipo": "bono", "valor": 150.00, "puntos_necesarios": 320, "descripcion": "Bono por desempeño destacado en reparaciones."},
-        {"tipo": "capacitacion", "valor": 0.00, "puntos_necesarios": 280, "descripcion": "Curso especializado en tecnología avanzada."},
-    ],
-    4: [
-        {"tipo": "herramienta", "valor": 300.00, "puntos_necesarios": 500, "descripcion": "Equipo avanzado de diagnóstico electrónico."},
-        {"tipo": "bono", "valor": 200.00, "puntos_necesarios": 520, "descripcion": "Bono por liderar proyectos técnicos."},
-        {"tipo": "reconocimiento", "valor": 0.00, "puntos_necesarios": 480, "descripcion": "Trofeo técnico destacado del año."},
-    ],
-    5: [
-        {"tipo": "herramienta", "valor": 500.00, "puntos_necesarios": 1000, "descripcion": "Estación de soldadura de alta precisión."},
-        {"tipo": "bono", "valor": 300.00, "puntos_necesarios": 1020, "descripcion": "Bono especial por maestría técnica."},
-        {"tipo": "reconocimiento", "valor": 0.00, "puntos_necesarios": 980, "descripcion": "Inscripción en el salón de la fama técnica."},
-    ],
-}
-
-# Crear y asignar recompensas automáticamente según retos cumplidos
-for nivel, recompensas in recompensas_por_nivel.items():
-    for recompensa_data in recompensas:
-        for tecnico in tecnicos:
-            # Verificar retos asociados al nivel del técnico
-            retos_cumplidos = RetoUsuario.objects.filter(usuario=tecnico, reto__nivel=nivel, cumplido=True).count()
-            retos_requeridos = Reto.objects.filter(nivel=nivel).count()
-
-            if retos_cumplidos == retos_requeridos:  # Todos los retos del nivel están cumplidos
-                recompensa, created = Recompensa.objects.get_or_create(
-                    usuario=tecnico,
-                    tipo=recompensa_data["tipo"],
-                    puntos_necesarios=recompensa_data["puntos_necesarios"],
-                    descripcion=recompensa_data["descripcion"],
-                    defaults={
-                        "valor": recompensa_data["valor"],
-                        "redimido": False,
-                    }
-                )
-                if created:
-                    print(f"[Nivel {nivel}] Recompensa '{recompensa.descripcion}' asignada a técnico '{tecnico.nombre}'.")
-                else:
-                    print(f"[Nivel {nivel}] Recompensa '{recompensa.descripcion}' ya existe para técnico '{tecnico.nombre}'.")
-            else:
-                print(f"Técnico '{tecnico.nombre}' aún no ha cumplido todos los retos de nivel {nivel}.")
-
-# Evaluar progreso y cumplimiento de retos para todos los técnicos
+# Evaluar progreso y cumplimiento de retos, recompensas y medallas
 for tecnico in tecnicos:
-    print(f"Evaluando retos y medallas para el técnico: {tecnico.nombre}")
+    print(f"Evaluando retos, recompensas y medallas para el técnico: {tecnico.nombre}")
 
-    # Llamar a la función centralizada para verificar medallas y retos
+    # Verificar retos, recompensas y medallas
+    from gamificacion.utils import verificar_y_asignar_medallas_y_retos
     animaciones = verificar_y_asignar_medallas_y_retos(tecnico)
 
     # Ajustar estadísticas del técnico
     tecnico.calificacion_promedio = (
         Servicio.objects.filter(tecnico=tecnico, estado="completado")
-        .aggregate(avg_calificacion=models.Avg("calificacion"))["avg_calificacion"]
+        .aggregate(promedio_calificacion=models.Avg("calificacion"))["promedio_calificacion"]
         or 0
     )
+    tecnico.nivel = min(tecnico.nivel, 5)  # Asegurar que el nivel no exceda el máximo permitido
     tecnico.save()
 
-    # Asegurar que el nivel máximo no sea excedido
-    if tecnico.nivel > 5:
-        tecnico.nivel = 5
-        tecnico.save()
-        print(f"Técnico '{tecnico.nombre}' ha sido ajustado al nivel máximo permitido (5).")
+    print(f"Técnico '{tecnico.nombre}' tiene calificación promedio: {tecnico.calificacion_promedio:.2f}")
+    print(f"Animaciones generadas: {len(animaciones)}")
 
-# Resumen de progreso y asignaciones
+# Resumen de progreso y asignaciones por técnico
 for tecnico in tecnicos:
+    retos_cumplidos = RetoUsuario.objects.filter(usuario=tecnico, cumplido=True, reto__temporada=temporada_1).count()
+    medallas_asignadas = tecnico.medallas.filter(temporada=temporada_1).count()
     print(f"Técnico '{tecnico.nombre}' tiene:")
     print(f"- Nivel: {tecnico.nivel}")
     print(f"- Experiencia: {tecnico.experiencia}")
     print(f"- Puntos: {tecnico.puntos}")
-    print(f"- Retos cumplidos: {RetoUsuario.objects.filter(usuario=tecnico, cumplido=True).count()}")
-    print(f"- Medallas asignadas: {tecnico.medallas.count()}")
+    print(f"- Retos cumplidos en Temporada 1: {retos_cumplidos}")
+    print(f"- Medallas asignadas en Temporada 1: {medallas_asignadas}")
 
-# Resumen de la población de datos
+# Resumen general de la población de datos
 print(f"Técnicos creados: {Usuario.objects.filter(rol=roles['tecnico']).count()}")
 print(f"Clientes creados: {Usuario.objects.filter(rol=roles['cliente']).count()}")
 print(f"Servicios creados: {Servicio.objects.count()}")
 
+# Resumen de retos y técnicos por nivel en la Temporada 1
 for nivel in range(1, 6):
-    total_retos_nivel = sum(len(medalla["retos"]) for medalla in medallas_por_nivel.get(nivel, []))
-    retos_cumplidos_nivel = RetoUsuario.objects.filter(reto__nivel=nivel, cumplido=True).count()
-    print(f"Nivel {nivel}: Retos cumplidos {retos_cumplidos_nivel}/{total_retos_nivel}")
-    print(f"Técnicos en nivel {nivel}: {Usuario.objects.filter(nivel=nivel, rol=roles['tecnico']).count()}")
+    total_retos_nivel = Reto.objects.filter(nivel=nivel, temporada=temporada_1).count()
+    retos_cumplidos_nivel = RetoUsuario.objects.filter(reto__nivel=nivel, cumplido=True, reto__temporada=temporada_1).count()
+    tecnicos_nivel = Usuario.objects.filter(nivel=nivel, rol=roles['tecnico']).count()
 
-print(f"Medallas asignadas: {sum(tecnico.medallas.count() for tecnico in tecnicos)}")
-print(f"Puntos registrados: {RegistroPuntos.objects.count()}")
-print("Población de datos completada exitosamente.")
+    print(f"Nivel {nivel}:")
+    print(f"- Retos cumplidos en Temporada 1: {retos_cumplidos_nivel}/{total_retos_nivel}")
+    print(f"- Técnicos en nivel {nivel}: {tecnicos_nivel}")
+
+# Resumen de logros y puntos generales
+medallas_asignadas_total = sum(tecnico.medallas.filter(temporada=temporada_1).count() for tecnico in tecnicos)
+puntos_registrados = RegistroPuntos.objects.filter(usuario__rol=roles['tecnico']).count()
+
+print(f"Medallas asignadas en Temporada 1: {medallas_asignadas_total}")
+print(f"Puntos registrados en Temporada 1: {puntos_registrados}")
+print("Evaluación de retos y progreso completada exitosamente.")
+# Verificar recompensas creadas
+print("\nResumen de recompensas creadas:")
+for nivel in range(1, 6):
+    recompensas_nivel = Recompensa.objects.filter(reto__nivel=nivel).count()
+    print(f"Nivel {nivel}: {recompensas_nivel} recompensas creadas.")
+
+# Verificar retos cumplidos y recompensas asignadas
+print("\nResumen de recompensas asignadas por técnico:")
+for tecnico in tecnicos:
+    recompensas_tecnico = Recompensa.objects.filter(usuario=tecnico).count()
+    print(f"Técnico {tecnico.nombre}: {recompensas_tecnico} recompensas asignadas.")
+

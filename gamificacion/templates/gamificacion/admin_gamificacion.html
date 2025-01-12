@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Administración de Gamificación{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">🎮 Administración de Gamificación</h1>
+
+    <!-- Temporadas -->
+    <h2 class="mt-4">📅 Temporadas</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ temporada_form.as_p }}
+        <input type="hidden" name="action" value="crear_temporada">
+        <button class="btn btn-primary">Crear Temporada</button>
+    </form>
+    <ul class="list-group mt-3">
+        {% for temporada in temporadas %}
+        <li class="list-group-item">
+            <strong>{{ temporada.nombre }}</strong> ({{ temporada.fecha_inicio }} - {{ temporada.fecha_fin }})
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="eliminar_temporada">
+                <input type="hidden" name="temporada_id" value="{{ temporada.id }}">
+                <button class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Retos -->
+    <h2 class="mt-4">📜 Retos</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ reto_form.as_p }}
+        <input type="hidden" name="action" value="crear_reto">
+        <button class="btn btn-primary">Crear Reto</button>
+    </form>
+    <ul class="list-group mt-3">
+        {% for reto in retos %}
+        <li class="list-group-item">
+            <strong>{{ reto.nombre }}</strong> (Nivel: {{ reto.nivel }})
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="eliminar_reto">
+                <input type="hidden" name="reto_id" value="{{ reto.id }}">
+                <button class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Recompensas -->
+    <h2 class="mt-4">🎁 Recompensas</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ recompensa_form.as_p }}
+        <input type="hidden" name="action" value="crear_recompensa">
+        <button class="btn btn-primary">Crear Recompensa</button>
+    </form>
+    <ul class="list-group mt-3">
+        {% for recompensa in recompensas %}
+        <li class="list-group-item">
+            <strong>{{ recompensa.descripcion }}</strong> ({{ recompensa.tipo }})
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="eliminar_recompensa">
+                <input type="hidden" name="recompensa_id" value="{{ recompensa.id }}">
+                <button class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Medallas -->
+    <h2 class="mt-4">🏅 Medallas</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ medalla_form.as_p }}
+        <input type="hidden" name="action" value="crear_medalla">
+        <button class="btn btn-primary">Crear Medalla</button>
+    </form>
+    <ul class="list-group mt-3">
+        {% for medalla in medallas %}
+        <li class="list-group-item">
+            <strong>{{ medalla.nombre }}</strong> (Nivel: {{ medalla.nivel_requerido }})
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="eliminar_medalla">
+                <input type="hidden" name="medalla_id" value="{{ medalla.id }}">
+                <button class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

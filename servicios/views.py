@@ -2,11 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
-<<<<<<< HEAD
-from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo
-=======
 from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage
->>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a
 from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides
 from django.http import JsonResponse
@@ -14,15 +10,11 @@ from django.template.loader import render_to_string
 from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm
 from django.contrib import messages
 from django.core.paginator import Paginator
-<<<<<<< HEAD
-
-=======
 from openai import OpenAI, RateLimitError
 from django.conf import settings
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
->>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a
 # Función para verificar si el usuario es técnico
 def is_tecnico(user):
     return user.rol.nombre == "tecnico"
@@ -178,8 +170,6 @@ def register_service(request, service_id):
 
 @login_required
 @user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
-<<<<<<< HEAD
-=======
 def chat(request):
     chat_history = ChatMessage.objects.all().order_by('created_at')
     response_text = None
@@ -212,16 +202,11 @@ def chat(request):
 # BASE DE CONOCIMIENTO
 @login_required
 @user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
->>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a
 def base_conocimiento(request):
     query = request.GET.get('q', '')
     categoria_filtro = request.GET.get('categoria', '')
     tipo_servicio_filtro = request.GET.get('tipo_servicio', '')
 
-<<<<<<< HEAD
-    # Filtrar guías con los criterios de búsqueda
-=======
->>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a
     guias = Guia.objects.all()
     if query:
         guias = guias.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
@@ -230,15 +215,10 @@ def base_conocimiento(request):
     if tipo_servicio_filtro:
         guias = guias.filter(tipo_servicio__icontains=tipo_servicio_filtro)
 
-<<<<<<< HEAD
-    # Si es una solicitud AJAX, devolver solo el HTML con los resultados
-=======
->>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('servicios/guia_list.html', {'guias': guias})
         return JsonResponse({'html': html})
 
-    # En caso contrario, renderizar la página completa
     categorias = Categoria.objects.all()
     tipos_servicio = Guia.objects.values_list('tipo_servicio', flat=True).distinct()
 

@@ -40,10 +40,25 @@
         </div>
     </div>
 
+    <!-- Temporada Activa -->
+    <div class="card mb-4 shadow-lg animate__animated animate__fadeInDown">
+        <div class="card-body text-center">
+            <h4>📅 Temporada Activa</h4>
+            {% if temporada_activa %}
+                <p class="fw-bold text-primary">{{ temporada_activa.nombre }}</p>
+                <p class="text-muted">
+                    Del {{ temporada_activa.fecha_inicio|date:"d M Y" }} al {{ temporada_activa.fecha_fin|date:"d M Y" }}
+                </p>
+            {% else %}
+                <p class="text-muted">No hay temporada activa actualmente.</p>
+            {% endif %}
+        </div>
+    </div>
+
     <!-- Barra de Progreso del Nivel -->
     <div class="card mb-4 shadow-lg animate__animated animate__lightSpeedInRight">
         <div class="card-body">
-            <h4 class="text-center mb-3">📈 Avance al Próximo Nivel</h4>
+            <h4 class="text-center mb-3">📈 Progreso de Retos Completados</h4>
             <div class="progress progress-personalizada">
                 <div
                     class="progress-bar progress-bar-striped progress-bar-animated"
@@ -52,11 +67,16 @@
                     aria-valuenow="{{ progreso_nivel }}"
                     aria-valuemin="0"
                     aria-valuemax="100">
-                    {{ experiencia_actual }} / {{ experiencia_requerida }} XP
+                    {{ progreso_nivel }}%
                 </div>
             </div>
+            <p class="text-center mt-2">
+                Retos Completados: {{ retos_completados }} / {{ total_retos_nivel }}
+            </p>
         </div>
     </div>
+
+
 
     <!-- Calificación Promedio -->
     <div class="card mb-4 shadow-lg animate__animated animate__bounceInUp">

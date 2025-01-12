@@ -8,13 +8,12 @@ urlpatterns = [
     path('nuevo-ranking-global/', views.nuevo_ranking_global, name='nuevo_ranking_global'),
     path('historial-puntos-paginado/', views.historial_puntos_paginated, name='historial_puntos_paginated'),
     path('recompensas/', views.recompensas_disponibles, name='recompensas_disponibles'),
+    path('redimir-recompensa/', views.redimir_recompensa, name='redimir_recompensa'),
 
     # Panel de administración
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard_gamificacion'),
     path('otorgar-puntos/', views.otorgar_puntos_view, name='otorgar_puntos'),
-
-    #Vistas para clientes
-    path("perfil_cliente/", views.perfil_cliente, name="perfil_cliente"),
+    path('administrar_gamificacion/', views.administrar_gamificacion, name='administrar_gamificacion'),
 
     # CRUD para Guías
     path('guias/', views.lista_guias, name='lista_guias'),
@@ -28,15 +27,4 @@ urlpatterns = [
     path('observaciones/editar/<int:observacion_id>/', views.editar_observacion, name='editar_observacion'),
     path('observaciones/eliminar/<int:observacion_id>/', views.eliminar_observacion, name='eliminar_observacion'),
 
-    # CRUD para Retos (admin-only)
-    path('retos/lista/', views.lista_retos, name='lista_retos'),
-    path('retos/crear/', views.crear_reto, name='crear_reto'),
-    path('retos/editar/<int:reto_id>/', views.editar_reto, name='editar_reto'),
-    path('retos/eliminar/<int:reto_id>/', views.eliminar_reto, name='eliminar_reto'),
-
-    # CRUD para Medallas (admin-only)
-    path('medallas/', views.lista_medallas, name='lista_medallas'),
-    path('medallas/crear/', views.crear_medalla, name='crear_medalla'),
-    path('medallas/editar/<int:medalla_id>/', views.editar_medalla, name='editar_medalla'),
-    path('medallas/eliminar/<int:medalla_id>/', views.eliminar_medalla, name='eliminar_medalla'),
 ]
