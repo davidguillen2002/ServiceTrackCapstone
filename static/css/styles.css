@@ -145,6 +145,8 @@ footer {
     }
 }
 
+<<<<<<< HEAD
+=======
 /* Botón flotante para chat con IA */
 .btn-flotante {
     font-size: 16px;
@@ -167,3 +169,4 @@ footer {
     background-color: #2c2fa5;
     transform: translateY(-7px);
 }
+>>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a

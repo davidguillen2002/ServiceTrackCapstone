@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Lista de Temporadas</h1>
+<a href="{% url 'crear_temporada' %}" class="btn btn-primary">Crear Nueva Temporada</a>
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Activa</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for temporada in temporadas %}
+        <tr>
+            <td>{{ temporada.nombre }}</td>
+            <td>{{ temporada.fecha_inicio }}</td>
+            <td>{{ temporada.fecha_fin }}</td>
+            <td>{{ temporada.activa|yesno:"Sí,No" }}</td>
+            <td>
+                <a href="{% url 'editar_temporada' temporada.id %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'eliminar_temporada' temporada.id %}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('¿Estás seguro de eliminar esta temporada?')">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

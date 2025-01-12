@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db.models import Avg
+from django.db.models import Avg, Sum
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -70,9 +70,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     # Campos para clientes
     servicios_solicitados = models.IntegerField(default=0, help_text="Número total de servicios solicitados por el cliente.")
-    puntos_cliente = models.IntegerField(default=0, help_text="Puntos acumulados como cliente.")
-    nivel_cliente = models.IntegerField(default=1, help_text="Nivel actual del cliente.")
-    recompenzas_disponibles = models.ManyToManyField('Recompensa', blank=True, related_name="clientes")
 
     # Campos adicionales para autenticación
     is_active = models.BooleanField(default=True)
@@ -108,6 +105,24 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
                 mensaje=f"¡Felicidades {self.nombre}, has alcanzado el nivel {self.nivel_cliente}! 🎉"
             )
         self.save()
+
+    def calcular_progreso_nivel_por_retos(self):
+        """
+        Calcula el progreso del nivel actual del usuario basado en los retos completados.
+        """
+        temporada_actual = Temporada.obtener_temporada_actual()
+        if not temporada_actual:
+            return 0
+
+        retos_nivel = RetoUsuario.objects.filter(
+            usuario=self,
+            reto__nivel=self.nivel,
+            reto__temporada=temporada_actual
+        )
+        total_retos = retos_nivel.count()
+        retos_cumplidos = retos_nivel.filter(cumplido=True).count()
+
+        return round((retos_cumplidos / total_retos) * 100, 2) if total_retos > 0 else 0
 
     # Métodos de lógica del modelo
     def calcular_experiencia_nivel_siguiente(self):
@@ -147,6 +162,32 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             self.experiencia = min(self.experiencia, 0)
 
         self.save()
+
+    def calcular_experiencia_total(self):
+        """
+        Calcula la experiencia total del usuario considerando retos cumplidos y puntos directos.
+        """
+        temporada_actual = Temporada.obtener_temporada_actual()
+        if not temporada_actual:
+            return self.experiencia
+
+        # Experiencia por retos cumplidos
+        retos_cumplidos = RetoUsuario.objects.filter(
+            usuario=self,
+            cumplido=True,
+            reto__temporada=temporada_actual
+        )
+        experiencia_por_retos = retos_cumplidos.aggregate(
+            total=Sum('reto__puntos_otorgados')
+        )['total'] or 0
+
+        # Experiencia por puntos directos
+        puntos_directos = RegistroPuntos.objects.filter(
+            usuario=self,
+            fecha__range=[temporada_actual.fecha_inicio, temporada_actual.fecha_fin]
+        ).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
+
+        return experiencia_por_retos + puntos_directos
 
 
     def calcular_progreso_nivel(self):
@@ -251,6 +292,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def verificar_y_subir_nivel(self):
         """
         Verifica si el usuario tiene suficiente experiencia para subir de nivel.
+        Reinicia la experiencia si se sube de nivel.
         """
         from gamificacion.notifications import notificar_tecnico  # Importación local para evitar el ciclo
 
@@ -274,6 +316,10 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             )
 
             experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
+
+        # Reiniciar experiencia si se alcanza el nivel máximo
+        if self.nivel >= 5:
+            self.experiencia = 0
 
         self.save()
 
@@ -542,8 +588,65 @@ class Enlace(models.Model):
     def __str__(self):
         return f"Enlace {self.id} para Servicio {self.servicio.id}"
 
+# Modelo Temporada
+class Temporada(models.Model):
+    nombre = models.CharField(max_length=50, help_text="Ejemplo: Temporada 2025-I")
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    activa = models.BooleanField(default=True, help_text="Indica si la temporada está activa")
+    usuarios_participantes = models.ManyToManyField(
+        Usuario, through='EstadisticaTemporada', related_name='temporadas'
+    )
+
+    def __str__(self):
+        return self.nombre
+
+    @staticmethod
+    def obtener_temporada_actual():
+        """
+        Retorna la temporada activa según la fecha actual.
+        """
+        fecha_actual = now().date()
+        return Temporada.objects.filter(
+            fecha_inicio__lte=fecha_actual,
+            fecha_fin__gte=fecha_actual,
+            activa=True
+        ).first()
+
+    @staticmethod
+    def crear_temporadas_anuales():
+        """
+        Crea dos temporadas automáticamente para el siguiente año.
+        """
+        fecha_actual = now().date()
+        anio = fecha_actual.year + 1
+
+        Temporada.objects.create(
+            nombre=f"Temporada {anio}-I",
+            fecha_inicio=f"{anio}-01-01",
+            fecha_fin=f"{anio}-06-30",
+            activa=False
+        )
+        Temporada.objects.create(
+            nombre=f"Temporada {anio}-II",
+            fecha_inicio=f"{anio}-07-01",
+            fecha_fin=f"{anio}-12-31",
+            activa=False
+        )
+
+# Modelo Estadística por Temporada
+class EstadisticaTemporada(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
+    puntos_totales = models.IntegerField(default=0)
+    nivel_alcanzado = models.IntegerField(default=0)
+    retos_completados = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.usuario.nombre} - {self.temporada.nombre}"
 
 class Medalla(models.Model):
+    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE, related_name='medallas', null=True, blank=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     icono = models.ImageField(upload_to='medallas/', null=True, blank=True)
@@ -585,6 +688,7 @@ class Medalla(models.Model):
             )
 
 class Reto(models.Model):
+    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE, related_name='retos')
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     puntos_otorgados = models.IntegerField()
@@ -705,25 +809,6 @@ class RetoUsuario(models.Model):
     def __str__(self):
         return f"{self.usuario.nombre} - {self.reto.nombre} (Progreso: {self.progreso}%)"
 
-class RetoCliente(models.Model):
-    cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="retos_cliente")
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    cumplido = models.BooleanField(default=False)
-    progreso = models.FloatField(default=0.0)
-    puntos_otorgados = models.IntegerField()
-
-    def actualizar_progreso(self, progreso):
-        """
-        Actualiza el progreso del reto.
-        """
-        self.progreso = min(100, self.progreso + progreso)
-        if self.progreso >= 100 and not self.cumplido:
-            self.cumplido = True
-            self.cliente.puntos_cliente += self.puntos_otorgados
-            self.cliente.save()
-        self.save()
-
 class RegistroPuntos(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True)  # Relación explícita
@@ -746,20 +831,24 @@ class HistorialReporte(models.Model):
 
 # Modelo Recompensa
 class Recompensa(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    tipo = models.CharField(max_length=50, choices=[
-        ('herramienta', 'Herramienta nueva'),
-        ('bono', 'Bono de desempeño'),
-        ('capacitacion', 'Curso de capacitación'),
-        ('reconocimiento', 'Reconocimiento oficial'),
-    ])
-    valor = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Valor monetario o equivalente")
-    puntos_necesarios = models.IntegerField(default=0, help_text="Puntos necesarios para obtener esta recompensa")
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="recompensas"
+    )
+    reto = models.ForeignKey(Reto, on_delete=models.CASCADE, related_name="recompensas_asignadas")
+    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE, related_name="recompensas")
+    tipo = models.CharField(max_length=50)
+    puntos_necesarios = models.IntegerField()
+    descripcion = models.TextField()
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
     redimido = models.BooleanField(default=False)
-    descripcion = models.TextField(null=True, blank=True, help_text="Detalles adicionales sobre la recompensa")
 
     def __str__(self):
-        return f"{self.tipo} para {self.usuario.nombre} - {'Redimido' if self.redimido else 'Disponible'}"
+        return f"{self.tipo} - {self.descripcion} ({'Redimido' if self.redimido else 'Disponible'})"
+
 
 class ChatMessage(models.Model):
     user_message = models.TextField()

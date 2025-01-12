@@ -1,5 +1,5 @@
 from django import forms
-from ServiceTrack.models import Guia, ObservacionIncidente, Reto, Medalla
+from ServiceTrack.models import Guia, ObservacionIncidente, Reto, Medalla, Temporada, Recompensa
 
 
 class GuiaForm(forms.ModelForm):
@@ -75,3 +75,49 @@ class MedallaForm(forms.ModelForm):
         if puntos <= 0:
             raise forms.ValidationError("Los puntos necesarios deben ser mayores que cero.")
         return puntos
+
+class TemporadaForm(forms.ModelForm):
+    class Meta:
+        model = Temporada
+        fields = ['nombre', 'fecha_inicio', 'fecha_fin', 'activa']
+
+class RecompensaForm(forms.ModelForm):
+    class Meta:
+        model = Recompensa
+        fields = [
+            'tipo', 'puntos_necesarios', 'descripcion', 'valor', 'reto', 'usuario', 'redimido'
+        ]
+        labels = {
+            'tipo': 'Tipo de recompensa',
+            'puntos_necesarios': 'Puntos necesarios para redimir',
+            'descripcion': 'Descripción de la recompensa',
+            'valor': 'Valor de la recompensa (monetario u otro)',
+            'reto': 'Reto asociado',
+            'usuario': 'Usuario (opcional)',
+            'redimido': 'Estado de redención',
+        }
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def clean_puntos_necesarios(self):
+        puntos = self.cleaned_data.get("puntos_necesarios")
+        if puntos <= 0:
+            raise forms.ValidationError("Los puntos necesarios deben ser mayores que cero.")
+        return puntos
+
+    def clean_valor(self):
+        valor = self.cleaned_data.get("valor")
+        if valor < 0:
+            raise forms.ValidationError("El valor de la recompensa no puede ser negativo.")
+        return valor
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo = cleaned_data.get("tipo")
+        descripcion = cleaned_data.get("descripcion")
+
+        if not tipo or not descripcion:
+            raise forms.ValidationError("El tipo y la descripción de la recompensa son obligatorios.")
+
+        return cleaned_data

@@ -46,6 +46,28 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+<!-- Script para búsqueda y filtrado en tiempo real con AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function searchGuides(event) {
+        event.preventDefault();  // Evitar que el formulario se envíe de la manera tradicional
+
+        const query = $('#search-input').val();
+        const categoria = $('#categoria-select').val();
+        const tipoServicio = $('#tipo-servicio-select').val();
+
+        $.ajax({
+            url: '{% url "base_conocimiento" %}',
+            data: { q: query, categoria: categoria, tipo_servicio: tipoServicio },
+            dataType: 'json',
+            success: function (data) {
+                $('#guide-list').html(data.html);
+            }
+        });
+    }
+
+=======
 <!-- Botón Flotante para el Chat con IA -->
 <a href="{% url 'chat' %}" class="btn-flotante">Chat con IA</a>
 
@@ -69,6 +91,7 @@
         });
     }
 
+>>>>>>> 68218e76ddb19def6044e16548b8b71d932bb66a
     // Adjuntar eventos al campo de búsqueda y los selectores de filtros
     $('#search-input').on('keyup', searchGuides);
     $('#categoria-select').on('change', searchGuides);

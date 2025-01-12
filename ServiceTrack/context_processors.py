@@ -1,5 +1,6 @@
 from django.db.models import Avg
-from ServiceTrack.models import Usuario, Servicio, Medalla, RetoUsuario
+from ServiceTrack.models import Usuario, Servicio, Medalla, RetoUsuario, Temporada
+from django.utils.timezone import now
 
 def gamificacion_context(request):
     """
@@ -35,6 +36,12 @@ def gamificacion_context(request):
                 retos_disponibles = RetoUsuario.objects.filter(usuario=usuario, cumplido=False).count()
                 retos_completados = RetoUsuario.objects.filter(usuario=usuario, cumplido=True).count()
 
+                # Temporada activa
+                fecha_actual = now().date()
+                temporada_activa = Temporada.objects.filter(
+                    fecha_inicio__lte=fecha_actual, fecha_fin__gte=fecha_actual
+                ).first()
+
                 return {
                     "usuario": usuario,
                     "experiencia_actual": experiencia_actual,
@@ -44,6 +51,7 @@ def gamificacion_context(request):
                     "progreso_medallas": progreso_medallas,
                     "retos_disponibles": retos_disponibles,
                     "retos_completados": retos_completados,
+                    "temporada_activa": temporada_activa,  # Agregado
                 }
     except Exception as e:
         # Registrar errores para depuración

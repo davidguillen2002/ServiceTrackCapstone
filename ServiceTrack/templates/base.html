@@ -29,7 +29,7 @@
                     {% if user.rol.nombre == "administrador" %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'base_conocimiento' %}"><i class="bi bi-book"></i> Base de Conocimientos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard_gamificacion' %}"><i class="bi bi-star"></i> Gamificación</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'administrar_gamificacion' %}"><i class="bi bi-trophy"></i> Panel Gamificación</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'panel_reportes' %}"><i class="bi bi-bar-chart"></i> Reportes</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'usuario-list' %}"><i class="bi bi-people"></i> Usuarios</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'lista_servicios' %}"><i class="bi bi-tools"></i> Servicios</a></li>
@@ -45,7 +45,6 @@
                             <li class="nav-item"><a class="nav-link" href="{% url 'panel_cliente' %}"><i class="bi bi-box-arrow-in-right"></i> Panel Seguimiento</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'lista_equipos_cliente' %}"><i class="bi bi-laptop"></i> Mis Equipos</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'lista_servicios_cliente' %}"><i class="bi bi-tools"></i> Mis Servicios</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'perfil_cliente' %}"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
                         {% endif %}
 
                     <!-- Notificaciones -->
