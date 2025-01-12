@@ -20,5 +20,11 @@ urlpatterns = [
     path('mis_servicios_cliente/', views.lista_servicios_cliente, name='lista_servicios_cliente'),
     path('enviar_codigo_tecnico/<int:servicio_id>/', views.enviar_codigo_tecnico, name='enviar_codigo_tecnico'),
     path('chat/', views.chat, name='chat'),
+    # Lista de capacitaciones (técnicos y administradores)
+    path('capacitaciones/', views.capacitacion_index, name='capacitacion_index'),
 
+    # CRUD de capacitaciones (solo administradores)
+    path('capacitaciones/crear/', views.capacitacion_create, name='capacitacion_create'),
+    path('capacitaciones/<int:capacitacion_id>/editar/', views.capacitacion_edit, name='capacitacion_edit'),
+    path('capacitaciones/<int:capacitacion_id>/eliminar/', views.capacitacion_delete, name='capacitacion_delete'),
 ]

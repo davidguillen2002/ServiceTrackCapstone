@@ -2,12 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
-from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage
+from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion
 from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm
+from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm, CapacitacionForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from openai import OpenAI, RateLimitError
@@ -340,3 +340,46 @@ def enviar_codigo_tecnico(request, servicio_id):
     return render(request, 'servicios/enviar_codigo_tecnico.html', {
         'servicio': servicio
     })
+
+# Listar capacitaciones (Disponible para técnicos y administradores)
+@login_required
+def capacitacion_index(request):
+    capacitaciones = Capacitacion.objects.all()
+    return render(request, 'servicios/capacitacion_index.html', {'capacitaciones': capacitaciones})
+
+# Crear capacitación (Solo para administradores)
+@login_required
+@user_passes_test(is_admin)
+def capacitacion_create(request):
+    if request.method == "POST":
+        form = CapacitacionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('capacitacion_index')
+    else:
+        form = CapacitacionForm()
+    return render(request, 'servicios/capacitacion_form.html', {'form': form})
+
+# Editar capacitación (Solo para administradores)
+@login_required
+@user_passes_test(is_admin)
+def capacitacion_edit(request, capacitacion_id):
+    capacitacion = get_object_or_404(Capacitacion, id=capacitacion_id)
+    if request.method == "POST":
+        form = CapacitacionForm(request.POST, instance=capacitacion)
+        if form.is_valid():
+            form.save()
+            return redirect('capacitacion_index')
+    else:
+        form = CapacitacionForm(instance=capacitacion)
+    return render(request, 'servicios/capacitacion_form.html', {'form': form})
+
+# Eliminar capacitación (Solo para administradores)
+@login_required
+@user_passes_test(is_admin)
+def capacitacion_delete(request, capacitacion_id):
+    capacitacion = get_object_or_404(Capacitacion, id=capacitacion_id)
+    if request.method == "POST":
+        capacitacion.delete()
+        return redirect('capacitacion_index')
+    return render(request, 'servicios/capacitacion_confirm_delete.html', {'capacitacion': capacitacion})

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Capacitaciones</h1>
+    {% if user.rol.nombre == "administrador" %}
+        <a href="{% url 'capacitacion_create' %}" class="btn btn-success mb-4">Nueva Capacitación</a>
+    {% endif %}
+    <div class="row">
+        {% for capacitacion in capacitaciones %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ capacitacion.titulo }}</h5>
+                        <p class="card-text">{{ capacitacion.descripcion_corta|slice:":100" }}...</p>
+                        <a href="{{ capacitacion.link }}" target="_blank" class="btn btn-primary">Ver Video</a>
+                        {% if user.rol.nombre == "administrador" %}
+                            <a href="{% url 'capacitacion_edit' capacitacion.id %}" class="btn btn-warning">Editar</a>
+                            <a href="{% url 'capacitacion_delete' capacitacion.id %}" class="btn btn-danger">Eliminar</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="empty-message">No se encontraron capacitaciones.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

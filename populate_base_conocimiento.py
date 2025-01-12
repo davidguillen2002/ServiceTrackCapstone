@@ -10,14 +10,28 @@ django.setup()
 
 from ServiceTrack.models import Categoria, Guia
 
-# IDs de categorías obtenidos de la tabla
+# IDs de categorías
 categoria_ids = {
     'Mantenimiento': 1,
     'Reparación': 2,
     'Diagnóstico': 3,
     'Actualización': 4,
     'Desensamblaje': 5,
+    'Desmontaje': 6,
+    'Evaluación': 7,
 }
+
+# Poblar la tabla de categorías
+for nombre, categoria_id in categoria_ids.items():
+    try:
+        # Crear la categoría si no existe
+        Categoria.objects.get_or_create(
+            id=categoria_id,
+            defaults={'nombre': nombre}
+        )
+        print(f"Categoría '{nombre}' creada o ya existe.")
+    except Exception as e:
+        print(f"Error al crear la categoría '{nombre}': {e}")
 
 guias = [
     {
@@ -8951,7 +8965,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Asus X200MA",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en Asus X200MA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X200MA+Wireless+Card+Replacement/36718",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Asus",
@@ -8960,7 +8974,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoz interno en Dell OptiPlex FX170",
         "descripcion": "Guía para cambiar el altavoz interno en Dell OptiPlex FX170.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+OptiPlex+FX170+Internal++Speaker+Replacement/36727",
         "tipo_servicio": "Altavoz interno",
         "equipo_marca": "Dell",
@@ -8969,7 +8983,7 @@ guias = [
     {
         "titulo": "Desmontaje y arreglo de bisagra en Toshiba Satellite P850 Series",
         "descripcion": "Guía para desmontar y arreglar la bisagra en Toshiba Satellite P850.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+Laptop+Toshiba+Satellite+P855+P850+plus+Hinge+FIX/36744",
         "tipo_servicio": "Bisagra y teclado",
         "equipo_marca": "Toshiba",
@@ -8978,7 +8992,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería CMOS en Acer Aspire V5-571",
         "descripcion": "Guía para cambiar la batería CMOS en Acer Aspire V5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-571+CMOS+-+Bios+Battery+Replacement/36745",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Acer",
@@ -8987,7 +9001,7 @@ guias = [
     {
         "titulo": "Reemplazo de cable SATA de HDD en Acer Aspire V5-571",
         "descripcion": "Guía para cambiar el cable SATA del disco duro en Acer Aspire V5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-571+HDD+SATA+Cable+Replacement/36746",
         "tipo_servicio": "Cable SATA HDD",
         "equipo_marca": "Acer",
@@ -8996,7 +9010,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Acer Aspire V5-571",
         "descripcion": "Guía para cambiar los altavoces en Acer Aspire V5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-571+Loudspeakers+Replacement/36747",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Acer",
@@ -9005,7 +9019,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Samsung Chromebook Series 3",
         "descripcion": "Guía para cambiar la batería en Samsung Chromebook Series 3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+Series+3+Battery+Replacement/36804",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -9014,7 +9028,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en Lenovo Y410P",
         "descripcion": "Guía para cambiar la placa madre en Lenovo Y410P.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Y410P+Motherboard+Replacement/36842",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Lenovo",
@@ -9023,7 +9037,7 @@ guias = [
     {
         "titulo": "Desmontaje de la carcasa inferior en HP Pavilion 11 x360",
         "descripcion": "Guía para desmontar la carcasa inferior en HP Pavilion 11 x360.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+HP+Pavilion+11+x360+Bottom+Case/36843",
         "tipo_servicio": "Carcasa inferior",
         "equipo_marca": "HP",
@@ -9032,7 +9046,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Dell XPS M1530",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en Dell XPS M1530.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1530+Wireless+Card+Replacement/36844",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Dell",
@@ -9041,7 +9055,7 @@ guias = [
     {
         "titulo": "Procedimiento de actualización de RAM y SSD en HP Pavilion Chromebook 14-c050nr",
         "descripcion": "Guía para actualizar la memoria RAM y el almacenamiento SSD en HP Pavilion Chromebook 14-c050nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+Chromebook+14-c050nr+RAM+%26+SSD+upgrade+procedure./36916",
         "tipo_servicio": "RAM y Almacenamiento SSD",
         "equipo_marca": "HP",
@@ -9050,7 +9064,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Dell XPS M1530",
         "descripcion": "Guía para cambiar el ventilador en Dell XPS M1530.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1530+Fan+Replacement/36919",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -9059,7 +9073,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador de calor en Dell XPS M1530",
         "descripcion": "Guía para cambiar el disipador de calor en Dell XPS M1530.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1530+Heat+Sink+Replacement/36923",
         "tipo_servicio": "Disipador de calor",
         "equipo_marca": "Dell",
@@ -9068,7 +9082,7 @@ guias = [
     {
         "titulo": "Reemplazo de CPU en Dell XPS M1530",
         "descripcion": "Guía para cambiar la CPU en Dell XPS M1530.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1530+CPU+Replacement/36924",
         "tipo_servicio": "CPU",
         "equipo_marca": "Dell",
@@ -9077,7 +9091,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en HP Pavilion 11 x360",
         "descripcion": "Guía para cambiar la placa madre en HP Pavilion 11 x360.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11+x360+Motherboard+Replacement/36953",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -9086,7 +9100,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Tecra 8200",
         "descripcion": "Guía para cambiar la memoria RAM en Toshiba Tecra 8200.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Tecra+8200+RAM+Replacement/36955",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -9095,7 +9109,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Sony Vaio Fit 13A",
         "descripcion": "Guía para cambiar la pantalla en Sony Vaio Fit 13A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Fit+13A+Screen+Replacement/36983",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Sony",
@@ -9104,7 +9118,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Sony Vaio Fit 13A",
         "descripcion": "Guía para cambiar la batería en Sony Vaio Fit 13A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Fit+13A+Battery+Replacement/36984",
         "tipo_servicio": "Batería",
         "equipo_marca": "Sony",
@@ -9113,7 +9127,7 @@ guias = [
     {
         "titulo": "Reemplazo de ensamblaje de teclado en Asus X200MA",
         "descripcion": "Guía para cambiar el ensamblaje de teclado en Asus X200MA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X200MA+Keyboard+Assembly+Replacement/36994",
         "tipo_servicio": "Ensamblaje de teclado",
         "equipo_marca": "Asus",
@@ -9122,7 +9136,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de refrigeración en Lenovo Y410P",
         "descripcion": "Guía para cambiar el ventilador de refrigeración en Lenovo Y410P.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Y410P+Cooling+Fan+Replacement/36997",
         "tipo_servicio": "Ventilador y disipador",
         "equipo_marca": "Lenovo",
@@ -9131,7 +9145,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Lenovo Y410P",
         "descripcion": "Guía para cambiar los altavoces en Lenovo Y410P.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Y410P+Speakers+Replacement/36999",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -9140,7 +9154,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto de carga en Sony Vaio Fit 13A",
         "descripcion": "Guía para cambiar el puerto de carga en Sony Vaio Fit 13A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Fit+13A+Charger+Port+Replacement/37000",
         "tipo_servicio": "Puerto de carga",
         "equipo_marca": "Sony",
@@ -9149,7 +9163,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje de disipador y ventilador en Sony Vaio Fit 13A",
         "descripcion": "Guía para cambiar el ensamblaje del disipador y ventilador en Sony Vaio Fit 13A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Fit+13A+Heatsink+%2B+Fan+Assembly+Replacement/37001",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Sony",
@@ -9158,7 +9172,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tapa trasera en Sony Vaio Fit 13A",
         "descripcion": "Guía para cambiar la tapa trasera en Sony Vaio Fit 13A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Fit+13A+Back+Cover+Replacement/37002",
         "tipo_servicio": "Tapa trasera",
         "equipo_marca": "Sony",
@@ -9167,7 +9181,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador de calor en Dell OptiPlex FX170",
         "descripcion": "Guía para cambiar el disipador de calor en Dell OptiPlex FX170.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+OptiPlex+FX170+Heat+Sink+Replacement/37043",
         "tipo_servicio": "Disipador de calor",
         "equipo_marca": "Dell",
@@ -9176,7 +9190,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Dell OptiPlex FX170",
         "descripcion": "Guía para cambiar la placa madre en Dell OptiPlex FX170.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+OptiPlex+FX170+Motherboard+Replacement/37047",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -9185,7 +9199,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar los altavoces en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Speaker+Replacement/37105",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -9194,7 +9208,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado y touchpad en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar el teclado y touchpad en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Keyboard+and+Touchpad+Replacement/37108",
         "tipo_servicio": "Teclado y touchpad",
         "equipo_marca": "HP",
@@ -9203,7 +9217,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta de Bluetooth y red inalámbrica en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar la tarjeta de Bluetooth y red inalámbrica en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Bluetooth+and+Wireless+Card+Replacement/37114",
         "tipo_servicio": "Tarjeta de Bluetooth y red inalámbrica",
         "equipo_marca": "HP",
@@ -9212,7 +9226,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar la batería en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Battery+Replacement/37115",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -9221,7 +9235,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta USB/SD en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar la tarjeta USB/SD en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+USB-SD+card+Replacement/37116",
         "tipo_servicio": "USB/SD card",
         "equipo_marca": "HP",
@@ -9230,7 +9244,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar el ventilador en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Fan+Replacement/37118",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -9239,7 +9253,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar la placa madre en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Motherboard+Replacement/37119",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -9248,7 +9262,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP Chromebook 14-Q010DX",
         "descripcion": "Guía para cambiar el disco duro en HP Chromebook 14-Q010DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-Q010DX+Hard+drive+Replacement/37121",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -9257,7 +9271,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP TouchSmart 15-r015dx",
         "descripcion": "Guía para cambiar el teclado en HP TouchSmart 15-r015dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+TouchSmart+15-r015dx+Keyboard+Replacement/37133",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -9266,7 +9280,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en Dell Inspiron 3520",
         "descripcion": "Guía para cambiar la unidad óptica en Dell Inspiron 3520.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+3520+Optical+Drive+Replacement/37141",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "Dell",
@@ -9275,7 +9289,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tapa inferior en Samsung Chromebook Series 3",
         "descripcion": "Guía para cambiar la tapa inferior en Samsung Chromebook Series 3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+Series+3+Bottom+Cover+Replacement/37145",
         "tipo_servicio": "Tapa inferior",
         "equipo_marca": "Samsung",
@@ -9284,7 +9298,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Dell Inspiron 3520",
         "descripcion": "Guía para cambiar la pantalla en Dell Inspiron 3520.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+3520+Screen+Replacement/37148",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -9293,7 +9307,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en HP TouchSmart 15-r015dx",
         "descripcion": "Guía para cambiar la placa madre en HP TouchSmart 15-r015dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+TouchSmart+15-r015dx+Motherboard+Replacement/37153",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -9302,7 +9316,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Samsung Chromebook Series 3",
         "descripcion": "Guía para cambiar los altavoces en Samsung Chromebook Series 3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+Series+3+Speaker+Replacement/37357",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Samsung",
@@ -9311,7 +9325,7 @@ guias = [
     {
         "titulo": "Reemplazo de puerto de carga en Samsung Chromebook Series 3",
         "descripcion": "Guía para cambiar el puerto de carga en Samsung Chromebook Series 3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+Series+3+Charging+Port+Replacement/37379",
         "tipo_servicio": "Puerto de carga",
         "equipo_marca": "Samsung",
@@ -9320,7 +9334,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta WiFi en Acer Aspire R7",
         "descripcion": "Guía para cambiar la tarjeta WiFi en Acer Aspire R7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+R7+WiFi+Card+Replacement/37442",
         "tipo_servicio": "Tarjeta WiFi",
         "equipo_marca": "Acer",
@@ -9329,7 +9343,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP Pavilion Sleekbook 15-b142dx",
         "descripcion": "Guía para cambiar el disco duro en HP Pavilion Sleekbook 15-b142dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+Sleekbook+15-b142dx+Hard+Drive+Replacement/37449",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -9338,7 +9352,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion Sleekbook 15-b142dx",
         "descripcion": "Guía para cambiar la memoria RAM en HP Pavilion Sleekbook 15-b142dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+Sleekbook+15-b142dx+RAM+Replacement/37451",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -9347,7 +9361,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en HP Pavilion Sleekbook 15-b142dx",
         "descripcion": "Guía para cambiar la pantalla en HP Pavilion Sleekbook 15-b142dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+Sleekbook+15-b142dx+Screen+Replacement/37453",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -9356,7 +9370,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire R7",
         "descripcion": "Guía para cambiar la memoria RAM en Acer Aspire R7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+R7+RAM+Replacement/37455",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -9365,7 +9379,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Acer Aspire R7",
         "descripcion": "Guía para cambiar los altavoces en Acer Aspire R7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+R7+Speakers+Replacement/37456",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Acer",
@@ -9374,7 +9388,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Pavilion 11 x360",
         "descripcion": "Guía para cambiar el teclado en HP Pavilion 11 x360.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11+x360+Keyboard+Replacement/37468",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -9383,7 +9397,7 @@ guias = [
     {
         "titulo": "Reemplazo de panel trasero en Asus VivoBook Q200E-BSI3T08",
         "descripcion": "Guía para cambiar el panel trasero en Asus VivoBook Q200E-BSI3T08.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BSI3T08+Back+Panel+Replacement/37484",
         "tipo_servicio": "Panel trasero",
         "equipo_marca": "Asus",
@@ -9392,7 +9406,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus VivoBook Q200E-BSI3T08",
         "descripcion": "Guía para cambiar la batería en Asus VivoBook Q200E-BSI3T08.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BSI3T08+Battery+Replacement/37554",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -9401,7 +9415,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Dell Inspiron 15-7537",
         "descripcion": "Guía para cambiar la batería en Dell Inspiron 15-7537.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15-7537+Battery+Replacement/37558",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -9410,7 +9424,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Sony Vaio Fit 13A",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en Sony Vaio Fit 13A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Fit+13A+Wireless+Card+Replacement/37617",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Sony",
@@ -9419,7 +9433,7 @@ guias = [
     {
         "titulo": "Reemplazo de pasta térmica en Dell XPS M1530",
         "descripcion": "Guía para aplicar pasta térmica en Dell XPS M1530.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1530+Thermal+Compound+Replacement/37619",
         "tipo_servicio": "Pasta térmica",
         "equipo_marca": "Dell",
@@ -9428,7 +9442,7 @@ guias = [
     {
         "titulo": "Extracción de la cubierta inferior en Dell Inspiron 15-7537",
         "descripcion": "Guía para desmontar la cubierta inferior de Dell Inspiron 15-7537.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Removing+Dell+Inspiron+15-7537+Bottom+Cover/37660",
         "tipo_servicio": "Cubierta inferior",
         "equipo_marca": "Dell",
@@ -9437,7 +9451,7 @@ guias = [
     {
         "titulo": "Limpieza de ventilador y reemplazo de pasta térmica en HP Probook 6450b",
         "descripcion": "Guía para limpiar el ventilador y aplicar pasta térmica en HP Probook 6450b.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/HP+Probook+6450b+Fan+Cleaning+%26+Thermal+Paste+Replacement/37688",
         "tipo_servicio": "Ventilador y pasta térmica",
         "equipo_marca": "HP",
@@ -9446,7 +9460,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP TouchSmart 15-r015dx",
         "descripcion": "Guía para cambiar el disco duro en HP TouchSmart 15-r015dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+TouchSmart+15-r015dx+Hard+Drive+Replacement/37765",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -9455,7 +9469,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP TouchSmart 15-r015dx",
         "descripcion": "Guía para cambiar la memoria RAM en HP TouchSmart 15-r015dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+TouchSmart+15-r015dx+RAM+Replacement/37779",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -9464,7 +9478,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en IBM ThinkPad X60s",
         "descripcion": "Guía para cambiar el ventilador en IBM ThinkPad X60s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/How+to+Perform+an+IBM+ThinkPad+X60s+Fan+Spindle+Replacement/37881",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "IBM",
@@ -9473,7 +9487,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP Envy 14",
         "descripcion": "Guía para cambiar el disco duro en HP Envy 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+14+Hard+Drive+Replacement/37968",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -9482,7 +9496,7 @@ guias = [
     {
         "titulo": "Reemplazo del conector de corriente en Acer Aspire R7",
         "descripcion": "Guía para cambiar el conector de corriente en Acer Aspire R7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+R7+AC+Socket+Replacement/38265",
         "tipo_servicio": "Conector de corriente",
         "equipo_marca": "Acer",
@@ -9491,7 +9505,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje de pantalla en Acer Aspire R7",
         "descripcion": "Guía para cambiar el ensamblaje de la pantalla en Acer Aspire R7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+R7+Display+Assembly+Replacement/38705",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -9500,7 +9514,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería de tablet en Toshiba Satellite Click",
         "descripcion": "Guía para cambiar la batería de la tablet Toshiba Satellite Click.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+Tablet+Battery++Replacement/38756",
         "tipo_servicio": "Batería de tablet",
         "equipo_marca": "Toshiba",
@@ -9509,7 +9523,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell XPS M1210",
         "descripcion": "Guía para cambiar la RAM en Dell XPS M1210.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1210+RAM+Replacement/39013",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -9518,7 +9532,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Dell XPS M1210",
         "descripcion": "Guía para cambiar el ventilador en Dell XPS M1210.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+M1210+Fan+Replacement/39014",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -9527,7 +9541,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Sony Vaio PCG-5N4L",
         "descripcion": "Guía para cambiar el disco duro en Sony Vaio PCG-5N4L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-5N4L+Hard+Drive+Replacement/39106",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Sony",
@@ -9536,7 +9550,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Sony Vaio PCG-5N4L",
         "descripcion": "Guía para cambiar la pantalla en Sony Vaio PCG-5N4L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-5N4L+Screen+Replacement/39108",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Sony",
@@ -9545,7 +9559,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Samsung ATIV Book 4",
         "descripcion": "Guía para cambiar la batería en Samsung ATIV Book 4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+ATIV+Book+4+Battery+Replacement/39373",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -9554,7 +9568,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en ASUS X502CA",
         "descripcion": "Guía para cambiar la batería en ASUS X502CA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X502CA+Battery+Replacement/39394",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -9563,7 +9577,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en ASUS X502CA",
         "descripcion": "Guía para cambiar la pantalla en ASUS X502CA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X502CA+Screen+Replacement/39395",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -9572,7 +9586,7 @@ guias = [
     {
         "titulo": "Reemplazo y limpieza de ventilador en ASUS X502CA",
         "descripcion": "Guía para cambiar y limpiar el ventilador en ASUS X502CA.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X502CA+Fan+Replacement+%26+Cleaning/39396",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -9581,7 +9595,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería de respaldo en Compaq Evo N400c",
         "descripcion": "Guía para cambiar la batería de respaldo en Compaq Evo N400c.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Compaq+Evo+N400c+Backup+Battery+Replacement/39436",
         "tipo_servicio": "Batería de respaldo",
         "equipo_marca": "Compaq",
@@ -9590,7 +9604,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Lenovo Yoga 2 13\"",
         "descripcion": "Guía para cambiar la batería en Lenovo Yoga 2 13\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+13-Inch+Battery+Replacement/39456",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -9599,7 +9613,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Lenovo Yoga 2 13\"",
         "descripcion": "Guía para cambiar el ventilador en Lenovo Yoga 2 13\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+13-Inch+Fan+Replacement/39460",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Lenovo",
@@ -9608,7 +9622,7 @@ guias = [
     {
         "titulo": "Extracción del panel trasero en Lenovo Yoga 2 13\"",
         "descripcion": "Guía para extraer el panel trasero en Lenovo Yoga 2 13\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+13-Inch+Back+Panel+Removal/39462",
         "tipo_servicio": "Panel trasero",
         "equipo_marca": "Lenovo",
@@ -9617,7 +9631,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Lenovo Yoga 2 13\"",
         "descripcion": "Guía para cambiar la pantalla en Lenovo Yoga 2 13\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+13-Inch+Screen+Replacement/39465",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -9626,7 +9640,7 @@ guias = [
     {
         "titulo": "Reemplazo del mouse pad en Samsung ATIV Book 4",
         "descripcion": "Guía para cambiar el mouse pad en Samsung ATIV Book 4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+ATIV+Book+4+Mouse+Pad+Replacement/39524",
         "tipo_servicio": "Mouse Pad",
         "equipo_marca": "Samsung",
@@ -9635,7 +9649,7 @@ guias = [
     {
         "titulo": "Reemplazo de cámara web en ASUS X502CA",
         "descripcion": "Guía para cambiar la cámara web en ASUS X502CA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X502CA+Webcam+Replacement/39546",
         "tipo_servicio": "Cámara web",
         "equipo_marca": "Asus",
@@ -9644,7 +9658,7 @@ guias = [
     {
         "titulo": "Reemplazo del trackpad en Lenovo IdeaPad Yoga 11S",
         "descripcion": "Guía para cambiar el trackpad en Lenovo IdeaPad Yoga 11S.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+Yoga+11S+Trackpad+Replacement/39618",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Lenovo",
@@ -9653,7 +9667,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Lenovo IdeaPad Yoga 11S",
         "descripcion": "Guía para cambiar la batería en Lenovo IdeaPad Yoga 11S.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+Yoga+11S+Battery+Replacement/39621",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -9662,7 +9676,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Lenovo IdeaPad Yoga 11S",
         "descripcion": "Guía para cambiar la pantalla en Lenovo IdeaPad Yoga 11S.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+Yoga+11S+Display+Replacement/39622",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -9671,7 +9685,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Dell Inspiron 15R",
         "descripcion": "Guía para cambiar el teclado en Dell Inspiron 15R.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15R+Keyboard+Replacement/39681",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -9680,7 +9694,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Samsung ATIV Book 4",
         "descripcion": "Guía para cambiar la pantalla en Samsung ATIV Book 4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+ATIV+Book+4+Screen+Replacement/39825",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -9689,7 +9703,7 @@ guias = [
     {
         "titulo": "Reemplazo de cámara web en Dell Inspiron 15R",
         "descripcion": "Guía para cambiar la cámara web en Dell Inspiron 15R.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15R+Webcam+Replacement/39875",
         "tipo_servicio": "Cámara web",
         "equipo_marca": "Dell",
@@ -9698,7 +9712,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Dell Inspiron 15R",
         "descripcion": "Guía para cambiar el disco duro en Dell Inspiron 15R.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15R+Hard+Drive+Replacement/39877",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Dell",
@@ -9707,7 +9721,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Dell Inspiron 15R",
         "descripcion": "Guía para cambiar la pantalla en Dell Inspiron 15R.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15R+Screen+Replacement/39878",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -9716,7 +9730,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Lenovo Y40",
         "descripcion": "Guía para cambiar el ventilador en Lenovo Y40.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Laptop+Fan+Replacement/40179",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Lenovo",
@@ -9725,7 +9739,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Razer Blade 14\" (2013)",
         "descripcion": "Guía para cambiar la batería en Razer Blade 14\" (2013).",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Razer+Blade+14-Inch+%282013%29+Battery+Replacement/40190",
         "tipo_servicio": "Batería",
         "equipo_marca": "Razer",
@@ -9734,7 +9748,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje del touchpad en Gateway NE52203u",
         "descripcion": "Guía para cambiar el ensamblaje del touchpad en Gateway NE52203u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+NE52203u+Touchpad+Assembly+Replacement/40361",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Gateway",
@@ -9743,7 +9757,7 @@ guias = [
     {
         "titulo": "Reemplazo de puerto USB en Gateway NE52203u",
         "descripcion": "Guía para cambiar el puerto USB en Gateway NE52203u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+NE52203u+USB+Port+Replacement/40365",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "Gateway",
@@ -9752,7 +9766,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Gateway NE52203u",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en Gateway NE52203u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+NE52203u+Wireless+Card+Replacement/40366",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Gateway",
@@ -9761,7 +9775,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería BIOS en Dell Inspiron 530 DCMF",
         "descripcion": "Guía para reemplazar la batería BIOS en Dell Inspiron 530 DCMF.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+530+DCMF+Bios+Battery+Replacement/40543",
         "tipo_servicio": "Batería BIOS",
         "equipo_marca": "Dell",
@@ -9770,7 +9784,7 @@ guias = [
     {
         "titulo": "Desmontaje para limpieza en HP G62-453",
         "descripcion": "Guía para desmontar y limpiar el HP G62-453, incluyendo la aplicación de pasta térmica.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G62-453+disassembly+for+cleaning+and+thermal+paste/40576",
         "tipo_servicio": "Limpieza y mantenimiento",
         "equipo_marca": "HP",
@@ -9779,7 +9793,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Toshiba Satellite C55D-A5201",
         "descripcion": "Guía para cambiar el teclado en Toshiba Satellite C55D-A5201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55D-A5201+Keyboard+Replacement/40600",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -9788,7 +9802,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería BIOS en Sony VAIO PCG-3E2L",
         "descripcion": "Guía para cambiar la batería BIOS en Sony VAIO PCG-3E2L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+VAIO+PCG-3E2L+BIOS+Battery+Replacement/40719",
         "tipo_servicio": "Batería BIOS",
         "equipo_marca": "Sony",
@@ -9797,7 +9811,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Dell Latitude E4200",
         "descripcion": "Guía para cambiar el teclado en Dell Latitude E4200.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E4200+Keyboard+Replacement/40742",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -9806,7 +9820,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Compaq NC6120",
         "descripcion": "Guía para cambiar la RAM en HP Compaq NC6120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+NC6120+RAM+Replacement/40888",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -9815,7 +9829,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Asus G74SX-BBK7",
         "descripcion": "Guía para cambiar la pantalla en Asus G74SX-BBK7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G74SX-BBK7+Screen+Replacement/40947",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -9824,7 +9838,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Lenovo ThinkPad T500",
         "descripcion": "Guía para cambiar el teclado en Lenovo ThinkPad T500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T500+Keyboard+Replacement/41037",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -9833,7 +9847,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Lenovo ThinkPad T500",
         "descripcion": "Guía para cambiar los altavoces en Lenovo ThinkPad T500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T500+Speaker+Replacement/41039",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -9842,7 +9856,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Lenovo ThinkPad T500",
         "descripcion": "Guía para cambiar la pantalla en Lenovo ThinkPad T500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T500+Screen+Replacement/41040",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -9851,7 +9865,7 @@ guias = [
     {
         "titulo": "Reemplazo de botones del trackpad en Lenovo ThinkPad T500",
         "descripcion": "Guía para reemplazar los botones del trackpad en Lenovo ThinkPad T500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Thinkpad+T500+Trackpad+Buttons+Replacement/41042",
         "tipo_servicio": "Botones del trackpad",
         "equipo_marca": "Lenovo",
@@ -9860,7 +9874,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Asus G74SX-BBK7",
         "descripcion": "Guía para reemplazar el disco duro en Asus G74SX-BBK7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G74SX-BBK7+Hard+Drive+Replacement/41205",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Asus",
@@ -9869,7 +9883,7 @@ guias = [
     {
         "titulo": "Reemplazo de botones del trackpad en Asus G74SX-BBK7",
         "descripcion": "Guía para reemplazar los botones del trackpad en Asus G74SX-BBK7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G74SX-BBK7+Trackpad+Button+Replacement/41206",
         "tipo_servicio": "Botones del trackpad",
         "equipo_marca": "Asus",
@@ -9878,7 +9892,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Lenovo ThinkPad T400s",
         "descripcion": "Guía para reemplazar las tarjetas RAM en Lenovo ThinkPad T400s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T400s+RAM+Cards+Replacement/41208",
         "tipo_servicio": "RAM",
         "equipo_marca": "Lenovo",
@@ -9887,7 +9901,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Lenovo ThinkPad T400s",
         "descripcion": "Guía para cambiar el teclado en Lenovo ThinkPad T400s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T400s+Keyboard+Replacement/41213",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -9896,7 +9910,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería CMOS en Lenovo ThinkPad T400s",
         "descripcion": "Guía para reemplazar la batería CMOS en Lenovo ThinkPad T400s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T400s+CMOS+Battery+Replacement/41222",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Lenovo",
@@ -9905,7 +9919,7 @@ guias = [
     {
         "titulo": "Desmontaje de portátil HP Compaq NC6120",
         "descripcion": "Guía para desmontar el HP Compaq NC6120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+HP+Compaq+NC6120+Laptop/41249",
         "tipo_servicio": "Desmontaje",
         "equipo_marca": "HP",
@@ -9914,7 +9928,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus G74SX-BBK7",
         "descripcion": "Guía para reemplazar la RAM en Asus G74SX-BBK7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G74SX-BBK7+RAM+Replacement/41465",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -9923,7 +9937,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Compaq 6710b",
         "descripcion": "Guía para cambiar el teclado en HP Compaq 6710b.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+6710b+Keyboard+Replacement/41535",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -9932,7 +9946,7 @@ guias = [
     {
         "titulo": "Reemplazo de disipador térmico en HP Compaq 6710b",
         "descripcion": "Guía para reemplazar el disipador térmico en HP Compaq 6710b.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+6710b+Heat+Sink+Replacement/41538",
         "tipo_servicio": "Disipador térmico",
         "equipo_marca": "HP",
@@ -9941,7 +9955,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en HP Compaq 6710b",
         "descripcion": "Guía para reemplazar la pantalla en HP Compaq 6710b.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+6710b+Screen+Replacement/41540",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -9950,7 +9964,7 @@ guias = [
     {
         "titulo": "Reemplazo de disipador y ventilador en Lenovo ThinkPad T400s",
         "descripcion": "Guía para reemplazar el disipador y el ventilador en Lenovo ThinkPad T400s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T400s+Heatsink+%26+Fan+Replacement/41541",
         "tipo_servicio": "Disipador/Ventilador",
         "equipo_marca": "Lenovo",
@@ -9959,7 +9973,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en HP Compaq 6710b",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en HP Compaq 6710b.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+6710b+Wireless+Card+Replacement/41542",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "HP",
@@ -9968,7 +9982,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla LCD en Lenovo ThinkPad T400s",
         "descripcion": "Guía para cambiar la pantalla LCD en Lenovo ThinkPad T400s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T400s+LCD+Screen+Replacement/41548",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Lenovo",
@@ -9977,7 +9991,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Lenovo ThinkPad T420s",
         "descripcion": "Guía para reemplazar el teclado en Lenovo ThinkPad T420s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T420s+Keyboard+Replacement/41606",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -9986,7 +10000,7 @@ guias = [
     {
         "titulo": "Reemplazo del reposamanos en Lenovo ThinkPad T420s",
         "descripcion": "Guía para cambiar el reposamanos en Lenovo ThinkPad T420s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T420s+Palm+Rest+Replacement/41608",
         "tipo_servicio": "Reposamanos",
         "equipo_marca": "Lenovo",
@@ -9995,7 +10009,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla LCD en Lenovo ThinkPad T420s",
         "descripcion": "Guía para reemplazar la pantalla LCD en Lenovo ThinkPad T420s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T420s+LCD+Replacement/41609",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Lenovo",
@@ -10004,7 +10018,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en PC de Escritorio",
         "descripcion": "Guía para cambiar la placa madre en una PC de escritorio.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Desktop+PC+Motherboard+Replacement/41643",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Genérica",
@@ -10013,7 +10027,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en HP Envy 17-3070NR",
         "descripcion": "Guía para reemplazar la batería en HP Envy 17-3070NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+17-3070NR+Battery+Replacement/41832",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -10022,7 +10036,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en Asus G74SX-BBK7",
         "descripcion": "Guía para cambiar la unidad óptica en Asus G74SX-BBK7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G74SX-BBK7+Optical+Drive+Replacement/41893",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "Asus",
@@ -10031,7 +10045,7 @@ guias = [
     {
         "titulo": "Reemplazo de conector de energía en Lenovo ThinkPad T420s",
         "descripcion": "Guía para cambiar el conector de energía en Lenovo ThinkPad T420s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+T420s+Power+Jack+Replacement/41920",
         "tipo_servicio": "Conector de energía",
         "equipo_marca": "Lenovo",
@@ -10040,7 +10054,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje del ventilador en HP Envy 17-3070NR",
         "descripcion": "Guía para reemplazar el ensamblaje del ventilador en HP Envy 17-3070NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+17-3070NR+Fan+Assembly+Replacement/42034",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -10049,7 +10063,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en HP Envy 17-3070NR",
         "descripcion": "Guía para cambiar la placa madre en HP Envy 17-3070NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+17-3070NR+Motherboard+Replacement/42035",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -10058,7 +10072,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en HP Envy 17-3070NR",
         "descripcion": "Guía para cambiar la unidad óptica en HP Envy 17-3070NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+17-3070NR+Optical+Drive+Replacement/42101",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "HP",
@@ -10067,7 +10081,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel del botón de encendido en HP Compaq 6710b",
         "descripcion": "Guía para cambiar el panel del botón de encendido en HP Compaq 6710b.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+6710b+Power+Button+Panel+Replacement/42436",
         "tipo_servicio": "Botón de encendido",
         "equipo_marca": "HP",
@@ -10076,7 +10090,7 @@ guias = [
     {
         "titulo": "Desensamblaje de HP Envy m6 1220sb",
         "descripcion": "Guía para desensamblar completamente el HP Envy m6 1220sb.",
-        "categoria_id": "Desensamblaje",
+        'categoria_id': categoria_ids['Desensamblaje'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+m6+1220sb+Disassembly/44197",
         "tipo_servicio": "Desensamblaje",
         "equipo_marca": "HP",
@@ -10085,7 +10099,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Pavilion dv7-6c90us",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion dv7-6c90us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv7-6c90us+Cooling+fan+Replacement/44253",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -10094,7 +10108,7 @@ guias = [
     {
         "titulo": "Reemplazo de pasta térmica en Toshiba Satellite C850",
         "descripcion": "Guía para aplicar nueva pasta térmica en Toshiba Satellite C850.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C850+Thermal+Paste+Replacement/44352",
         "tipo_servicio": "Pasta térmica",
         "equipo_marca": "Toshiba",
@@ -10103,7 +10117,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en ASUS U30SD-XA1",
         "descripcion": "Guía para cambiar los módulos de RAM en ASUS U30SD-XA1.",
-        "categoria_id": "Actualización",
+        'categoria_id': categoria_ids['Actualización'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U30SD-XA1+RAM+Replacement/45016",
         "tipo_servicio": "RAM",
         "equipo_marca": "ASUS",
@@ -10112,7 +10126,7 @@ guias = [
     {
         "titulo": "Desensamblaje de la cubierta frontal de Dell Inspiron Duo",
         "descripcion": "Guía para desensamblar la cubierta frontal de Dell Inspiron Duo.",
-        "categoria_id": "Desensamblaje",
+        'categoria_id': categoria_ids['Desensamblaje'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+Dell+Inspiron+Duo+Front+Cover/45230",
         "tipo_servicio": "Cubierta frontal",
         "equipo_marca": "Dell",
@@ -10121,7 +10135,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar la batería de Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+Battery+Replacement/50271",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -10130,7 +10144,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Asus U56E",
         "descripcion": "Guía para cambiar la pantalla del portátil Asus U56E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+U56E+Laptop+Screen+Replacement/50386",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -10139,7 +10153,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en HP Envy 14",
         "descripcion": "Guía para cambiar la pantalla en HP Envy 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+14+Screen+Replacement/50412",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -10148,7 +10162,7 @@ guias = [
     {
         "titulo": "Reemplazo de mSATA SSDs en Origin EON17-S",
         "descripcion": "Guía para reemplazar los discos SSD mSATA en Origin EON17-S.",
-        "categoria_id": "Actualización",
+        'categoria_id': categoria_ids['Actualización'],
         "manual": "https://www.ifixit.com/Guide/Origin+EON17-S+mSATA+SSDs+Replacement/50441",
         "tipo_servicio": "Discos SSD mSATA",
         "equipo_marca": "Origin",
@@ -10157,7 +10171,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta Wi-Fi en Samsung NP300V5A-A08US",
         "descripcion": "Guía para cambiar la tarjeta Wi-Fi en Samsung NP300V5A-A08US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/How+to+Replace+the+Wi-Fi+Card+for+a+Samsung+NP300V5A-A08US+Laptop/50446",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Samsung",
@@ -10166,7 +10180,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP EliteBook 8440p",
         "descripcion": "Guía para cambiar el teclado en HP EliteBook 8440p.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+EliteBook+8440p+Keyboard+Replacement/50475",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -10175,7 +10189,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Gigabyte P35K",
         "descripcion": "Guía para reemplazar el disco duro en Gigabyte P35K.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gigabyte+P35K+Laptop+Hard+Drive+Replacement/50505",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Gigabyte",
@@ -10184,7 +10198,7 @@ guias = [
     {
         "titulo": "Reemplazo de disipador y ventilador en HP EliteBook 840 G1",
         "descripcion": "Guía para cambiar el disipador y ventilador en HP EliteBook 840 G1.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Elitebook+840+G1+Heatsink+and+Fan+Replacement/50553",
         "tipo_servicio": "Disipador/Ventilador",
         "equipo_marca": "HP",
@@ -10193,7 +10207,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en HP EliteBook 840 G1",
         "descripcion": "Guía para cambiar la placa madre en HP EliteBook 840 G1.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Elitebook+840+G1+Motherboard+Replacement/50569",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -10202,7 +10216,7 @@ guias = [
     {
         "titulo": "Reemplazo del digitalizador del panel frontal en Asus Transformer T100",
         "descripcion": "Guía para cambiar el digitalizador del panel frontal en Asus Transformer T100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Transformer+T100+Front+Panel+Digitizer+Replacement/50652",
         "tipo_servicio": "Digitalizador",
         "equipo_marca": "Asus",
@@ -10211,7 +10225,7 @@ guias = [
     {
         "titulo": "Reemplazo de ensamblaje de conector de audio/USB en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar el ensamblaje de conector de audio y puerto USB en Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+Audio+Jack-USB+Port+Assembly+Replacement/50791",
         "tipo_servicio": "Conector de Audio/USB",
         "equipo_marca": "Lenovo",
@@ -10220,7 +10234,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoz en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar el altavoz en Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+Speaker+Replacement/50807",
         "tipo_servicio": "Altavoz",
         "equipo_marca": "Lenovo",
@@ -10229,7 +10243,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar la placa madre en Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+Motherboard+Replacement/50819",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Lenovo",
@@ -10238,7 +10252,7 @@ guias = [
     {
         "titulo": "Reemplazo de trackpad en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar el trackpad en Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+Trackpad+Replacement/50826",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Lenovo",
@@ -10247,7 +10261,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion dv4-2045dx",
         "descripcion": "Guía para cambiar la memoria RAM en HP Pavilion dv4-2045dx.",
-        "categoria_id": "Actualización",
+        'categoria_id': categoria_ids['Actualización'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv4-2045dx+RAM+Replacement/50975",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -10256,7 +10270,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería CMOS en HP Envy TouchSmart 15",
         "descripcion": "Guía para cambiar la batería CMOS en HP Envy TouchSmart 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+TouchSmart+15+CMOS+Battery+Replacement/51040",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "HP",
@@ -10265,7 +10279,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP Envy TouchSmart 15",
         "descripcion": "Guía para cambiar el disco duro en HP Envy TouchSmart 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+TouchSmart+15+Hard+Drive+Replacement/51041",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -10274,7 +10288,7 @@ guias = [
     {
         "titulo": "Desmontaje de la placa trasera en HP Envy TouchSmart 15",
         "descripcion": "Guía para desmontar la placa trasera en HP Envy TouchSmart 15.",
-        "categoria_id": "Desmontaje",
+        'categoria_id': categoria_ids['Desmontaje'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+HP+Envy+TouchSmart+15+Back+Plate/51042",
         "tipo_servicio": "Placa Trasera",
         "equipo_marca": "HP",
@@ -10283,7 +10297,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion g6-1b79dx",
         "descripcion": "Guía para cambiar la memoria RAM en HP Pavilion g6-1b79dx.",
-        "categoria_id": "Actualización",
+        'categoria_id': categoria_ids['Actualización'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+g6-1b79dx+RAM+Replacement/51047",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -10292,7 +10306,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en HP Pavilion g6-1b79dx",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en HP Pavilion g6-1b79dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+g6-1b79dx+Wireless+Card+Replacement/51050",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "HP",
@@ -10301,7 +10315,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoz en HP Pavilion g6-1b79dx",
         "descripcion": "Guía para cambiar el altavoz en HP Pavilion g6-1b79dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+g6-1b79dx+Speaker+Replacement/51052",
         "tipo_servicio": "Altavoz",
         "equipo_marca": "HP",
@@ -10310,7 +10324,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP Envy TouchSmart 15",
         "descripcion": "Guía para cambiar el ventilador en HP Envy TouchSmart 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+TouchSmart+15+Fan++Replacement/51092",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -10319,7 +10333,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel inferior en HP Pavilion g6-1b79dx",
         "descripcion": "Guía para cambiar el panel inferior en HP Pavilion g6-1b79dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+g6-1b79dx+Bottom+Panel+Replacement/51151",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "HP",
@@ -10328,7 +10342,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta Wi-Fi en HP Pavilion dv4-2045dx",
         "descripcion": "Guía para cambiar la tarjeta Wi-Fi en HP Pavilion dv4-2045dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv4-2045dx+Wi-fi+Adapter-card+Replacement/51158",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "HP",
@@ -10337,7 +10351,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Pavilion dv4-2045dx",
         "descripcion": "Guía para cambiar el teclado en HP Pavilion dv4-2045dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv4-2045dx+Keyboard+Replacement/51168",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -10346,7 +10360,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Pavilion g6-1b79dx",
         "descripcion": "Guía para cambiar el teclado en HP Pavilion g6-1b79dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+g6-1b79dx+Keyboard+Replacement/51174",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -10355,7 +10369,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Samsung NP300E5C",
         "descripcion": "Guía para cambiar el disco duro en Samsung NP300E5C.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP300E5C+Hard+Drive+Replacement/51207",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -10364,7 +10378,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Samsung NP300E5C",
         "descripcion": "Guía para cambiar la pantalla en Samsung NP300E5C.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP300E5C+Screen+Replacement/51209",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -10373,7 +10387,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de CD en HP Pavilion g6-1b79dx",
         "descripcion": "Guía para cambiar la unidad de CD en HP Pavilion g6-1b79dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+g6-1b79dx+CD+Drive+Replacement/51217",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "HP",
@@ -10382,7 +10396,7 @@ guias = [
     {
         "titulo": "Desmontaje del disipador de calor en HP Envy TouchSmart 15",
         "descripcion": "Guía para desmontar el disipador de calor en HP Envy TouchSmart 15.",
-        "categoria_id": "Desmontaje",
+        'categoria_id': categoria_ids['Desmontaje'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+HP+Envy+TouchSmart+15+Heat+Sink/51621",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "HP",
@@ -10391,7 +10405,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Lenovo Yoga 3 Pro",
         "descripcion": "Guía para cambiar la batería en Lenovo Yoga 3 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+Pro+Battery+Replacement/51724",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -10400,7 +10414,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP ProOne 600 G1",
         "descripcion": "Guía para cambiar el ventilador en HP ProOne 600 G1.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProOne+600+G1+Fan+Replacement/51793",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -10409,7 +10423,7 @@ guias = [
     {
         "titulo": "Reemplazo de adaptador Wi-Fi en HP ProOne 600 G1",
         "descripcion": "Guía para cambiar el adaptador Wi-Fi en HP ProOne 600 G1.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProOne+600+G1+Wi-Fi+Adapter+Replacement/51794",
         "tipo_servicio": "Adaptador Wi-Fi",
         "equipo_marca": "HP",
@@ -10418,7 +10432,7 @@ guias = [
     {
         "titulo": "Reemplazo del reposamanos en Dell XPS 17 L702X",
         "descripcion": "Guía para cambiar el reposamanos en Dell XPS 17 L702X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+17+L702X+Palm+Rest+Replacement/51804",
         "tipo_servicio": "Reposamanos",
         "equipo_marca": "Dell",
@@ -10427,7 +10441,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Dell XPS 17 L702X",
         "descripcion": "Guía para cambiar el teclado en Dell XPS 17 L702X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+17+L702X+Keyboard+Replacement/51805",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -10436,7 +10450,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Dell XPS 17 L702X",
         "descripcion": "Guía para cambiar la pantalla en Dell XPS 17 L702X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+17+L702X+Display+Replacement/51806",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -10445,7 +10459,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Dell XPS 17 L702X",
         "descripcion": "Guía para cambiar la placa madre en Dell XPS 17 L702X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+17+L702X+Mother+Board+Replacement/51807",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -10454,7 +10468,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Dell XPS 17 L702X",
         "descripcion": "Guía para cambiar los altavoces en Dell XPS 17 L702X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+17+L702X+Speaker+Replacement/51809",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -10463,7 +10477,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus Chromebook C300M",
         "descripcion": "Guía para cambiar la batería en Asus Chromebook C300M.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C300M+Battery+Replacement/51825",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -10472,7 +10486,7 @@ guias = [
     {
         "titulo": "Reemplazo de tecla en Asus Chromebook C300M",
         "descripcion": "Guía para cambiar una tecla en Asus Chromebook C300M.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C300M+Key+Replacement/51826",
         "tipo_servicio": "Tecla",
         "equipo_marca": "Asus",
@@ -10481,7 +10495,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Asus Chromebook C300M",
         "descripcion": "Guía para cambiar la pantalla en Asus Chromebook C300M.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C300M+Screen+Replacement/51828",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -10490,7 +10504,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar la SSD en Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+SSD+Replacement/51838",
         "tipo_servicio": "SSD",
         "equipo_marca": "Lenovo",
@@ -10499,7 +10513,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Lenovo Yoga 3 11",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en Lenovo Yoga 3 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+11+Wireless+Card+Replacement/51839",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Lenovo",
@@ -10508,7 +10522,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus Zenbook UX32VD",
         "descripcion": "Guía para cambiar la RAM en Asus Zenbook UX32VD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX32VD+RAM+Replacement/51909",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -10517,7 +10531,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Lenovo Yoga 3 Pro",
         "descripcion": "Guía para cambiar los altavoces en Lenovo Yoga 3 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+Pro+Speakers+Replacement/51932",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -10526,7 +10540,7 @@ guias = [
     {
         "titulo": "Reemplazo de puertos USB en Lenovo Yoga 3 Pro",
         "descripcion": "Guía para cambiar los puertos USB en Lenovo Yoga 3 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+Pro+USB+Ports+Replacement/51933",
         "tipo_servicio": "Puertos USB",
         "equipo_marca": "Lenovo",
@@ -10535,7 +10549,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Acer Aspire E5-571",
         "descripcion": "Guía para cambiar el teclado en Acer Aspire E5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E5-571+Keyboard+Replacement/51947",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -10544,7 +10558,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Acer Aspire E5-571",
         "descripcion": "Guía para cambiar el disco duro en Acer Aspire E5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E5-571+Hard+Drive+Replacement/51951",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -10553,7 +10567,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta Wi-Fi en Acer Aspire E5-571",
         "descripcion": "Guía para cambiar la tarjeta Wi-Fi en Acer Aspire E5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E5-571+WiFi+Replacement/51954",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Acer",
@@ -10562,7 +10576,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus X555LA-SI305041",
         "descripcion": "Guía para cambiar la batería en Asus X555LA-SI305041.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X555LA-SI305041+Battery+Replacement/51968",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -10571,7 +10585,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Asus X555LA-SI305041",
         "descripcion": "Guía para cambiar el disco duro en Asus X555LA-SI305041.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X555LA-SI305041+Hard+Drive+Replacement/51969",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -10580,7 +10594,7 @@ guias = [
     {
         "titulo": "Reemplazo de ensamblaje de teclado en Asus X555LA-SI305041",
         "descripcion": "Guía para cambiar el ensamblaje del teclado en Asus X555LA-SI305041.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X555LA-SI305041++Keyboard+Assembly+Replacement/51971",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -10589,7 +10603,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de CD en Asus X555LA-SI305041",
         "descripcion": "Guía para cambiar la unidad de CD en Asus X555LA-SI305041.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X555LA-SI305041+CD+Drive+Replacement/51975",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "Asus",
@@ -10598,7 +10612,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus X555LA-SI305041",
         "descripcion": "Guía para cambiar la RAM en Asus X555LA-SI305041.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X555LA-SI305041+RAM+Replacement/51978",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -10607,7 +10621,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Toshiba Satellite C55D-B5206",
         "descripcion": "Guía para cambiar el disco duro en Toshiba Satellite C55D-B5206.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55D-B5206+Hard+Drive+Replacement/52004",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -10616,7 +10630,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador de CPU en Acer Aspire E5-571",
         "descripcion": "Guía para cambiar el ventilador de la CPU en Acer Aspire E5-571.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E5-571+CPU+Fan+Replacement/52042",
         "tipo_servicio": "Ventilador de CPU",
         "equipo_marca": "Acer",
@@ -10625,7 +10639,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de CD en HP Envy 700-030qe",
         "descripcion": "Guía para cambiar la unidad de CD en HP Envy 700-030qe.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+700-030qe+CD+Drive+Replacement/52136",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "HP",
@@ -10634,7 +10648,7 @@ guias = [
     {
         "titulo": "Desmontaje de cubierta trasera en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para desmontar la cubierta trasera en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+HP+ENVY+Rove+20-k014us+Back+Cover/52137",
         "tipo_servicio": "Cubierta Trasera",
         "equipo_marca": "HP",
@@ -10643,7 +10657,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para cambiar la RAM en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ENVY+Rove+20-k014us+Ram+Replacement/52138",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -10652,7 +10666,7 @@ guias = [
     {
         "titulo": "Extracción de disco duro en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para extraer el disco duro en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ENVY+Rove+20-k014us+Hard+Drive+Removal/52144",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -10661,7 +10675,7 @@ guias = [
     {
         "titulo": "Desmontaje del soporte en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para desmontar el soporte en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Disassembling+HP+ENVY+Rove+20-k014us+Stand+Recess/52145",
         "tipo_servicio": "Soporte",
         "equipo_marca": "HP",
@@ -10670,7 +10684,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para cambiar el ventilador en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ENVY+Rove+20-k014us+Fan+Replacement/52148",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -10679,7 +10693,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para cambiar la batería en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ENVY+Rove+20-k014us+Battery+Replacement/52149",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -10688,7 +10702,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa de USB y audio en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para cambiar la placa de USB y audio en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ENVY+Rove+20-k014us+USB+and+Audio+Board+Replacement/52151",
         "tipo_servicio": "Placa USB y Audio",
         "equipo_marca": "HP",
@@ -10697,7 +10711,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa USB en HP ENVY Rove 20-k014us",
         "descripcion": "Guía para cambiar la placa USB en HP ENVY Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ENVY+Rove+20-k014us+USB+Board+Replacement/52153",
         "tipo_servicio": "Placa USB",
         "equipo_marca": "HP",
@@ -10706,7 +10720,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Lenovo Yoga 2 Pro",
         "descripcion": "Guía para cambiar la batería en Lenovo Yoga 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+Pro+Battery+Replacement/52187",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -10715,7 +10729,7 @@ guias = [
     {
         "titulo": "Reemplazo de trackpad en Lenovo Yoga 2 Pro",
         "descripcion": "Guía para cambiar el trackpad en Lenovo Yoga 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+Pro+Trackpad+Replacement/52188",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Lenovo",
@@ -10724,7 +10738,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Lenovo Yoga 2 11\"",
         "descripcion": "Guía para cambiar la batería en Lenovo Yoga 2 11\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+11-Inch+Battery+Replacement/52203",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -10733,7 +10747,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel trasero en Lenovo Yoga 2 11\"",
         "descripcion": "Guía para cambiar el panel trasero en Lenovo Yoga 2 11\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+11-Inch+Back+Panel+Replacement/52204",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Lenovo",
@@ -10742,7 +10756,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en HP Envy 23-d060qd TouchSmart",
         "descripcion": "Guía para cambiar los altavoces en HP Envy 23-d060qd TouchSmart.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+23-d060qd+TouchSmart+Speaker+Replacement/52211",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -10751,7 +10765,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje de pantalla en HP Envy 23-d060qd TouchSmart",
         "descripcion": "Guía para reemplazar el ensamblaje de pantalla en HP Envy 23-d060qd TouchSmart.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+23-d060qd+TouchSmart+Display+Assembly+Replacement/52212",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -10760,7 +10774,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Envy 23-d060qd TouchSmart",
         "descripcion": "Guía para cambiar el ventilador en HP Envy 23-d060qd TouchSmart.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+23-d060qd+TouchSmart+Fan+Replacement/52213",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -10769,7 +10783,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en HP Envy 23-d060qd TouchSmart",
         "descripcion": "Guía para cambiar la placa madre en HP Envy 23-d060qd TouchSmart.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+23-d060qd+TouchSmart+Motherboard+Replacement/52214",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -10778,7 +10792,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Lenovo Yoga 2 11\"",
         "descripcion": "Guía para cambiar los altavoces en Lenovo Yoga 2 11\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+11-Inch+Speakers+Replacement/52226",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -10787,7 +10801,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Lenovo Yoga 2 11\"",
         "descripcion": "Guía para cambiar la pantalla en Lenovo Yoga 2 11\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+11-Inch+Screen+Replacement/52228",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -10796,7 +10810,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD en Lenovo Yoga 3 Pro",
         "descripcion": "Guía para cambiar el SSD en Lenovo Yoga 3 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+Pro+SSD+Replacement/52256",
         "tipo_servicio": "SSD",
         "equipo_marca": "Lenovo",
@@ -10805,7 +10819,7 @@ guias = [
     {
         "titulo": "Reemplazo del módulo de teclado en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar el módulo de teclado en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Keyboard+Module+Replacement/52265",
         "tipo_servicio": "Módulo de Teclado",
         "equipo_marca": "ASUS",
@@ -10814,7 +10828,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Asus Zenbook UX32VD",
         "descripcion": "Guía para cambiar el disco duro en Asus Zenbook UX32VD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX32VD+Hard+Drive+Replacement/52270",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -10823,7 +10837,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar el disco duro en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Hard+Drive+Replacement/52275",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "ASUS",
@@ -10832,7 +10846,7 @@ guias = [
     {
         "titulo": "Reemplazo del procesador en HP Compaq 6910p",
         "descripcion": "Guía para cambiar el procesador en HP Compaq 6910p.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+6910p+Processor+Replacement/52281",
         "tipo_servicio": "Procesador",
         "equipo_marca": "HP",
@@ -10841,7 +10855,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel inferior en Asus Zenbook UX32VD",
         "descripcion": "Guía para reemplazar el panel inferior en Asus Zenbook UX32VD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX32VD+Bottom+Panel+Replacement/52286",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "Asus",
@@ -10850,7 +10864,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta de red inalámbrica en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar la tarjeta de red inalámbrica en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Wireless+Network+Card+Replacement/52290",
         "tipo_servicio": "Tarjeta de Red Inalámbrica",
         "equipo_marca": "ASUS",
@@ -10859,7 +10873,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar la batería en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Battery+Replacement/52291",
         "tipo_servicio": "Batería",
         "equipo_marca": "ASUS",
@@ -10868,7 +10882,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad de DVD en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar la unidad de DVD en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+DVD+Drive+Replacement/52292",
         "tipo_servicio": "Unidad de DVD",
         "equipo_marca": "ASUS",
@@ -10877,7 +10891,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar la placa madre en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Motherboard+Replacement/52293",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "ASUS",
@@ -10886,7 +10900,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar el ventilador en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Fan+Replacement/52310",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "ASUS",
@@ -10895,7 +10909,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar la pantalla en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Screen+Replacement/52311",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "ASUS",
@@ -10904,7 +10918,7 @@ guias = [
     {
         "titulo": "Reemplazo del botón de encendido en ASUS D550MA-DS01",
         "descripcion": "Guía para cambiar el botón de encendido en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+Power+Button+Replacement/52313",
         "tipo_servicio": "Botón de Encendido",
         "equipo_marca": "ASUS",
@@ -10913,7 +10927,7 @@ guias = [
     {
         "titulo": "Reemplazo de bisagra en Dell Inspiron 13-7352",
         "descripcion": "Guía para cambiar la bisagra en Dell Inspiron 13-7352.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13-7352+Hinge+Replacement/52318",
         "tipo_servicio": "Bisagra",
         "equipo_marca": "Dell",
@@ -10922,7 +10936,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa del sistema en Dell Inspiron 13-7352",
         "descripcion": "Guía para cambiar la placa del sistema en Dell Inspiron 13-7352.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13-7352+System+Board+Replacement/52319",
         "tipo_servicio": "Placa del Sistema",
         "equipo_marca": "Dell",
@@ -10931,7 +10945,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en ASUS D550MA-DS01",
         "descripcion": "Guía para reemplazar la RAM en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+RAM+Replacement/52323",
         "tipo_servicio": "RAM",
         "equipo_marca": "ASUS",
@@ -10940,7 +10954,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería CMOS en ASUS D550MA-DS01",
         "descripcion": "Guía para reemplazar la batería CMOS en ASUS D550MA-DS01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+D550MA-DS01+CMOS+Battery+Replacement/52324",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "ASUS",
@@ -10949,7 +10963,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Dell Inspiron Mini 1012",
         "descripcion": "Guía para cambiar la pantalla en Dell Inspiron Mini 1012.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+1012++Screen+Replacement/52364",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -10958,7 +10972,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Dell Inspiron Mini 1012",
         "descripcion": "Guía para cambiar el teclado en Dell Inspiron Mini 1012.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+1012+Keyboard+Replacement/52370",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -10967,7 +10981,7 @@ guias = [
     {
         "titulo": "Reemplazo de ensamblaje de pantalla en Lenovo Yoga 3 Pro",
         "descripcion": "Guía para reemplazar el ensamblaje de la pantalla en Lenovo Yoga 3 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+Pro+Display+Assembly+Replacement/52401",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -10976,7 +10990,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Lenovo Yoga 2 Pro",
         "descripcion": "Guía para cambiar la tarjeta inalámbrica en Lenovo Yoga 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+Pro+Wireless+Card+Replacement/52426",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Lenovo",
@@ -10985,7 +10999,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Toshiba Satellite C55D-B5206",
         "descripcion": "Guía para cambiar la pantalla en Toshiba Satellite C55D-B5206.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55D-B5206+Screen+Replacement/52443",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Toshiba",
@@ -10994,7 +11008,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla y digitalizador en Lenovo Yoga 2 Pro",
         "descripcion": "Guía para reemplazar la pantalla y el digitalizador en Lenovo Yoga 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+Pro+Screen+and+Digitizer+Replacement/52447",
         "tipo_servicio": "Pantalla y Digitalizador",
         "equipo_marca": "Lenovo",
@@ -11003,7 +11017,7 @@ guias = [
     {
         "titulo": "Reemplazo de módulo de memoria (RAM) en Dell Inspiron 13-7352",
         "descripcion": "Guía para reemplazar el módulo de memoria en Dell Inspiron 13-7352.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13-7352+Memory+Module+%28RAM%29+Replacement/52470",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -11012,7 +11026,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Dell Inspiron 13-7352",
         "descripcion": "Guía para cambiar el disco duro en Dell Inspiron 13-7352.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13-7352+Hard+Drive+Replacement/52471",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -11021,7 +11035,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de enfriamiento en Dell Inspiron 13-7352",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Dell Inspiron 13-7352.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13-7352+Cooling+Fan+Replacement/52479",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Dell",
@@ -11030,7 +11044,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Dell Inspiron 13-7352",
         "descripcion": "Guía para reemplazar la batería en Dell Inspiron 13-7352.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13-7352+Battery+Replacement/52484",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -11039,7 +11053,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro de la carcasa en HP Envy Rove 20-k014us",
         "descripcion": "Guía para reemplazar el disco duro de la carcasa en HP Envy Rove 20-k014us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+Rove+20-k014us+Hard+Drive+from+Case+Replacement/52502",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -11048,7 +11062,7 @@ guias = [
     {
         "titulo": "Reemplazo de la carcasa trasera en Toshiba Satellite C55D-B5206",
         "descripcion": "Guía para reemplazar la carcasa trasera en Toshiba Satellite C55D-B5206.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55D-B5206+Back+Casing+Replacement/52506",
         "tipo_servicio": "Carcasa Trasera",
         "equipo_marca": "Toshiba",
@@ -11057,7 +11071,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad de CD en Toshiba Satellite C55D-B5206",
         "descripcion": "Guía para reemplazar la unidad de CD en Toshiba Satellite C55D-B5206.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55D-B5206+CD+Drive+Replacement/52515",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "Toshiba",
@@ -11066,7 +11080,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Asus Eee PC 1000HA",
         "descripcion": "Guía para reemplazar el disco duro en Asus Eee PC 1000HA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HA+Hard+Drive+Replacement/52533",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -11075,7 +11089,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Dell Inspiron 1564",
         "descripcion": "Guía para reemplazar el ventilador en Dell Inspiron 1564.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+1564+CPU+Fan+Replacement/52537",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -11084,7 +11098,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad de CD en Dell Inspiron 1564",
         "descripcion": "Guía para reemplazar la unidad de CD en Dell Inspiron 1564.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+1564+CD+Drive+Replacement/52555",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "Dell",
@@ -11093,7 +11107,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel inferior en Asus Chromebook C300M",
         "descripcion": "Guía para reemplazar el panel inferior en Asus Chromebook C300M.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C300M+Bottom+Panel+Replacement/52605",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "Asus",
@@ -11102,7 +11116,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco de estado sólido en HP Envy 700-030qe",
         "descripcion": "Guía para reemplazar el disco de estado sólido en HP Envy 700-030qe.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+700-030qe+Solid+State+Drive+Replacement/52617",
         "tipo_servicio": "Disco de Estado Sólido",
         "equipo_marca": "HP",
@@ -11111,7 +11125,7 @@ guias = [
     {
         "titulo": "Reemplazo del rotador de pantalla en HP Pavilion tx2500",
         "descripcion": "Guía para reemplazar el rotador de pantalla en HP Pavilion tx2500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+tx2500+Screen+Rotator+Replacement/52618",
         "tipo_servicio": "Rotador de Pantalla",
         "equipo_marca": "HP",
@@ -11120,7 +11134,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Envy 700-030qe",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Envy 700-030qe.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+700-030qe+RAM+Replacement/52630",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -11129,7 +11143,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de CPU en HP Envy 700-030qe",
         "descripcion": "Guía para reemplazar el ventilador de CPU en HP Envy 700-030qe.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+700-030qe+CPU+Fan+Replacement/52631",
         "tipo_servicio": "Ventilador de CPU",
         "equipo_marca": "HP",
@@ -11138,7 +11152,7 @@ guias = [
     {
         "titulo": "Reemplazo de cámara web HD en Asus Zenbook UX32VD",
         "descripcion": "Guía para reemplazar la cámara web HD en Asus Zenbook UX32VD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX32VD++HD+Web+Camera+Replacement/52632",
         "tipo_servicio": "Cámara Web HD",
         "equipo_marca": "Asus",
@@ -11147,7 +11161,7 @@ guias = [
     {
         "titulo": "Reemplazo de la fuente de alimentación en HP Envy 700-030qe",
         "descripcion": "Guía para reemplazar la fuente de alimentación en HP Envy 700-030qe.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+700-030qe+Power+Supply+Replacement/52638",
         "tipo_servicio": "Fuente de Alimentación",
         "equipo_marca": "HP",
@@ -11156,7 +11170,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de enfriamiento en Asus Zenbook UX303L",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Asus Zenbook UX303L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX303L+Cooling+Fan+Replacement/52646",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Asus",
@@ -11165,7 +11179,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en ASUS Eee PC 900HD",
         "descripcion": "Guía para reemplazar el disco duro en ASUS Eee PC 900HD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Eee+PC+900HD+Hard+Drive+Replacement/52662",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -11174,7 +11188,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Dell Vostro 1320",
         "descripcion": "Guía para reemplazar el ventilador en Dell Vostro 1320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+1320+Fan+Replacement/52711",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -11183,7 +11197,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Dell Vostro 1320",
         "descripcion": "Guía para reemplazar la pantalla en Dell Vostro 1320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+1320+Screen+Replacement/52712",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -11192,7 +11206,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Dell Vostro 1320",
         "descripcion": "Guía para reemplazar el teclado en Dell Vostro 1320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+1320+Keyboard+Replacement/52713",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -11201,7 +11215,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto USB en Dell Vostro 1320",
         "descripcion": "Guía para reemplazar el puerto USB en Dell Vostro 1320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+1320+USB+Port+Replacement/52715",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "Dell",
@@ -11210,7 +11224,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Acer Aspire V3-472p-324J",
         "descripcion": "Guía para reemplazar la batería en Acer Aspire V3-472p-324J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V3-472p-324J+Battery+Replacement/52759",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -11219,7 +11233,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad de DVD en Lenovo IdeaPad G50-45",
         "descripcion": "Guía para reemplazar la unidad de DVD en Lenovo IdeaPad G50-45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+G50-45+DVD+Drive+Replacement/52819",
         "tipo_servicio": "Unidad de DVD",
         "equipo_marca": "Lenovo",
@@ -11228,7 +11242,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en HP Pavilion dv2700",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion dv2700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv2700+Hard+Drive+Replacement/52843",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -11237,7 +11251,7 @@ guias = [
     {
         "titulo": "Reemplazo de la cubierta trasera en HP Split x2",
         "descripcion": "Guía para reemplazar la cubierta trasera en HP Split x2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Split+x2+Rear+Cover+Replacement/52852",
         "tipo_servicio": "Cubierta Trasera",
         "equipo_marca": "HP",
@@ -11246,7 +11260,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en HP Split x2",
         "descripcion": "Guía para reemplazar la pantalla en HP Split x2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Split+x2+Screen+Replacement/52855",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -11255,7 +11269,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Toshiba Chromebook 2",
         "descripcion": "Guía para reemplazar la batería en Toshiba Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+2+Battery+Replacement/52911",
         "tipo_servicio": "Batería",
         "equipo_marca": "Toshiba",
@@ -11264,7 +11278,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en ASUS X44H-BBR4",
         "descripcion": "Guía para reemplazar el teclado en ASUS X44H-BBR4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X44H-BBR4+Keyboard+Replacement/52944",
         "tipo_servicio": "Teclado",
         "equipo_marca": "ASUS",
@@ -11273,7 +11287,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel frontal en ASUS X44H-BBR4",
         "descripcion": "Guía para reemplazar el panel frontal en ASUS X44H-BBR4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X44H-BBR4+Front+Panel+Replacement/53041",
         "tipo_servicio": "Panel Frontal",
         "equipo_marca": "ASUS",
@@ -11282,7 +11296,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en ASUS X44H-BBR4",
         "descripcion": "Guía para reemplazar la placa madre en ASUS X44H-BBR4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X44H-BBR4+MotherBoard+Replacement/53042",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "ASUS",
@@ -11291,7 +11305,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en ASUS X44H-BBR4",
         "descripcion": "Guía para reemplazar el ventilador en ASUS X44H-BBR4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X44H-BBR4+Fan+Replacement/53043",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "ASUS",
@@ -11300,7 +11314,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en ASUS X44H-BBR4",
         "descripcion": "Guía para reemplazar la pantalla en ASUS X44H-BBR4.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+X44H-BBR4+Screen+Replacement/53044",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "ASUS",
@@ -11309,7 +11323,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Lenovo IdeaPad G50-45",
         "descripcion": "Guía para reemplazar el ventilador en Lenovo IdeaPad G50-45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+G50-45+Fan+Replacement/53050",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Lenovo",
@@ -11318,7 +11332,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Lenovo IdeaPad G50-45",
         "descripcion": "Guía para reemplazar la pantalla en Lenovo IdeaPad G50-45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+G50-45+Screen+Replacement/53051",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -11327,7 +11341,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Lenovo Essential B570",
         "descripcion": "Guía para reemplazar el disco duro en Lenovo Essential B570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Essential+B570+Hard+Drive+Replacement/53126",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Lenovo",
@@ -11336,7 +11350,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Lenovo Essential B570",
         "descripcion": "Guía para reemplazar la RAM en Lenovo Essential B570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Essential+B570+RAM+Replacement/53133",
         "tipo_servicio": "RAM",
         "equipo_marca": "Lenovo",
@@ -11345,7 +11359,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad de DVD en Lenovo Essential B570",
         "descripcion": "Guía para reemplazar la unidad de DVD en Lenovo Essential B570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Essential+B570+DVD+Drive+Replacement/53134",
         "tipo_servicio": "Unidad de DVD",
         "equipo_marca": "Lenovo",
@@ -11354,7 +11368,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Lenovo Essential B570",
         "descripcion": "Guía para reemplazar el teclado en Lenovo Essential B570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Essential+B570+Keyboard+Replacement/53135",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -11363,7 +11377,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Lenovo IdeaPad G50-45",
         "descripcion": "Guía para reemplazar el teclado en Lenovo IdeaPad G50-45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+G50-45+Keyboard+Replacement/53139",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -11372,7 +11386,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Toshiba Satellite c650d",
         "descripcion": "Guía para reemplazar la RAM en Toshiba Satellite c650d.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+c650d+RAM+Replacement/53238",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -11381,7 +11395,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Toshiba Satellite c650d",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite c650d.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+c650d+Hard+Drive+Replacement/53239",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -11390,7 +11404,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Toshiba Satellite c650d",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite c650d.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+c650d+Keyboard+Replacement/53241",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -11399,7 +11413,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Toshiba Satellite c650d",
         "descripcion": "Guía para reemplazar el ventilador en Toshiba Satellite c650d.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+c650d+Fan+Replacement/53242",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Toshiba",
@@ -11408,7 +11422,7 @@ guias = [
     {
         "titulo": "Reemplazo del trackpad en ASUS Eee PC 900HD",
         "descripcion": "Guía para reemplazar el trackpad en ASUS Eee PC 900HD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Eee+PC+900HD+Track+Pad+Replacement/53452",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "ASUS",
@@ -11417,7 +11431,7 @@ guias = [
     {
         "titulo": "Reemplazo del clicker en ASUS Eee PC 900HD",
         "descripcion": "Guía para reemplazar el clicker en ASUS Eee PC 900HD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Eee+PC+900HD+Clicker+Replacement/53456",
         "tipo_servicio": "Clicker",
         "equipo_marca": "ASUS",
@@ -11426,7 +11440,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Asus Eee PC 1000HA",
         "descripcion": "Guía para reemplazar la RAM en Asus Eee PC 1000HA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HA+RAM+Replacement/53468",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -11435,7 +11449,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Asus Eee PC 1000HA",
         "descripcion": "Guía para reemplazar la pantalla en Asus Eee PC 1000HA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HA+Screen+Replacement/53474",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -11444,7 +11458,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Asus Zenbook UX303L",
         "descripcion": "Guía para reemplazar el disco duro en Asus Zenbook UX303L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX303L+Hard+Drive+Replacement/53484",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -11453,7 +11467,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Pavilion tx2500",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion tx2500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+tx2500+Fan++Replacement/53516",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -11462,7 +11476,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en ASUS Eee PC 900HD",
         "descripcion": "Guía para reemplazar el teclado en ASUS Eee PC 900HD.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Eee+PC+900HD+Key+Board+Replacement/53538",
         "tipo_servicio": "Teclado",
         "equipo_marca": "ASUS",
@@ -11471,7 +11485,7 @@ guias = [
     {
         "titulo": "Reemplazo del trackpad en Asus Zenbook UX303L",
         "descripcion": "Guía para reemplazar el trackpad en Asus Zenbook UX303L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX303L+Trackpad+Replacement/53550",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Asus",
@@ -11480,7 +11494,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Asus Zenbook UX303L",
         "descripcion": "Guía para reemplazar el teclado en Asus Zenbook UX303L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX303L+Keyboard+Replacement/53551",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -11489,7 +11503,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Asus Eee PC T101MT",
         "descripcion": "Guía para reemplazar la RAM en Asus Eee PC T101MT.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+T101MT+RAM+Replacement/53614",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -11498,7 +11512,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Asus Eee PC T101MT",
         "descripcion": "Guía para reemplazar el ventilador en Asus Eee PC T101MT.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+T101MT+Fan+Replacement/53617",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -11507,7 +11521,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta de red inalámbrica en Asus Eee PC T101MT",
         "descripcion": "Guía para reemplazar la tarjeta de red inalámbrica en Asus Eee PC T101MT.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+T101MT+Wireless+Network+Interface+Card+Replacement/53618",
         "tipo_servicio": "Tarjeta de Red",
         "equipo_marca": "Asus",
@@ -11516,7 +11530,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel trasero en Lenovo Essential B570",
         "descripcion": "Guía para reemplazar el panel trasero en Lenovo Essential B570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Essential+B570+Back+Panel+Replacement/53659",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Lenovo",
@@ -11525,7 +11539,7 @@ guias = [
     {
         "titulo": "Reemplazo del monitor/display en HP Pavilion dv6700",
         "descripcion": "Guía para reemplazar el monitor/display en HP Pavilion dv6700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6700+Display-Monitor+Replacement/53959",
         "tipo_servicio": "Display",
         "equipo_marca": "HP",
@@ -11534,7 +11548,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en HP Pavilion dv6700",
         "descripcion": "Guía para reemplazar la placa madre en HP Pavilion dv6700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6700+Motherboard+Replacement/53962",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -11543,7 +11557,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador de calor en HP Pavilion dv6700",
         "descripcion": "Guía para reemplazar el disipador de calor en HP Pavilion dv6700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6700+Heat+Sink+Replacement/53966",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "HP",
@@ -11552,7 +11566,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto de carga en HP Pavilion dv6700",
         "descripcion": "Guía para reemplazar el puerto de carga en HP Pavilion dv6700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6700+Charging+Port+Replacement/53967",
         "tipo_servicio": "Puerto de Carga",
         "equipo_marca": "HP",
@@ -11561,7 +11575,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire 5552",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire 5552.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5552+RAM+Replacement/54765",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -11570,7 +11584,7 @@ guias = [
     {
         "titulo": "Desmontaje de HP Stream 13 para actualización de SSD PCIe mini",
         "descripcion": "Guía para desmontar el HP Stream 13 y actualizar el SSD PCIe mini.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+13+Disassembly+for+Upgrading+the+PCIe+mini+SSD/55353",
         "tipo_servicio": "SSD",
         "equipo_marca": "HP",
@@ -11579,7 +11593,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Acer Aspire S7-392",
         "descripcion": "Guía para reemplazar el ventilador en Acer Aspire S7-392.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+S7-392+Fan+replacement+Replacement/55478",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Acer",
@@ -11588,7 +11602,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Samsung Chromebook 2",
         "descripcion": "Guía para reemplazar la pantalla en Samsung Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+2+Screen+Replacement/55933",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -11597,7 +11611,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Samsung Chromebook 2",
         "descripcion": "Guía para reemplazar la batería en Samsung Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+2+Battery+Replacement/55936",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -11606,7 +11620,7 @@ guias = [
     {
         "titulo": "Reemplazo del trackpad en Samsung Chromebook 2",
         "descripcion": "Guía para reemplazar el trackpad en Samsung Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+2+Trackpad+Replacement/55939",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Samsung",
@@ -11615,7 +11629,7 @@ guias = [
     {
         "titulo": "Remoción de la carcasa trasera en HP Spectre 13-3010dx",
         "descripcion": "Guía para remover la carcasa trasera en HP Spectre 13-3010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Spectre+13-3010dx+Back+Case+Removal/56153",
         "tipo_servicio": "Carcasa Trasera",
         "equipo_marca": "HP",
@@ -11624,7 +11638,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en HP Spectre 13-3010dx",
         "descripcion": "Guía para reemplazar la batería en HP Spectre 13-3010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Spectre+13-3010dx+Battery+Replacement/56157",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -11633,7 +11647,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto de carga en HP Spectre 13-3010dx",
         "descripcion": "Guía para reemplazar el puerto de carga en HP Spectre 13-3010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Spectre+13-3010dx+Charge+Port+Replacement/56230",
         "tipo_servicio": "Puerto de Carga",
         "equipo_marca": "HP",
@@ -11642,7 +11656,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Spectre 13-3010dx",
         "descripcion": "Guía para reemplazar el ventilador en HP Spectre 13-3010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Spectre+13-3010dx+Fan+Replacement/56232",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -11651,7 +11665,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP Spectre 13-3010dx",
         "descripcion": "Guía para reemplazar la pantalla en HP Spectre 13-3010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Spectre+13-3010dx+Screen+Replacement/56233",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -11660,7 +11674,7 @@ guias = [
     {
         "titulo": "Reemplazo del Trackpad en Lenovo Thinkpad X220",
         "descripcion": "Guía para reemplazar el trackpad en Lenovo Thinkpad X220.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Thinkpad+X220+Trackpad+Replacement/56263",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Lenovo",
@@ -11669,7 +11683,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Lenovo Thinkpad X220",
         "descripcion": "Guía para reemplazar el teclado en Lenovo Thinkpad X220.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Thinkpad+X220+Keyboard+Replacement/56265",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -11678,7 +11692,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla LCD en Lenovo Thinkpad X220",
         "descripcion": "Guía para reemplazar la pantalla LCD en Lenovo Thinkpad X220.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Thinkpad+X220+LCD+Screen+Replacement/56268",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Lenovo",
@@ -11687,7 +11701,7 @@ guias = [
     {
         "titulo": "Reemplazo del Escáner de Huellas en HP Pavillion dm4t-2100",
         "descripcion": "Guía para reemplazar el escáner de huellas en HP Pavillion dm4t-2100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavillion+dm4t-2100+Finger+Print+Scanner+Replacement/56391",
         "tipo_servicio": "Escáner de Huellas",
         "equipo_marca": "HP",
@@ -11696,7 +11710,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP Pavillion dm4t-2100",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavillion dm4t-2100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavillion+dm4t-2100+Screen+Replacement/56395",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -11705,7 +11719,7 @@ guias = [
     {
         "titulo": "Reemplazo del Trackpad en HP Spectre 13-3010dx",
         "descripcion": "Guía para reemplazar el trackpad en HP Spectre 13-3010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/hp+spectre+13-3010dx+Track+Pad+Replacement/56415",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "HP",
@@ -11714,7 +11728,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en HP Pavillion dm4t-2100",
         "descripcion": "Guía para reemplazar el touchpad en HP Pavillion dm4t-2100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavillion+dm4t-2100+Touchpad+Replacement/56508",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "HP",
@@ -11723,7 +11737,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Carcasa Inferior en Acer Aspire E 11",
         "descripcion": "Guía para reemplazar la carcasa inferior en Acer Aspire E 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E+11+Lower+Case+Replacement/56527",
         "tipo_servicio": "Carcasa Inferior",
         "equipo_marca": "Acer",
@@ -11732,7 +11746,7 @@ guias = [
     {
         "titulo": "Reemplazo del Chip WLAN en Acer Chromebook CB3-111-C670",
         "descripcion": "Guía para reemplazar el chip WLAN en Acer Chromebook CB3-111-C670.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C670+WLAN+Chip+Replacement/56649",
         "tipo_servicio": "Chip WLAN",
         "equipo_marca": "Acer",
@@ -11741,7 +11755,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Acer Chromebook CB3-111-C670",
         "descripcion": "Guía para reemplazar la pantalla en Acer Chromebook CB3-111-C670.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C670+Screen+Replacement/56651",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -11750,7 +11764,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería Interna en Sony Vaio Pro 13",
         "descripcion": "Guía para reemplazar la batería interna en Sony Vaio Pro 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Pro+13+Internal+Battery+Replacement/56763",
         "tipo_servicio": "Batería Interna",
         "equipo_marca": "Sony",
@@ -11759,7 +11773,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Acer Aspire E 11",
         "descripcion": "Guía para reemplazar la batería en Acer Aspire E 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E+11+Battery+Replacement/56915",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -11768,7 +11782,7 @@ guias = [
     {
         "titulo": "Reemplazo del Trackpad en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar el trackpad en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Trackpad+Replacement/56950",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "HP",
@@ -11777,7 +11791,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Carcasa Inferior en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar la carcasa inferior en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Lower+Case+Replacement/57022",
         "tipo_servicio": "Carcasa Inferior",
         "equipo_marca": "HP",
@@ -11786,7 +11800,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Acer Chromebook CB3-111-C670",
         "descripcion": "Guía para reemplazar la batería en Acer Chromebook CB3-111-C670.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C670+Battery+Replacement/59515",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -11795,7 +11809,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa madre en Acer Aspire E 11",
         "descripcion": "Guía para reemplazar la placa madre en Acer Aspire E 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E+11+Motherboard+Replacement/59809",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -11804,7 +11818,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Acer Aspire E 11",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire E 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E+11+RAM+Replacement/59814",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -11813,7 +11827,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Asamblea del Reposamuñecas en Asus Chromebook C201",
         "descripcion": "Guía para reemplazar la asamblea del reposamuñecas en Asus Chromebook C201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C201+Palm+Rest+Assembly+Replacement/59919",
         "tipo_servicio": "Asamblea del Reposamuñecas",
         "equipo_marca": "Asus",
@@ -11822,7 +11836,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Dell Chromebook 11 CB1C13",
         "descripcion": "Guía para reemplazar la batería en Dell Chromebook 11 CB1C13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Chromebook+11+CB1C13+Battery+Replacement/60019",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -11831,7 +11845,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ensamblaje con Bisagra de la Pantalla LCD en Dell Chromebook 11 CB1C13",
         "descripcion": "Guía para reemplazar el ensamblaje con bisagra de la pantalla LCD en Dell Chromebook 11 CB1C13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Chromebook+11+CB1C13+LCD+Hinged+Assembly+Replacement/60166",
         "tipo_servicio": "Ensamblaje con Bisagra de Pantalla LCD",
         "equipo_marca": "Dell",
@@ -11840,7 +11854,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar el teclado en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Keyboard+Replacement/60199",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -11849,7 +11863,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar la batería en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Battery+Replacement/60204",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -11858,7 +11872,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tapa en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar la tapa en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Lid+Replacement/60702",
         "tipo_servicio": "Tapa",
         "equipo_marca": "HP",
@@ -11867,7 +11881,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Asus Chromebook C201",
         "descripcion": "Guía para reemplazar la batería en Asus Chromebook C201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C201+Battery+Replacement/60766",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -11876,7 +11890,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa madre en Asus Chromebook C201",
         "descripcion": "Guía para reemplazar la placa madre en Asus Chromebook C201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C201+Motherboard+Replacement/60770",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -11885,7 +11899,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla LCD en Asus Chromebook C201",
         "descripcion": "Guía para reemplazar la pantalla LCD en Asus Chromebook C201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C201+LCD+Screen+Replacement/60771",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Asus",
@@ -11894,7 +11908,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Unidad de Estado Sólido en Sony Vaio Pro 13",
         "descripcion": "Guía para reemplazar la unidad de estado sólido en Sony Vaio Pro 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Pro+13+Solid+State+Drive+Replacement/60773",
         "tipo_servicio": "Unidad de Estado Sólido",
         "equipo_marca": "Sony",
@@ -11903,7 +11917,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Asus Chromebook C201",
         "descripcion": "Guía para reemplazar el teclado en Asus Chromebook C201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C201+Keyboard+Replacement/60774",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -11912,7 +11926,7 @@ guias = [
     {
         "titulo": "Reemplazo del Trackpad en Sony Vaio Pro 13",
         "descripcion": "Guía para reemplazar el trackpad en Sony Vaio Pro 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Pro+13+Trackpad+Replacement/60777",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Sony",
@@ -11921,7 +11935,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta WiFi en Sony Vaio Pro 13",
         "descripcion": "Guía para reemplazar la tarjeta WiFi en Sony Vaio Pro 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Pro+13+WiFi+Card+Replacement/60779",
         "tipo_servicio": "Tarjeta WiFi",
         "equipo_marca": "Sony",
@@ -11930,7 +11944,7 @@ guias = [
     {
         "titulo": "Reemplazo del Lector/Escritor de Tarjetas de Memoria en Sony Vaio Pro 13",
         "descripcion": "Guía para reemplazar el lector/escritor de tarjetas de memoria en Sony Vaio Pro 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Pro+13+Memory+Card+Reader-Writer+Replacement/60780",
         "tipo_servicio": "Lector/Escritor de Tarjetas de Memoria",
         "equipo_marca": "Sony",
@@ -11939,7 +11953,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Acer Aspire One AO756-2623",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire One AO756-2623.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+AO756-2623+Hard+Drive+Replacement/60846",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -11948,7 +11962,7 @@ guias = [
     {
         "titulo": "Reemplazo del Panel Táctil en Acer Aspire E 11",
         "descripcion": "Guía para reemplazar el panel táctil en Acer Aspire E 11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E+11+Touchpad+Replacement/60867",
         "tipo_servicio": "Panel Táctil",
         "equipo_marca": "Acer",
@@ -11957,7 +11971,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Cámara Web en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar la cámara web en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Webcam+Replacement/60896",
         "tipo_servicio": "Cámara Web",
         "equipo_marca": "HP",
@@ -11966,7 +11980,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla en HP Stream 11-d020nr",
         "descripcion": "Guía para reemplazar la pantalla en HP Stream 11-d020nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Stream+11-d020nr+Screen+Replacement/60898",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -11975,7 +11989,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla en Gateway LT4004u",
         "descripcion": "Guía para reemplazar la pantalla en Gateway LT4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+LT4004u+Screen+Replacement/60921",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Gateway",
@@ -11984,7 +11998,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Lenovo Ideapad Flex 15",
         "descripcion": "Guía para reemplazar el disco duro en Lenovo Ideapad Flex 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Ideapad+Flex+15+Hard+Drive+Replacement/61117",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Lenovo",
@@ -11993,7 +12007,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta de Red Inalámbrica en Lenovo Ideapad Flex 15",
         "descripcion": "Guía para reemplazar la tarjeta de red inalámbrica en Lenovo Ideapad Flex 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Ideapad+Flex+15+Wireless+Networking+Card+Replacement/61118",
         "tipo_servicio": "Tarjeta de Red Inalámbrica",
         "equipo_marca": "Lenovo",
@@ -12002,7 +12016,7 @@ guias = [
     {
         "titulo": "Reemplazo del Adaptador del Puerto USB en Lenovo Ideapad Flex 15",
         "descripcion": "Guía para reemplazar el adaptador del puerto USB en Lenovo Ideapad Flex 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Ideapad+Flex+15+USB+Header+Adaptor+Replacement/61119",
         "tipo_servicio": "Adaptador del Puerto USB",
         "equipo_marca": "Lenovo",
@@ -12011,7 +12025,7 @@ guias = [
     {
         "titulo": "Reemplazo del Altavoz en Lenovo Ideapad Flex 15",
         "descripcion": "Guía para reemplazar el altavoz en Lenovo Ideapad Flex 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Ideapad+Flex+15+Speaker+Replacement/61121",
         "tipo_servicio": "Altavoz",
         "equipo_marca": "Lenovo",
@@ -12020,7 +12034,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Asus Eee PC 1000HE",
         "descripcion": "Guía para reemplazar el disco duro en Asus Eee PC 1000HE.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HE+Hard+Drive+Replacement/61191",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -12029,7 +12043,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en ASUS VivoBook S300CA-BBI5T01",
         "descripcion": "Guía para reemplazar la batería en ASUS VivoBook S300CA-BBI5T01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+VivoBook+S300CA-BBI5T01+Battery+Replacement/61223",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -12038,7 +12052,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador en ASUS VivoBook S300CA-BBI5T01",
         "descripcion": "Guía para reemplazar el ventilador en ASUS VivoBook S300CA-BBI5T01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+VivoBook+S300CA-BBI5T01+Fan+Replacement/61230",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -12047,7 +12061,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa madre en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar la placa madre en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Motherboard+Replacement/61242",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -12056,7 +12070,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Dell Inspiron 15 3541",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron 15 3541.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15+3541+Hard+Drive+Replacement/61252",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -12065,7 +12079,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería CMOS en Dell Inspiron 11-3147",
         "descripcion": "Guía para reemplazar la batería CMOS en Dell Inspiron 11-3147.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3147+CMOS+Battery+Replacement/61260",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Dell",
@@ -12074,7 +12088,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta Inalámbrica en Dell Inspiron 11-3147",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Dell Inspiron 11-3147.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3147+Wireless+Card+Replacement/61262",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Dell",
@@ -12083,7 +12097,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Acer Aspire TimelineU M5-481TG",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire TimelineU M5-481TG.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+TimelineU+M5-481TG+Keyboard+Replacement/61268",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -12092,7 +12106,7 @@ guias = [
     {
         "titulo": "Retiro de la Cubierta Trasera en Samsung NP530U4BL",
         "descripcion": "Guía para retirar la cubierta trasera en Samsung NP530U4BL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP530U4BL+Removing+Back+Cover/61297",
         "tipo_servicio": "Cubierta Trasera",
         "equipo_marca": "Samsung",
@@ -12101,7 +12115,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar el disco duro en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Hard+Drive+Replacement/61313",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -12110,7 +12124,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar el teclado en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Keyboard+Replacement/61329",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -12119,7 +12133,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Asus Eee PC 1000HE",
         "descripcion": "Guía para reemplazar el teclado en Asus Eee PC 1000HE.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HE+Keyboard+Replacement/61337",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -12128,7 +12142,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar el teclado en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+Keyboard+Replacement/61362",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Gateway",
@@ -12137,7 +12151,7 @@ guias = [
     {
         "titulo": "Reemplazo del Panel Trasero en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar el panel trasero en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+Back+Panel+Replacement/61364",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Gateway",
@@ -12146,7 +12160,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla LCD en Acer Aspire One AO756-2623",
         "descripcion": "Guía para reemplazar la pantalla LCD en Acer Aspire One AO756-2623.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+AO756-2623+LCD+Sceen+Replacement/61372",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Acer",
@@ -12155,7 +12169,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Acer Aspire One AO756-2623",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire One AO756-2623.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+AO756-2623+Keyboard+Replacement/61373",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -12164,7 +12178,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla en Dell Inspiron 15 3541",
         "descripcion": "Guía para reemplazar la pantalla en Dell Inspiron 15 3541.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15+3541+Screen+Replacement/61414",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -12173,7 +12187,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa madre en Acer Aspire TimelineU M5-481TG",
         "descripcion": "Guía para reemplazar la placa madre en Acer Aspire TimelineU M5-481TG.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+TimelineU+M5-481TG+Motherboard+Replacement/61478",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -12182,7 +12196,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Acer Aspire TimelineU M5-481TG",
         "descripcion": "Guía para reemplazar la batería en Acer Aspire TimelineU M5-481TG.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+TimelineU+M5-481TG+Battery+Replacement/61479",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -12191,7 +12205,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Samsung NP530U4BL",
         "descripcion": "Guía para reemplazar la RAM en Samsung NP530U4BL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP530U4BL+RAM+Replacement/61485",
         "tipo_servicio": "RAM",
         "equipo_marca": "Samsung",
@@ -12200,7 +12214,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Samsung NP530U4BL",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP530U4BL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP530U4BL+Hard+Drive+Replacement/61486",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -12209,7 +12223,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Unidad de CD en Samsung NP530U4BL",
         "descripcion": "Guía para reemplazar la unidad de CD en Samsung NP530U4BL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP530U4BL+CD+Drive+Replacement/61487",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "Samsung",
@@ -12218,7 +12232,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Samsung NP530U4BL",
         "descripcion": "Guía para reemplazar la batería en Samsung NP530U4BL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP530U4BL+Battery+Replacement/61488",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -12227,7 +12241,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla en Samsung NP530U4BL",
         "descripcion": "Guía para reemplazar la pantalla en Samsung NP530U4BL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP530U4BL+Screen+Replacement/61489",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -12236,7 +12250,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa madre en Asus Eee PC 1000HE",
         "descripcion": "Guía para reemplazar la placa madre en Asus Eee PC 1000HE.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HE+Motherboard+Replacement/61513",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -12245,7 +12259,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Unidad de Audio en Acer Aspire TimelineU M5-481TG",
         "descripcion": "Guía para reemplazar la unidad de audio en Acer Aspire TimelineU M5-481TG.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+TimelineU+M5-481TG+Audio+Drive+Replacement/61514",
         "tipo_servicio": "Unidad de Audio",
         "equipo_marca": "Acer",
@@ -12254,7 +12268,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador en Asus Eee PC 1000HE",
         "descripcion": "Guía para reemplazar el ventilador en Asus Eee PC 1000HE.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HE+Fan+Replacement/61515",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -12263,7 +12277,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador en Acer Aspire TimelineU M5-481TG",
         "descripcion": "Guía para reemplazar el ventilador en Acer Aspire TimelineU M5-481TG.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+TimelineU+M5-481TG+Fan+Replacement/61516",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Acer",
@@ -12272,7 +12286,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Unidad SSD en Acer Aspire TimelineU M5-481TG",
         "descripcion": "Guía para reemplazar la unidad SSD en Acer Aspire TimelineU M5-481TG.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+TimelineU+M5-481TG+Solid+State+Drive+%28SSD%29+Replacement/61517",
         "tipo_servicio": "Unidad SSD",
         "equipo_marca": "Acer",
@@ -12281,7 +12295,7 @@ guias = [
     {
         "titulo": "Reemplazo del Altavoz en Asus Eee PC 1000HE",
         "descripcion": "Guía para reemplazar el altavoz en Asus Eee PC 1000HE.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HE+Speaker+Replacement/61518",
         "tipo_servicio": "Altavoz",
         "equipo_marca": "Asus",
@@ -12290,7 +12304,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta de Red Inalámbrica en Asus Eee PC 1000HE",
         "descripcion": "Guía para reemplazar la tarjeta de red inalámbrica en Asus Eee PC 1000HE.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1000HE+Wireless+Network+Card+Replacement/61519",
         "tipo_servicio": "Tarjeta de Red Inalámbrica",
         "equipo_marca": "Asus",
@@ -12299,7 +12313,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en ASUS VivoBook S300C",
         "descripcion": "Guía para reemplazar el disco duro en ASUS VivoBook S300C.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+VivoBook+S300C+Hard+Drive+Replacement/61529",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -12308,7 +12322,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar la batería en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Battery+Replacement/61588",
         "tipo_servicio": "Batería",
         "equipo_marca": "Toshiba",
@@ -12317,7 +12331,7 @@ guias = [
     {
         "titulo": "Reemplazo del Panel Inferior en Lenovo Ideapad Flex 15",
         "descripcion": "Guía para reemplazar el panel inferior en Lenovo Ideapad Flex 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Ideapad+Flex+15++Bottom+Panel+Replacement/61590",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "Lenovo",
@@ -12326,7 +12340,7 @@ guias = [
     {
         "titulo": "Reemplazo del Panel Trasero en Acer Aspire One D255E",
         "descripcion": "Guía para reemplazar el panel trasero en Acer Aspire One D255E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D255E+Back+Panel+Replacement/61653",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Acer",
@@ -12335,7 +12349,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Acer Aspire One D255E",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire One D255E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D255E+Hard+Drive+Replacement/61655",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -12344,7 +12358,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Acer Aspire One D255E",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire One D255E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D255E+RAM+Replacement/61660",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -12353,7 +12367,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla en Acer Aspire One D255E",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire One D255E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D255E+Screen+Replacement/61661",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -12362,7 +12376,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Dell Inspiron 11-3152",
         "descripcion": "Guía para reemplazar la batería en Dell Inspiron 11-3152.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3152+Battery+Replacement/61670",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -12371,7 +12385,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en Acer Aspire One AO756-2623",
         "descripcion": "Guía para reemplazar el touchpad en Acer Aspire One AO756-2623.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+AO756-2623+Touchpad+Replacement/61671",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Acer",
@@ -12380,7 +12394,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar la batería en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Battery+Replacement/61732",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -12389,7 +12403,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Hard+Drive++Replacement/61734",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -12398,7 +12412,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa Madre en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar la placa madre en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Motherboard+Replacement/61735",
         "tipo_servicio": "Placa Madre",
         "equipo_marca": "Toshiba",
@@ -12407,7 +12421,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta Wifi en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Wifi+Card+Replacement/61737",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Toshiba",
@@ -12416,7 +12430,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar el ventilador en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Heat+Sync+Fan+Replacement/61738",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Toshiba",
@@ -12425,7 +12439,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar la RAM en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+RAM+Replacement/61782",
         "tipo_servicio": "RAM",
         "equipo_marca": "Gateway",
@@ -12434,7 +12448,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta Wireless en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar la tarjeta wireless en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+Wireless+Card+Replacement/61791",
         "tipo_servicio": "Tarjeta Wireless",
         "equipo_marca": "Gateway",
@@ -12443,7 +12457,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar el disco duro en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+Hard+Drive+Replacement/61793",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Gateway",
@@ -12452,7 +12466,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar el touchpad en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Trackpad+Replacement/61798",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Asus",
@@ -12461,7 +12475,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en Acer Aspire One AO756-2623",
         "descripcion": "Guía para reemplazar el touchpad en Acer Aspire One AO756-2623.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+AO756-2623+Touchpad+Replacement/61671",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Acer",
@@ -12470,7 +12484,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar la batería en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Battery+Replacement/61732",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -12479,7 +12493,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Hard+Drive++Replacement/61734",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -12488,7 +12502,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa Madre en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar la placa madre en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Motherboard+Replacement/61735",
         "tipo_servicio": "Placa Madre",
         "equipo_marca": "Toshiba",
@@ -12497,7 +12511,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta Wifi en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Wifi+Card+Replacement/61737",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Toshiba",
@@ -12506,7 +12520,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador en Toshiba Satellite Click 2 Pro",
         "descripcion": "Guía para reemplazar el ventilador en Toshiba Satellite Click 2 Pro.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+Click+2+Pro+Heat+Sync+Fan+Replacement/61738",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Toshiba",
@@ -12515,7 +12529,7 @@ guias = [
     {
         "titulo": "Reemplazo de la RAM en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar la RAM en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+RAM+Replacement/61782",
         "tipo_servicio": "RAM",
         "equipo_marca": "Gateway",
@@ -12524,7 +12538,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta Wireless en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar la tarjeta wireless en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+Wireless+Card+Replacement/61791",
         "tipo_servicio": "Tarjeta Wireless",
         "equipo_marca": "Gateway",
@@ -12533,7 +12547,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Gateway Lt4004u",
         "descripcion": "Guía para reemplazar el disco duro en Gateway Lt4004u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+Lt4004u+Hard+Drive+Replacement/61793",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Gateway",
@@ -12542,7 +12556,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar el touchpad en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Trackpad+Replacement/61798",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Asus",
@@ -12551,7 +12565,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Pantalla en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar la pantalla en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Screen+Replacement/61799",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -12560,7 +12574,7 @@ guias = [
     {
         "titulo": "Reemplazo del Marco Frontal de la Pantalla en Asus 1015E-DS03",
         "descripcion": "Guía para reemplazar el marco frontal de la pantalla en Asus 1015E-DS03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+1015E-DS03+Front+Screen+Trim+Replacement/61800",
         "tipo_servicio": "Marco Frontal",
         "equipo_marca": "Asus",
@@ -12569,7 +12583,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Gateway LT2104u",
         "descripcion": "Guía para reemplazar el teclado en Gateway LT2104u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Keyboard+Replacement+guide/61813",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Gateway",
@@ -12578,7 +12592,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tapa Inferior en Sony Vaio Pro 13",
         "descripcion": "Guía para reemplazar la tapa inferior en Sony Vaio Pro 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+Pro+13+Bottom+Cover+Replacement/61819",
         "tipo_servicio": "Tapa Inferior",
         "equipo_marca": "Sony",
@@ -12587,7 +12601,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Acer Aspire V5-122P-0889",
         "descripcion": "Guía para reemplazar la batería en Acer Aspire V5-122P-0889.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-122P-0889+Battery+Replacement/61825",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -12596,7 +12610,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Tarjeta de Red en Acer Aspire V5-122P-0889",
         "descripcion": "Guía para reemplazar la tarjeta de red en Acer Aspire V5-122P-0889.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-122P-0889+Network+Card+Replacement/61826",
         "tipo_servicio": "Tarjeta de Red",
         "equipo_marca": "Acer",
@@ -12605,7 +12619,7 @@ guias = [
     {
         "titulo": "Reemplazo del Disco Duro en Acer Aspire V5-122P-0889",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire V5-122P-0889.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-122P-0889+Hard+drive+Replacement/61827",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -12614,7 +12628,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en Acer Aspire V5-122P-0889",
         "descripcion": "Guía para reemplazar el touchpad en Acer Aspire V5-122P-0889.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-122P-0889+Touch+pad+Replacement/61828",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Acer",
@@ -12623,7 +12637,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador de CPU en Acer Aspire V5-122P-0889",
         "descripcion": "Guía para reemplazar el ventilador de CPU en Acer Aspire V5-122P-0889.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+V5-122P-0889+CPU+fan+Replacement/61829",
         "tipo_servicio": "Ventilador de CPU",
         "equipo_marca": "Acer",
@@ -12632,7 +12646,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería en Samsung Chromebook 2",
         "descripcion": "Guía para reemplazar la batería en Samsung Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Chromebook+2+Battery+Replacement/61842",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -12641,7 +12655,7 @@ guias = [
     {
         "titulo": "Reemplazo de CPU en HP Elitebook 6930p",
         "descripcion": "Guía para reemplazar la CPU en HP Elitebook 6930p.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Elitebook+6930p+CPU+Replacement/61866",
         "tipo_servicio": "CPU",
         "equipo_marca": "HP",
@@ -12650,7 +12664,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wi-Fi en Toshiba NB250-108",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en Toshiba NB250-108.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+NB250-108+Wlan+Karte+Replacement/61888",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Toshiba",
@@ -12659,7 +12673,7 @@ guias = [
     {
         "titulo": "Reemplazo del Panel Inferior en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar el panel inferior en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Bottom+Panel+Replacement/61939",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "Lenovo",
@@ -12668,7 +12682,7 @@ guias = [
     {
         "titulo": "Extracción del Panel Trasero en Dell Inspiron 11-3152",
         "descripcion": "Guía para extraer el panel trasero en Dell Inspiron 11-3152.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3152+Back+Panel+Removal/61958",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Dell",
@@ -12677,7 +12691,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Toshiba Portege R205-S209",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Portege R205-S209.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Portege+R205-S209+Keyboard+Replacement/61970",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -12686,7 +12700,7 @@ guias = [
     {
         "titulo": "Reemplazo del Puerto USB en Dell Inspiron 11-3152",
         "descripcion": "Guía para reemplazar el puerto USB en Dell Inspiron 11-3152.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3152+USB+Port+Replacement/61989",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "Dell",
@@ -12695,7 +12709,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco de Estado Sólido (SSD) en Dell Inspiron 11-3152",
         "descripcion": "Guía para reemplazar el SSD en Dell Inspiron 11-3152.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3152+Solid+State+Drive+Replacement/61997",
         "tipo_servicio": "SSD",
         "equipo_marca": "Dell",
@@ -12704,7 +12718,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Dell Inspiron 11-3152",
         "descripcion": "Guía para reemplazar la pantalla en Dell Inspiron 11-3152.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3152+Screen+Replacement/62000",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -12713,7 +12727,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Cubierta Base en Dell Inspiron 14-7437",
         "descripcion": "Guía para reemplazar la cubierta base en Dell Inspiron 14-7437.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14-7437+Base+Cover+Replacement/62004",
         "tipo_servicio": "Cubierta Base",
         "equipo_marca": "Dell",
@@ -12722,7 +12736,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Dell Vostro A860",
         "descripcion": "Guía para reemplazar el teclado en Dell Vostro A860.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+A860+Keyboard+Replacement/62073",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -12731,7 +12745,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar la placa madre en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Motherboard+Replacement/62081",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Lenovo",
@@ -12740,7 +12754,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta de Red en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar la tarjeta de red en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Network+Card+Replacement/62082",
         "tipo_servicio": "Tarjeta de Red",
         "equipo_marca": "Lenovo",
@@ -12749,7 +12763,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar los altavoces en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Speakers+Replacement/62085",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -12758,7 +12772,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar el disco duro en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Hard+Drive+Replacement/62087",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Lenovo",
@@ -12767,7 +12781,7 @@ guias = [
     {
         "titulo": "Reemplazo de Compuesto Térmico en Lenovo Flex 3-1120",
         "descripcion": "Guía para reemplazar el compuesto térmico en Lenovo Flex 3-1120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Flex+3-1120+Thermal+Compound+Replacement/62090",
         "tipo_servicio": "Compuesto Térmico",
         "equipo_marca": "Lenovo",
@@ -12776,7 +12790,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería de Moneda en Dell Inspiron 14-7437",
         "descripcion": "Guía para reemplazar la batería de moneda en Dell Inspiron 14-7437.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14-7437+Coin+Cell+Battery+Replacement/62093",
         "tipo_servicio": "Batería de Moneda",
         "equipo_marca": "Dell",
@@ -12785,7 +12799,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Dell Inspiron 14-7437",
         "descripcion": "Guía para reemplazar los altavoces en Dell Inspiron 14-7437.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14-7437+Speaker+Replacement/62097",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -12794,7 +12808,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ensamblaje de Enfriamiento en Dell Inspiron 14-7437",
         "descripcion": "Guía para reemplazar el ensamblaje de enfriamiento en Dell Inspiron 14-7437.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14-7437+Thermal+Cooling+Fan+Replacement/62098",
         "tipo_servicio": "Ensamblaje de Enfriamiento",
         "equipo_marca": "Dell",
@@ -12803,7 +12817,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador de Enfriamiento en Dell Inspiron 14-7437",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Dell Inspiron 14-7437.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14-7437+Cooling+Fan+Replacement/62099",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Dell",
@@ -12812,7 +12826,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP Mini 110-3735dx",
         "descripcion": "Guía para reemplazar la pantalla en HP Mini 110-3735dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3735dx+Screen+Replacement/62101",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -12821,7 +12835,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Dell Inspiron 14-7437",
         "descripcion": "Guía para reemplazar la batería en Dell Inspiron 14-7437.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14-7437+Battery+Replacement/62102",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -12830,7 +12844,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP Flyer Red",
         "descripcion": "Guía para reemplazar el teclado en HP Flyer Red.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Flyer+Red+Keyboard+Replacement/62115",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -12839,7 +12853,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP Flyer Red",
         "descripcion": "Guía para reemplazar el disco duro en HP Flyer Red.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Flyer+Red+Hard+Disc+Drive+Replacement/62116",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -12848,7 +12862,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP Flyer Red",
         "descripcion": "Guía para reemplazar la pantalla en HP Flyer Red.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Flyer+Red+Screen+Replacement/62118",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -12857,7 +12871,7 @@ guias = [
     {
         "titulo": "Reemplazo de Botón de Encendido en Dell Vostro A860",
         "descripcion": "Guía para reemplazar el botón de encendido en Dell Vostro A860.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+A860+Power+Button+Replacement/62131",
         "tipo_servicio": "Botón de Encendido",
         "equipo_marca": "Dell",
@@ -12866,7 +12880,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Dell Vostro A860",
         "descripcion": "Guía para reemplazar la pantalla en Dell Vostro A860.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+A860+Display+Replacement/62132",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -12875,7 +12889,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell Vostro A860",
         "descripcion": "Guía para reemplazar la RAM en Dell Vostro A860.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+A860+RAM+Memory+Sticks+Replacement/62136",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -12884,7 +12898,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Dell Vostro A860",
         "descripcion": "Guía para reemplazar los altavoces en Dell Vostro A860.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Vostro+A860+Speaker+Replacement/62137",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -12893,7 +12907,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion 17 TS",
         "descripcion": "Guía para reemplazar la RAM en HP Pavilion 17 TS.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17+TS+RAM+Replacement/62177",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -12902,7 +12916,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP Pavilion 17 TS",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion 17 TS.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17+TS+Keyboard+Replacement/62178",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -12911,7 +12925,7 @@ guias = [
     {
         "titulo": "Reemplazo de Digitalizador en HP Envy TouchSmart 15",
         "descripcion": "Guía para reemplazar el digitalizador o pantalla táctil en HP Envy TouchSmart 15.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+TouchSmart+15+Digitizer+Replacement/62191",
         "tipo_servicio": "Pantalla Táctil/Digitalizador",
         "equipo_marca": "HP",
@@ -12920,7 +12934,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en HP Pavilion 17 TS",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en HP Pavilion 17 TS.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17+TS+Wireless+Card+Replacement/62233",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "HP",
@@ -12929,7 +12943,7 @@ guias = [
     {
         "titulo": "Reemplazo de Cubierta Frontal en HP Pavilion 17 TS",
         "descripcion": "Guía para reemplazar la cubierta frontal en HP Pavilion 17 TS.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17+TS+Front+Cover+Replacement/62234",
         "tipo_servicio": "Cubierta Frontal",
         "equipo_marca": "HP",
@@ -12938,7 +12952,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador de Enfriamiento en HP Pavilion 17 TS",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en HP Pavilion 17 TS.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17+TS+Cooling+Fan+Replacement/62235",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "HP",
@@ -12947,7 +12961,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Toshiba Mini NB505",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Mini NB505.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Mini+NB505+Keyboard+Replacement/62302",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -12956,7 +12970,7 @@ guias = [
     {
         "titulo": "Reparación de Bisagras en Lenovo Yoga 2 13\"",
         "descripcion": "Guía para reparar las bisagras en Lenovo Yoga 2 13\".",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+2+13-Inch+Hinge+Bracket+Fix/62478",
         "tipo_servicio": "Bisagras",
         "equipo_marca": "Lenovo",
@@ -12965,7 +12979,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla Táctil en Acer Aspire E1-510P-4637",
         "descripcion": "Guía para reemplazar la pantalla táctil en Acer Aspire E1-510P-4637.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E1-510P-4637+Touch+Screen+Display+Replacement/62820",
         "tipo_servicio": "Pantalla Táctil",
         "equipo_marca": "Acer",
@@ -12974,7 +12988,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería CMOS en Acer Aspire E1-510P-4637",
         "descripcion": "Guía para reemplazar la batería CMOS en Acer Aspire E1-510P-4637.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E1-510P-4637+CMOS+Battery+Replacement/62821",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Acer",
@@ -12983,7 +12997,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Acer Aspire E1-510P-4637",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire E1-510P-4637.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E1-510P-4637+Keyboard+Replacement/62822",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -12992,7 +13006,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire E1-510P-4637",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire E1-510P-4637.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E1-510P-4637+RAM+Replacement/62823",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -13001,7 +13015,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Acer Aspire E1-510P-4637",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire E1-510P-4637.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E1-510P-4637+Hard+Drive+Replacement/62824",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -13010,7 +13024,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire One D270-1865",
         "descripcion": "Guía para reemplazar la memoria RAM en Acer Aspire One D270-1865.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D270-1865+RAM+Replacement/62855",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -13019,7 +13033,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Samsung N150 Plus",
         "descripcion": "Guía para reemplazar la memoria RAM en Samsung N150 Plus.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+N150+Plus+RAM+Replacement/62857",
         "tipo_servicio": "RAM",
         "equipo_marca": "Samsung",
@@ -13028,7 +13042,7 @@ guias = [
     {
         "titulo": "Reemplazo de Panel Trasero en Samsung N150 Plus",
         "descripcion": "Guía para reemplazar el panel trasero en Samsung N150 Plus.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+N150+Plus+Back+Panel+Replacement/62858",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Samsung",
@@ -13037,7 +13051,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Samsung N150 Plus",
         "descripcion": "Guía para reemplazar el teclado en Samsung N150 Plus.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+N150+Plus+Keyboard+Replacement/62941",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Samsung",
@@ -13046,7 +13060,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Samsung N150 Plus",
         "descripcion": "Guía para reemplazar el ventilador en Samsung N150 Plus.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+N150+Plus+Fan+Replacement/62944",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -13055,7 +13069,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Acer Aspire One D270-1865",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire One D270-1865.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+d270-1865+Hard+Drive+Replacement/62948",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -13064,7 +13078,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Acer Aspire One D270-1865",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire One D270-1865.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D270-1865+Screen+Replacement/62949",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Acer",
@@ -13073,7 +13087,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Samsung N150 Plus",
         "descripcion": "Guía para reemplazar la pantalla en Samsung N150 Plus.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+N150+Plus+Screen+Replacement/62951",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -13082,7 +13096,7 @@ guias = [
     {
         "titulo": "Reemplazo de Conector de Energía en Acer Aspire 8920g",
         "descripcion": "Guía para reemplazar el conector de energía en Acer Aspire 8920g.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+8920g+Power+Jack+Replacement/63010",
         "tipo_servicio": "Conector de Energía",
         "equipo_marca": "Acer",
@@ -13091,7 +13105,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Acer Aspire One D270-1865",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire One D270-1865.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D270-1865+Keyboard+Replacement/63089",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -13100,7 +13114,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en ASUS VivoBook S300C",
         "descripcion": "Guía para reemplazar el teclado en ASUS VivoBook S300C.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+VivoBook+S300C+keyboard+Replacement/63466",
         "tipo_servicio": "Teclado",
         "equipo_marca": "ASUS",
@@ -13109,7 +13123,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería CMOS en HP Touchsmart IQ506",
         "descripcion": "Guía rápida para reemplazar la batería CMOS en HP Touchsmart IQ506.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/How+to+Replace+the+HP+Touchsmart+IQ506+CMOS+Battery+%28Quick+and+Dirty%29/63641",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "HP",
@@ -13118,7 +13132,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Lenovo Thinkpad T440s",
         "descripcion": "Guía para reemplazar la pantalla Full-HD (sin táctil) en Lenovo Thinkpad T440s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Thinkpad+T440s+Display+%28Full-HD+no+touch%29+Replacement/63644",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -13127,7 +13141,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Asus X401A",
         "descripcion": "Guía para reemplazar el disco duro en Asus X401A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X401A+Hard+Drive+Replacement/63757",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -13136,7 +13150,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Dell Optiplex 745",
         "descripcion": "Guía para reemplazar la placa madre en Dell Optiplex 745.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Optiplex+745+Motherboard+Replacement/63771",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -13145,7 +13159,7 @@ guias = [
     {
         "titulo": "Reemplazo de Trackpad en Asus Chromebook C201",
         "descripcion": "Guía para reemplazar el trackpad en Asus Chromebook C201.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C201+Trackpad+Replacement/63785",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Asus",
@@ -13154,7 +13168,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wi-Fi en Acer Aspire E1-531",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en Acer Aspire E1-531.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+E1-531+Wi-Fi+Wireless+Card+Replacement/63917",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Acer",
@@ -13163,7 +13177,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Gráfica en Dell Inspiron 531",
         "descripcion": "Guía para reemplazar la tarjeta gráfica en Dell Inspiron 531.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+531+Graphics+Card+Replacement/64366",
         "tipo_servicio": "Tarjeta Gráfica",
         "equipo_marca": "Dell",
@@ -13172,7 +13186,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Asus Chromebook Flip C100P",
         "descripcion": "Guía para reemplazar la batería en Asus Chromebook Flip C100P.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+Flip+C100P+Battery+Replacement/65489",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -13181,7 +13195,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP Compaq Presario V3000",
         "descripcion": "Guía para reemplazar el disco duro en HP Compaq Presario V3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+V3000+Hard+Disk+Drive+Replacement/65558",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13190,7 +13204,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad CD/DVD ROM en HP Compaq Presario V3000",
         "descripcion": "Guía para reemplazar la unidad CD/DVD ROM en HP Compaq Presario V3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+V3000+CD-DVD+ROM+Replacement/65708",
         "tipo_servicio": "CD/DVD ROM",
         "equipo_marca": "HP",
@@ -13199,7 +13213,7 @@ guias = [
     {
         "titulo": "Reemplazo de CPU en Alienware X51 R2/R3",
         "descripcion": "Guía para reemplazar el CPU en Alienware X51 R2/R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Alienware+X51+R2-R3+CPU+Replacement/65718",
         "tipo_servicio": "CPU (Procesador)",
         "equipo_marca": "Alienware",
@@ -13208,7 +13222,7 @@ guias = [
     {
         "titulo": "Reemplazo de Carcasa Inferior en Asus Chromebook Flip C100P",
         "descripcion": "Guía para reemplazar la carcasa inferior en Asus Chromebook Flip C100P.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+Flip+C100+Lower+Case+Replacement/65761",
         "tipo_servicio": "Carcasa Inferior",
         "equipo_marca": "Asus",
@@ -13217,7 +13231,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD en ThinkPad X1 Carbon",
         "descripcion": "Guía para reemplazar el SSD en ThinkPad X1 Carbon.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ThinkPad+X1+Carbon+SSD+Replacement/66157",
         "tipo_servicio": "SSD",
         "equipo_marca": "Lenovo",
@@ -13226,7 +13240,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla LCD en HP 550 Notebook",
         "descripcion": "Guía para reemplazar la pantalla LCD en HP 550 Notebook.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+550+Notebook+LCD+Display+Replacement/66333",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "HP",
@@ -13235,7 +13249,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador de CPU en ThinkPad X1 Carbon",
         "descripcion": "Guía para reemplazar el ventilador de CPU en ThinkPad X1 Carbon.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ThinkPad+X1+Carbon+Fan+Replacement/66537",
         "tipo_servicio": "Ventilador de CPU",
         "equipo_marca": "Lenovo",
@@ -13244,7 +13258,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería CMOS en HP Touchsmart IQ506",
         "descripcion": "Guía para reemplazar la batería CMOS en HP Touchsmart IQ506.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Touchsmart+IQ506+CMOS+Battery+Replacement/66721",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "HP",
@@ -13253,7 +13267,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP ProBook 645",
         "descripcion": "Guía para reemplazar el teclado en HP ProBook 645.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+645+Keyboard+Replacement/67006",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -13262,7 +13276,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en ThinkPad X1 Carbon",
         "descripcion": "Guía para reemplazar la batería en ThinkPad X1 Carbon.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ThinkPad+X1+Carbon+Battery+Replacement/67229",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -13271,7 +13285,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Samsung NC110",
         "descripcion": "Guía para reemplazar la pantalla en el Samsung NC110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NC110+Display+Replacement/67288",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -13280,7 +13294,7 @@ guias = [
     {
         "titulo": "Actualización/Reemplazo de RAM en Lenovo Y700-14ISK",
         "descripcion": "Guía para actualizar o reemplazar la RAM en Lenovo Y700-14ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Y700-14ISK+Upgrading-Replacing+RAM+Replacement/67478",
         "tipo_servicio": "RAM",
         "equipo_marca": "Lenovo",
@@ -13289,7 +13303,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP 310-1037",
         "descripcion": "Guía para reemplazar el disco duro en HP 310-1037.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+310-1037+Hard+Drive+Replacement/67535",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13298,7 +13312,7 @@ guias = [
     {
         "titulo": "Acceso a Componentes Principales en why! W670SZQ1",
         "descripcion": "Guía para acceder a los componentes más importantes en why! W670SZQ1.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/why%21+W670SZQ1+Access+to+the+most+important+components/68120",
         "tipo_servicio": "Acceso a Componentes",
         "equipo_marca": "why!",
@@ -13307,7 +13321,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en HP Pavilion 11-n010dx",
         "descripcion": "Guía para reemplazar la batería en HP Pavilion 11-n010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11-n010dx+Battery+Replacement/69201",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -13316,7 +13330,7 @@ guias = [
     {
         "titulo": "Reemplazo de Adaptador Wi-Fi en Toshiba Satellite S55T-B5335",
         "descripcion": "Guía para reemplazar el adaptador Wi-Fi en Toshiba Satellite S55T-B5335.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+S55T-B5335+Wi-Fi++Adapter+Replacement/69223",
         "tipo_servicio": "Adaptador Wi-Fi",
         "equipo_marca": "Toshiba",
@@ -13325,7 +13339,7 @@ guias = [
     {
         "titulo": "Reemplazo de Carcasa Inferior en HP Pavilion 11-n010dx",
         "descripcion": "Guía para reemplazar la carcasa inferior en HP Pavilion 11-n010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11-n010dx+Bottom+Case+Replacement/69231",
         "tipo_servicio": "Carcasa Inferior",
         "equipo_marca": "HP",
@@ -13334,7 +13348,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Samsung RC512",
         "descripcion": "Guía para reemplazar la pantalla en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+Screen+Replacement/69252",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -13343,7 +13357,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP ProBook 4520s",
         "descripcion": "Guía para reemplazar el teclado en HP ProBook 4520s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+4520s+Keyboard+Replacement/69273",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -13352,7 +13366,7 @@ guias = [
     {
         "titulo": "Reemplazo de Cubierta Inferior en Toshiba Satellite S55T-B5335",
         "descripcion": "Guía para reemplazar la cubierta inferior en Toshiba Satellite S55T-B5335.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+S55T-B5335+Bottom+Cover+Replacement/69357",
         "tipo_servicio": "Cubierta Inferior",
         "equipo_marca": "Toshiba",
@@ -13361,7 +13375,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventiladores de Enfriamiento en Toshiba Satellite S55T-B5335",
         "descripcion": "Guía para reemplazar los ventiladores de enfriamiento en Toshiba Satellite S55T-B5335.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+S55T-B5335+Cooling+Fans+Replacement/69358",
         "tipo_servicio": "Ventiladores de Enfriamiento",
         "equipo_marca": "Toshiba",
@@ -13370,7 +13384,7 @@ guias = [
     {
         "titulo": "Reemplazo de Touchpad en Toshiba Satellite S55T-B5335",
         "descripcion": "Guía para reemplazar el touchpad en Toshiba Satellite S55T-B5335.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+S55T-B5335+Touchpad+Replacement/69415",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Toshiba",
@@ -13379,7 +13393,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en HP Pavilion 11-n010dx",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion 11-n010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11-n010dx+Fan+Replacement/69417",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -13388,7 +13402,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion 11-n010dx",
         "descripcion": "Guía para reemplazar la RAM en HP Pavilion 11-n010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11-n010dx+Ram+Replacement/69421",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -13397,7 +13411,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Toshiba Satellite L675D-S7016",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite L675D-S7016.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L675D-S7016+Keyboard+Replacement/69442",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -13406,7 +13420,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Toshiba Satellite L675D-S7016",
         "descripcion": "Guía para reemplazar el ventilador en Toshiba Satellite L675D-S7016.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L675D-S7016+Fan+Replacement/69444",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Toshiba",
@@ -13415,7 +13429,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Toshiba Satellite L675D-S7016",
         "descripcion": "Guía para reemplazar la pantalla en Toshiba Satellite L675D-S7016.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L675D-S7016+Screen+Replacement/69445",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Toshiba",
@@ -13424,7 +13438,7 @@ guias = [
     {
         "titulo": "Reemplazo de Panel Frontal en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar el panel frontal en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+Front+Panel+Replacement/71043",
         "tipo_servicio": "Panel Frontal",
         "equipo_marca": "HP",
@@ -13433,7 +13447,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad de CD en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar la unidad de CD en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+CD+Drive+Replacement/71045",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "HP",
@@ -13442,7 +13456,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+Hard+Drive+Replacement/71047",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13451,7 +13465,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wi-Fi en HP G71t-300",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en HP G71t-300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G71t-300+Wi-Fi+Card+Replacement/71103",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "HP",
@@ -13460,7 +13474,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Toshiba Satellite S55T-B5335",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite S55T-B5335.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+S55T-B5335+Keyboard+Replacement/71186",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -13469,7 +13483,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP Pavilion 11-n010dx",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion 11-n010dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+11-n010dx+Hard+Drive+Replacement/71195",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13478,7 +13492,7 @@ guias = [
     {
         "titulo": "Reemplazo de Panel Trasero en Samsung RC512",
         "descripcion": "Guía para reemplazar el panel trasero en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+Back+Panel+Replacement/71206",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Samsung",
@@ -13487,7 +13501,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad Óptica en Samsung RC512",
         "descripcion": "Guía para reemplazar la unidad óptica en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+Optic+Drive+Replacement/71208",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Samsung",
@@ -13496,7 +13510,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wi-Fi en Samsung RC512",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+Wi-Fi+Card+Replacement/71216",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Samsung",
@@ -13505,7 +13519,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad de DVD en HP G71t-300",
         "descripcion": "Guía para reemplazar la unidad de DVD en HP G71t-300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G71t-300+DVD+Drive+Replacement/71224",
         "tipo_servicio": "Unidad de DVD",
         "equipo_marca": "HP",
@@ -13514,7 +13528,7 @@ guias = [
     {
         "titulo": "Desmontaje de la Carcasa Superior en Toshiba Satellite L675D-S7016",
         "descripcion": "Guía para desmontar la carcasa superior en Toshiba Satellite L675D-S7016.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L675D-S7016+Top+Case+Housing+Removal/71225",
         "tipo_servicio": "Carcasa Superior",
         "equipo_marca": "Toshiba",
@@ -13523,7 +13537,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP G71t-300",
         "descripcion": "Guía para reemplazar el disco duro en HP G71t-300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G71t-300+Hard+Drive+Replacement/71226",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13532,7 +13546,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP G71t-300",
         "descripcion": "Guía para reemplazar el teclado en HP G71t-300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G71t-300+Keyboard+Replacement/71228",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -13541,7 +13555,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad Óptica en HP ProBook 4520s",
         "descripcion": "Guía para reemplazar la unidad óptica en HP ProBook 4520s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+4520s+Optical+Drive+Replacement/71388",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "HP",
@@ -13550,7 +13564,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP ProBook 4520s",
         "descripcion": "Guía para reemplazar el disco duro en HP ProBook 4520s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+4520s+Hard+Drive+Replacement/71389",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13559,7 +13573,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en One Education Infinity:One",
         "descripcion": "Guía para reemplazar la batería en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Battery+Replacement/71396",
         "tipo_servicio": "Batería",
         "equipo_marca": "One Education",
@@ -13568,7 +13582,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+RAM+Replacement/71398",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -13577,7 +13591,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ensamblaje de Cámara en One Education Infinity:One",
         "descripcion": "Guía para reemplazar el ensamblaje de cámara en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Camera+Assembly+Replacement/71399",
         "tipo_servicio": "Ensamblaje de Cámara",
         "equipo_marca": "One Education",
@@ -13586,7 +13600,7 @@ guias = [
     {
         "titulo": "Reemplazo de Bocinas en One Education Infinity:One",
         "descripcion": "Guía para reemplazar las bocinas en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Speaker+Replacement/71401",
         "tipo_servicio": "Bocinas",
         "equipo_marca": "One Education",
@@ -13595,7 +13609,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ensamblaje de Contactos Dock en One Education Infinity:One",
         "descripcion": "Guía para reemplazar el ensamblaje de contactos dock en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Dock+Contact+Assembly+Replacement/71403",
         "tipo_servicio": "Ensamblaje de Contactos Dock",
         "equipo_marca": "One Education",
@@ -13604,7 +13618,7 @@ guias = [
     {
         "titulo": "Reemplazo de Antena en One Education Infinity:One",
         "descripcion": "Guía para reemplazar la antena en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Antenna+Prerequisite/71404",
         "tipo_servicio": "Antena",
         "equipo_marca": "One Education",
@@ -13613,7 +13627,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en One Education Infinity:One",
         "descripcion": "Guía para reemplazar la placa madre en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Motherboard+Replacement/71408",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "One Education",
@@ -13622,7 +13636,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Acer Aspire 7736Z-4809",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire 7736Z-4809.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+7736Z-4809+Keyboard+Replacement/71429",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -13631,7 +13645,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Toshiba Satellite S55T-B5335",
         "descripcion": "Guía para reemplazar la placa madre en Toshiba Satellite S55T-B5335.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+S55T-B5335+Motherboard+Replacement/71483",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Toshiba",
@@ -13640,7 +13654,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Placa Trasera en Acer Aspire One 532h-2527",
         "descripcion": "Guía para reemplazar la placa trasera en Acer Aspire One 532h-2527.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+532h-2527++Back+Plate+Replacement/71514",
         "tipo_servicio": "Placa Trasera",
         "equipo_marca": "Acer",
@@ -13649,7 +13663,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Acer Aspire One 532h-2527",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire One 532h-2527.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+532h-2527+Hard+Disk+Drive+Replacement/71515",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -13658,7 +13672,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Acer Aspire One 532h-2527",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire One 532h-2527.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+532h-2527++Screen+Replacement/71516",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -13667,7 +13681,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire One 532h-2527",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire One 532h-2527.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+532h-2527+RAM+Replacement/71518",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -13676,7 +13690,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Samsung RC512",
         "descripcion": "Guía para reemplazar el disco duro en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+HDD+Replacement/71524",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -13685,7 +13699,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador/Disipador de Calor en Samsung RC512",
         "descripcion": "Guía para reemplazar el ventilador y el disipador de calor en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+Cooling+Fan-Heat+Sink+Replacement/71535",
         "tipo_servicio": "Ventilador/Disipador de Calor",
         "equipo_marca": "Samsung",
@@ -13694,7 +13708,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador en HP G71t-300",
         "descripcion": "Guía para reemplazar el ventilador en HP G71t-300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G71t-300+Cooling+Fan+Replacement/71541",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -13703,7 +13717,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ensamblaje de Pantalla en One Education Infinity:One",
         "descripcion": "Guía para reemplazar el ensamblaje de pantalla en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Display+Assembly+Replacement/71542",
         "tipo_servicio": "Ensamblaje de Pantalla",
         "equipo_marca": "One Education",
@@ -13712,7 +13726,7 @@ guias = [
     {
         "titulo": "Reemplazo del Carcasa Trasera en One Education Infinity:One",
         "descripcion": "Guía para reemplazar la carcasa trasera en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Back+Case+Prerequisite/71546",
         "tipo_servicio": "Carcasa Trasera",
         "equipo_marca": "One Education",
@@ -13721,7 +13735,7 @@ guias = [
     {
         "titulo": "Reemplazo del Módulo LCD en Acer Aspire 7736Z-4809",
         "descripcion": "Guía para reemplazar el módulo LCD en Acer Aspire 7736Z-4809.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+7736Z-4809+LCD+Module+Replacement/71561",
         "tipo_servicio": "Módulo LCD",
         "equipo_marca": "Acer",
@@ -13730,7 +13744,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador de CPU en Acer Aspire 7736Z-4809",
         "descripcion": "Guía para reemplazar el ventilador de CPU en Acer Aspire 7736Z-4809.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+7736Z-4809+CPU+Fan+Replacement/71568",
         "tipo_servicio": "Ventilador de CPU",
         "equipo_marca": "Acer",
@@ -13739,7 +13753,7 @@ guias = [
     {
         "titulo": "Reemplazo del Módulo Inalámbrico en Acer Aspire 7736Z-4809",
         "descripcion": "Guía para reemplazar el módulo inalámbrico en Acer Aspire 7736Z-4809.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+7736Z-4809+Wireless+Module+Replacement/71577",
         "tipo_servicio": "Módulo Inalámbrico",
         "equipo_marca": "Acer",
@@ -13748,7 +13762,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Cubierta del Interruptor en HP ProBook 4520s",
         "descripcion": "Guía para reemplazar la cubierta del interruptor en HP ProBook 4520s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+4520s+Switch+Cover+Replacement/71580",
         "tipo_servicio": "Cubierta del Interruptor",
         "equipo_marca": "HP",
@@ -13757,7 +13771,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP ProBook 4520s",
         "descripcion": "Guía para reemplazar la pantalla en HP ProBook 4520s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+4520s+Screen+Replacement/71582",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -13766,7 +13780,7 @@ guias = [
     {
         "titulo": "Reemplazo del Descansa Muñecas en HP ProBook 4520s",
         "descripcion": "Guía para reemplazar el descansa muñecas en HP ProBook 4520s.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+ProBook+4520s+Palm+Rest+Replacement/71643",
         "tipo_servicio": "Descansa Muñecas",
         "equipo_marca": "HP",
@@ -13775,7 +13789,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+Screen+Replacement/71722",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -13784,7 +13798,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Lenovo Yoga 700-11ISK",
         "descripcion": "Guía para reemplazar la batería en Lenovo Yoga 700-11ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+700-11ISK+Battery+Replacement/71728",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -13793,7 +13807,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en Lenovo Yoga 700-11ISK",
         "descripcion": "Guía para reemplazar el touchpad en Lenovo Yoga 700-11ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+700-11ISK+Touchpad+Replacement/71770",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Lenovo",
@@ -13802,7 +13816,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Lenovo ThinkPad X140e",
         "descripcion": "Guía para reemplazar el disco duro en Lenovo ThinkPad X140e.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+X140e+Hard+Drive+Replacement/71794",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Lenovo",
@@ -13811,7 +13825,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Lenovo ThinkPad X140e",
         "descripcion": "Guía para reemplazar los altavoces en Lenovo ThinkPad X140e.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+X140e+Speakers+Replacement/71795",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -13820,7 +13834,7 @@ guias = [
     {
         "titulo": "Reemplazo del Panel Trasero en Lenovo ThinkPad X140e",
         "descripcion": "Guía para reemplazar el panel trasero en Lenovo ThinkPad X140e.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+ThinkPad+X140e+Back+Panel+Replacement/71798",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Lenovo",
@@ -13829,7 +13843,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Keyboard+Replacement/71809",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -13838,7 +13852,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador y Disipador en IBM ThinkPad X41",
         "descripcion": "Guía para reemplazar el ventilador y disipador en IBM ThinkPad X41.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IBM+ThinkPad+X41+Fan+and+Heat+Sink+Replacement/71811",
         "tipo_servicio": "Ventilador y Disipador",
         "equipo_marca": "IBM",
@@ -13847,7 +13861,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla LCD en IBM ThinkPad X41",
         "descripcion": "Guía para reemplazar la pantalla LCD en IBM ThinkPad X41.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IBM+ThinkPad+X41+LCD+Screen+Replacement/71815",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "IBM",
@@ -13856,7 +13870,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Samsung RC512",
         "descripcion": "Guía para reemplazar la RAM en Samsung RC512.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+RC512+RAM+Replacement/71849",
         "tipo_servicio": "RAM",
         "equipo_marca": "Samsung",
@@ -13865,7 +13879,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Dell Inspiron N5050",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron N5050.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+N5050+Hard+Drive+Replacement/71904",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -13874,7 +13888,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP Pavilion dv6-6180us",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion dv6-6180us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6-6180us+Hard+Drive++Replacement/71910",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -13883,7 +13897,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pasta Térmica en HP G71t-300",
         "descripcion": "Guía para reemplazar la pasta térmica en HP G71t-300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G71t-300+Thermal+Paste+Replacement/71919",
         "tipo_servicio": "Pasta Térmica",
         "equipo_marca": "HP",
@@ -13892,7 +13906,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en HP Envy 15-u001dx",
         "descripcion": "Guía para reemplazar la pantalla en HP Envy 15-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+15-u001dx+Screen+Replacement/71971",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -13901,7 +13915,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Toshiba Satellite P775-S7320",
         "descripcion": "Guía para reemplazar el ventilador en Toshiba Satellite P775-S7320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P775-S7320+Fan+Replacement/71984",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Toshiba",
@@ -13910,7 +13924,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Asus VivoBook Q200E-BHI3T45",
         "descripcion": "Guía para reemplazar la batería en Asus VivoBook Q200E-BHI3T45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BHI3T45+Battery+Replacement/72014",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -13919,7 +13933,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Asus VivoBook Q200E-BHI3T45",
         "descripcion": "Guía para reemplazar el disco duro en Asus VivoBook Q200E-BHI3T45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BHI3T45+Hard+Drive+Replacement/72015",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -13928,7 +13942,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar la RAM en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+RAM+Replacement/72018",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -13937,7 +13951,7 @@ guias = [
     {
         "titulo": "Reemplazo de Lector de Tarjetas SD en Microsoft Surface Book",
         "descripcion": "Guía para reemplazar el lector de tarjetas SD en Microsoft Surface Book.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Microsoft+Surface+Book+Keyboard+SD+Card+Reader+Replacement/72021",
         "tipo_servicio": "Lector de Tarjetas SD",
         "equipo_marca": "Microsoft",
@@ -13946,7 +13960,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Asus VivoBook Q200E-BHI3T45",
         "descripcion": "Guía para reemplazar el ventilador en Asus VivoBook Q200E-BHI3T45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BHI3T45+Fan+Replacement/72025",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -13955,7 +13969,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tecla Individual del Teclado en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar una tecla individual en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+Individual+Keyboard+Key+Replacement/72026",
         "tipo_servicio": "Tecla Individual",
         "equipo_marca": "HP",
@@ -13964,7 +13978,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP Pavilion 17-f004dx",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion 17-f004dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+17-f004dx+Keyboard+Replacement/72036",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -13973,7 +13987,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar la batería en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Battery+Replacement/72045",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -13982,7 +13996,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Acer Aspire 5734z-4836",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire 5734z-4836.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5734z-4836+Screen+Replacement/72046",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -13991,7 +14005,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Acer Aspire 5734z-4836",
         "descripcion": "Guía para reemplazar los altavoces en Acer Aspire 5734z-4836.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5734z-4836+Speaker+Replacement/72047",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Acer",
@@ -14000,7 +14014,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Dell Inspiron 15R 5520",
         "descripcion": "Guía para reemplazar la pantalla en Dell Inspiron 15R 5520.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+15R+5520+Display+Replacement/72070",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -14009,7 +14023,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco de Estado Sólido en Lenovo Yoga 700-11ISK",
         "descripcion": "Guía para reemplazar el disco de estado sólido en Lenovo Yoga 700-11ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+700-11ISK+Solid+State+Drive+Replacement/72102",
         "tipo_servicio": "Disco de Estado Sólido",
         "equipo_marca": "Lenovo",
@@ -14018,7 +14032,7 @@ guias = [
     {
         "titulo": "Reemplazo de Puerto de Energía en Lenovo Yoga 700-11ISK",
         "descripcion": "Guía para reemplazar el puerto de energía en Lenovo Yoga 700-11ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+700-11ISK+Power+Port+Replacement/72111",
         "tipo_servicio": "Puerto de Energía",
         "equipo_marca": "Lenovo",
@@ -14027,7 +14041,7 @@ guias = [
     {
         "titulo": "Reemplazo de Puerto de Carga en Toshiba Chromebook 2",
         "descripcion": "Guía para reemplazar el puerto de carga en Toshiba Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+2+Charging+Port+Replacement/72120",
         "tipo_servicio": "Puerto de Carga",
         "equipo_marca": "Toshiba",
@@ -14036,7 +14050,7 @@ guias = [
     {
         "titulo": "Reemplazo de Touchpad en Toshiba Chromebook 2",
         "descripcion": "Guía para reemplazar el touchpad en Toshiba Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+2+Touchpad+Replacement/72127",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Toshiba",
@@ -14045,7 +14059,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Toshiba Chromebook 2",
         "descripcion": "Guía para reemplazar los altavoces en Toshiba Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+2+Speakers+Replacement/72128",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Toshiba",
@@ -14054,7 +14068,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Microsoft Surface Book Keyboard",
         "descripcion": "Guía para reemplazar el ventilador en el teclado de Microsoft Surface Book.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Microsoft+Surface+Book+Keyboard+Fan+Replacement/72135",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Microsoft",
@@ -14063,7 +14077,7 @@ guias = [
     {
         "titulo": "Reemplazo de Puerto USB en Microsoft Surface Book Keyboard",
         "descripcion": "Guía para reemplazar el puerto USB en el teclado de Microsoft Surface Book.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Microsoft+Surface+Book+Keyboard+USB+Port+Replacement/72136",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "Microsoft",
@@ -14072,7 +14086,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta GPU en Microsoft Surface Book Keyboard",
         "descripcion": "Guía para reemplazar la tarjeta GPU en el teclado de Microsoft Surface Book.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Microsoft+Surface+Book+Keyboard+GPU+board+Replacement/72137",
         "tipo_servicio": "Tarjeta GPU",
         "equipo_marca": "Microsoft",
@@ -14081,7 +14095,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell Inspiron N5050",
         "descripcion": "Guía para reemplazar la RAM en Dell Inspiron N5050.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+N5050+RAM+Replacement/72138",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -14090,7 +14104,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disipador de Calor en Microsoft Surface Book Keyboard",
         "descripcion": "Guía para reemplazar el disipador de calor en el teclado de Microsoft Surface Book.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Microsoft+Surface+Book+Keyboard+Heat+Sink+Replacement/72142",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "Microsoft",
@@ -14099,7 +14113,7 @@ guias = [
     {
         "titulo": "Reemplazo de Marco Frontal en Lenovo Thinkpad x230",
         "descripcion": "Guía para reemplazar el marco frontal (bezel) en Lenovo Thinkpad x230.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Thinkpad+x230+Bezel+Replacement/72153",
         "tipo_servicio": "Marco Frontal",
         "equipo_marca": "Lenovo",
@@ -14108,7 +14122,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar la pantalla en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+Screen+Replacement/72167",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "ASUS",
@@ -14117,7 +14131,7 @@ guias = [
     {
         "titulo": "Reemplazo de Cámara en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar la cámara en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+Camera+Replacement/72168",
         "tipo_servicio": "Cámara",
         "equipo_marca": "ASUS",
@@ -14126,7 +14140,7 @@ guias = [
     {
         "titulo": "Reemplazo de Cubierta Trasera en Toshiba Chromebook 2",
         "descripcion": "Guía para reemplazar la cubierta trasera en Toshiba Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+2+Back+Cover+Replacement/72218",
         "tipo_servicio": "Cubierta Trasera",
         "equipo_marca": "Toshiba",
@@ -14135,7 +14149,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta WIFI en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar la tarjeta WIFI en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+WIFI+Card+Replacement/72232",
         "tipo_servicio": "Tarjeta WIFI",
         "equipo_marca": "Dell",
@@ -14144,7 +14158,7 @@ guias = [
     {
         "titulo": "Reemplazo de Base de Computadora en Dell Alienware 13",
         "descripcion": "Guía para reemplazar la base de computadora en Dell Alienware 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Alienware+13+Computer+Base+Replacement/72280",
         "tipo_servicio": "Base de Computadora",
         "equipo_marca": "Dell",
@@ -14153,7 +14167,7 @@ guias = [
     {
         "titulo": "Reemplazo de Panel Inferior en Dell Alienware 13",
         "descripcion": "Guía para reemplazar el panel inferior en Dell Alienware 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Alienware+13+Base+Panel+Replacement/72281",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "Dell",
@@ -14162,7 +14176,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Acer Aspire One D257",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire One D257.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D257+Keyboard+Replacement/72338",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -14171,7 +14185,7 @@ guias = [
     {
         "titulo": "Apertura de la tapa en Acer Aspire One D257",
         "descripcion": "Guía para abrir la tapa del Acer Aspire One D257.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D257+opening+the+hatch/72341",
         "tipo_servicio": "Apertura",
         "equipo_marca": "Acer",
@@ -14180,7 +14194,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en Acer Aspire One D257",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Acer Aspire One D257.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D257+Wireless+card+Replacement/72351",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Acer",
@@ -14189,7 +14203,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Acer Aspire One D257",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire One D257.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D257+HDD+Replacement/72353",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -14198,7 +14212,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire One D257",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire One D257.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D257+RAM+Replacement/72354",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -14207,7 +14221,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tecla en Acer One 10 S1002 145-A",
         "descripcion": "Guía para reemplazar una tecla en Acer One 10 S1002 145-A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+One+10+S1002+145-A+Key+Replacement/72373",
         "tipo_servicio": "Tecla",
         "equipo_marca": "Acer",
@@ -14216,7 +14230,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Toshiba Chromebook 2",
         "descripcion": "Guía para reemplazar la placa madre en Toshiba Chromebook 2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+2+Motherboard+Replacement/72381",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Toshiba",
@@ -14225,7 +14239,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla LCD en Lenovo Yoga 700-11ISK",
         "descripcion": "Guía para reemplazar la pantalla LCD en Lenovo Yoga 700-11ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+700-11ISK+LCD+Replacement/72382",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Lenovo",
@@ -14234,7 +14248,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en Lenovo Yoga 700-11ISK",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Lenovo Yoga 700-11ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+700-11ISK+Wireless+Card+Replacement/72384",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Lenovo",
@@ -14243,7 +14257,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad CD/DVD en HP G62 347NR",
         "descripcion": "Guía para reemplazar la unidad CD/DVD en HP G62 347NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G62+347NR++CD-DVD+Drive+Replacement/72410",
         "tipo_servicio": "Unidad CD/DVD",
         "equipo_marca": "HP",
@@ -14252,7 +14266,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Samsung NP R580 JBB2",
         "descripcion": "Guía para reemplazar el ventilador en Samsung NP R580 JBB2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP+R580+JBB2+Cooling+Fan+Replacement/72411",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -14261,7 +14275,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en HP G62 347NR",
         "descripcion": "Guía para reemplazar el teclado en HP G62 347NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G62+347NR+Keyboard+Replacement/72413",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -14270,7 +14284,7 @@ guias = [
     {
         "titulo": "Reemplazo de pasta térmica en Asus VivoBook Q200E-BHI3T45",
         "descripcion": "Guía para reemplazar la pasta térmica en Asus VivoBook Q200E-BHI3T45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BHI3T45+Thermal+Paste+Replacement/72425",
         "tipo_servicio": "Pasta Térmica",
         "equipo_marca": "Asus",
@@ -14279,7 +14293,7 @@ guias = [
     {
         "titulo": "Cómo limpiar el ventilador del CPU en Asus VivoBook Q200E-BHI3T45",
         "descripcion": "Guía para limpiar el ventilador del CPU en Asus VivoBook Q200E-BHI3T45.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/How+to+clean+the+CPU+fan+on+Asus+VivoBook+Q200E-BHI3T45/72427",
         "tipo_servicio": "Limpieza de Ventilador",
         "equipo_marca": "Asus",
@@ -14288,7 +14302,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Dell Alienware 13",
         "descripcion": "Guía para reemplazar los altavoces en Dell Alienware 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Alienware+13+Speakers+Replacement/72429",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -14297,7 +14311,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador de calor en Dell Alienware 13",
         "descripcion": "Guía para reemplazar el disipador de calor en Dell Alienware 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Alienware+13+Heat-sink+Assembly+Replacement/72432",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "Dell",
@@ -14306,7 +14320,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel táctil en Dell Alienware 13",
         "descripcion": "Guía para reemplazar el panel táctil en Dell Alienware 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Alienware+13+Touch+pad+Replacement/72433",
         "tipo_servicio": "Panel Táctil",
         "equipo_marca": "Dell",
@@ -14315,7 +14329,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Dell Alienware 13",
         "descripcion": "Guía para reemplazar la batería en Dell Alienware 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Alienware+13+Battery+Replacement/72440",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -14324,7 +14338,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar la batería en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+Battery+Replacement/72542",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -14333,7 +14347,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel táctil en Acer Aspire Switch 10 SW5-011-18R3",
         "descripcion": "Guía para reemplazar el panel táctil en Acer Aspire Switch 10 SW5-011-18R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+Switch+10+SW5-011-18R3+Track+pad+Replacement/72548",
         "tipo_servicio": "Panel Táctil",
         "equipo_marca": "Acer",
@@ -14342,7 +14356,7 @@ guias = [
     {
         "titulo": "Solo requisitos previos en Dell Inspiron 9300",
         "descripcion": "Guía para preparar el Dell Inspiron 9300 para reparaciones.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Prerequisite+Only++Replacement/72564",
         "tipo_servicio": "Requisitos Previos",
         "equipo_marca": "Dell",
@@ -14351,7 +14365,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar los altavoces en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Speaker+Replacement/72569",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -14360,7 +14374,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar el ventilador en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Fan++Replacement/72571",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -14369,7 +14383,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Acer Aspire 5734z-4836",
         "descripcion": "Guía para reemplazar el ventilador en Acer Aspire 5734z-4836.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5734z-4836+Fan+Replacement/72572",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Acer",
@@ -14378,7 +14392,7 @@ guias = [
     {
         "titulo": "Reemplazo de la base en Acer Aspire 5734z-4836",
         "descripcion": "Guía para reemplazar la base en Acer Aspire 5734z-4836.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5734z-4836+Base+Assembly+Replacement/72573",
         "tipo_servicio": "Base",
         "equipo_marca": "Acer",
@@ -14387,7 +14401,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar el disco duro en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+Hard+Drive+Replacement/72613",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "ASUS",
@@ -14396,7 +14410,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad CD en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar la unidad CD en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+CD+Drive+Replacement/72620",
         "tipo_servicio": "Unidad CD",
         "equipo_marca": "ASUS",
@@ -14405,7 +14419,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tapa trasera en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar la tapa trasera en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+Back+Cover+Replacement/72622",
         "tipo_servicio": "Tapa Trasera",
         "equipo_marca": "ASUS",
@@ -14414,7 +14428,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en HP Pavilion dv6-6180us",
         "descripcion": "Guía para reemplazar la placa madre en HP Pavilion dv6-6180us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6-6180us+Motherboard+Replacement/72635",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -14423,7 +14437,7 @@ guias = [
     {
         "titulo": "Reemplazo de la base para las palmas en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar la base para las palmas en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423++Palm+Rest++Assembly+Replacement/72719",
         "tipo_servicio": "Base para Palmas",
         "equipo_marca": "Dell",
@@ -14432,7 +14446,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Acer One 10 S1002-145A",
         "descripcion": "Guía para reemplazar la placa madre en Acer One 10 S1002-145A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+One+10+S1002+145-A+Motherboard+Replacement/72723",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -14441,7 +14455,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Acer One 10 S1002-145A",
         "descripcion": "Guía para reemplazar la batería en Acer One 10 S1002-145A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+One+10+S1002+145-A+Battery+Replacement/72726",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -14450,7 +14464,7 @@ guias = [
     {
         "titulo": "Reemplazo de la cámara en Acer One 10 S1002-145A",
         "descripcion": "Guía para reemplazar la cámara en Acer One 10 S1002-145A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+One+10+S1002+145-A+Camera+Replacement/72728",
         "tipo_servicio": "Cámara",
         "equipo_marca": "Acer",
@@ -14459,7 +14473,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en HP Pavilion dv6-6180us",
         "descripcion": "Guía para reemplazar los altavoces en HP Pavilion dv6-6180us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6-6180us+Speaker+Replacement/72742",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -14468,7 +14482,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en HP Pavilion dv6-6180us",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavilion dv6-6180us.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6-6180us+Screen+Replacement/72744",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -14477,7 +14491,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Asus Chromebook C202",
         "descripcion": "Guía para reemplazar la batería en Asus Chromebook C202.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C202+Battery+Replacement/72756",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -14486,7 +14500,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en HP Pavilion dv6-2155dx",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion dv6-2155dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6-2155dx+Hard+Drive+Replacement/72781",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -14495,7 +14509,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Asus Transformer Book T100TAF",
         "descripcion": "Guía para reemplazar la batería en Asus Transformer Book T100TAF.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Transformer+Book+T100TAF+Battery+Replacement/72789",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -14504,7 +14518,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Toshiba Satellite P775-S7320",
         "descripcion": "Guía para reemplazar la pantalla en Toshiba Satellite P775-S7320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P775-S7320+Screen+Replacement/72791",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Toshiba",
@@ -14513,7 +14527,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar el ventilador en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+Cooling+Fan+Replacement/72794",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Lenovo",
@@ -14522,7 +14536,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en HP Pavilion dv6-2155dx",
         "descripcion": "Guía para reemplazar la unidad óptica en HP Pavilion dv6-2155dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Hp+Pavilion+dv6-2155dx+Optical++Drive+Replacement/72796",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "HP",
@@ -14531,7 +14545,7 @@ guias = [
     {
         "titulo": "Reemplazo del conector de audio en HP Pavilion dv6-2155dx",
         "descripcion": "Guía para reemplazar el conector de audio en HP Pavilion dv6-2155dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Hp+Pavilion+dv6-2155dx+Audio+Jack++Replacement/72799",
         "tipo_servicio": "Conector de Audio",
         "equipo_marca": "HP",
@@ -14540,7 +14554,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto USB en HP Pavilion dv6-2155dx",
         "descripcion": "Guía para reemplazar el puerto USB en HP Pavilion dv6-2155dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Hp+Pavilion+dv6-2155dx+USB+Port+Replacement/72801",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "HP",
@@ -14549,7 +14563,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar los altavoces en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+Speaker+Replacement/72802",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Lenovo",
@@ -14558,7 +14572,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en HP Pavilion dv6-2155dx",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion dv6-2155dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Hp+Pavilion+dv6-2155dx+Keyboard+Replacement/72803",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -14567,7 +14581,7 @@ guias = [
     {
         "titulo": "Reemplazo de memoria RAM en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar la memoria RAM en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+Ram+Replacement/72806",
         "tipo_servicio": "Memoria RAM",
         "equipo_marca": "Lenovo",
@@ -14576,7 +14590,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta de red inalámbrica en HP Envy 15-u001dx",
         "descripcion": "Guía para reemplazar la tarjeta de red inalámbrica en HP Envy 15-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+15-u001dx+Wireless+Network+Card+Replacement/72841",
         "tipo_servicio": "Tarjeta de Red Inalámbrica",
         "equipo_marca": "HP",
@@ -14585,7 +14599,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en HP Envy 15-u001dx",
         "descripcion": "Guía para reemplazar la batería en HP Envy 15-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+15-u001dx+Battery+Replacement/72851",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -14594,7 +14608,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Envy 15-u001dx",
         "descripcion": "Guía para reemplazar el ventilador en HP Envy 15-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+15-u001dx+Cooling+Fan+Replacement/72852",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -14603,7 +14617,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel trasero superior en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar el panel trasero superior en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+Top+Rear+Panel/72929",
         "tipo_servicio": "Panel Trasero Superior",
         "equipo_marca": "Asus",
@@ -14612,7 +14626,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Toshiba Satellite P775-S7320",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite P775-S7320.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P775-S7320+Keyboard+Replacement/72954",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -14621,7 +14635,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Gateway LT2514u",
         "descripcion": "Guía para reemplazar el teclado en Gateway LT2514u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+LT2514u+Keyboard+Replacement/72955",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Gateway",
@@ -14630,7 +14644,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje del teclado en Sony Vaio SVE111B11L",
         "descripcion": "Guía para reemplazar el ensamblaje del teclado en Sony Vaio SVE111B11L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+SVE111B11L+Keyboard+Assembly+Replacement/72957",
         "tipo_servicio": "Ensamblaje de teclado",
         "equipo_marca": "Sony",
@@ -14639,7 +14653,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Dell Inspiron 11-3162",
         "descripcion": "Guía para reemplazar la batería en Dell Inspiron 11-3162.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3162+Battery+Replacement/72959",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -14648,7 +14662,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Sony Vaio SVE111B11L",
         "descripcion": "Guía para reemplazar la pantalla en Sony Vaio SVE111B11L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+SVE111B11L+Screen+Replacement/72965",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Sony",
@@ -14657,7 +14671,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta WLAN en Dell Inspiron 11-3162",
         "descripcion": "Guía para reemplazar la tarjeta WLAN en Dell Inspiron 11-3162.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3162+Wireless+WLAN+Card+Replacement/72968",
         "tipo_servicio": "Tarjeta WLAN",
         "equipo_marca": "Dell",
@@ -14666,7 +14680,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Sony Vaio SVE111B11L",
         "descripcion": "Guía para reemplazar el ventilador en Sony Vaio SVE111B11L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+SVE111B11L+Fan+Replacement/72971",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Sony",
@@ -14675,7 +14689,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Sony Vaio SVE111B11L",
         "descripcion": "Guía para reemplazar la placa madre en Sony Vaio SVE111B11L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+SVE111B11L+Motherboard+Replacement/72972",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Sony",
@@ -14684,7 +14698,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador térmico/pasta térmica en Acer Aspire 5742",
         "descripcion": "Guía para reemplazar el disipador térmico y la pasta térmica en Acer Aspire 5742.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5742+Heat+Sink-Thermal+Paste+Replacement/72974",
         "tipo_servicio": "Disipador térmico/Pasta térmica",
         "equipo_marca": "Acer",
@@ -14693,7 +14707,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Dell Inspiron 11-3162",
         "descripcion": "Guía para reemplazar la placa madre en Dell Inspiron 11-3162.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3162+Motherboard+Replacement/72975",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -14702,7 +14716,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Acer Aspire 5742",
         "descripcion": "Guía para reemplazar el ventilador en Acer Aspire 5742.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5742+Cooling+Fan+Replacement/72978",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Acer",
@@ -14711,7 +14725,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Acer Aspire 5742",
         "descripcion": "Guía para reemplazar la placa madre en Acer Aspire 5742.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5742+Motherboard+Replacement/72985",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -14720,7 +14734,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en HP Envy 15-u001dx",
         "descripcion": "Guía para reemplazar el disco duro en HP Envy 15-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+15-u001dx+Hard+Drive+Replacement/73021",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -14729,7 +14743,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Lenovo IdeaPad U310",
         "descripcion": "Guía para reemplazar la batería en Lenovo IdeaPad U310.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U310+Battery++Replacement/73040",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -14738,7 +14752,7 @@ guias = [
     {
         "titulo": "Reemplazo del módem en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar el módem en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Modem+Replacement/73056",
         "tipo_servicio": "Módem",
         "equipo_marca": "Dell",
@@ -14747,7 +14761,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Keyboard+Replacement/73058",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -14756,7 +14770,7 @@ guias = [
     {
         "titulo": "Reemplazo del trackpad en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar el trackpad en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Trackpad+Replacement/73059",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Dell",
@@ -14765,7 +14779,7 @@ guias = [
     {
         "titulo": "Reemplazo del chip WLAN en Asus VivoBook Q200E-BHI3T45",
         "descripcion": "Guía para reemplazar el chip WLAN en Asus VivoBook Q200E-BHI3T45.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+VivoBook+Q200E-BHI3T45+WLAN+%28Wireless+Chip%29+Replacement/73061",
         "tipo_servicio": "WLAN",
         "equipo_marca": "Asus",
@@ -14774,7 +14788,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Hard+Drive+Replacement/73062",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Dell",
@@ -14783,7 +14797,7 @@ guias = [
     {
         "titulo": "Extracción del panel trasero en Lenovo B575-1450",
         "descripcion": "Guía para extraer el panel trasero en Lenovo B575-1450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+B575-1450+Back+Panel+Removal/73063",
         "tipo_servicio": "Panel trasero",
         "equipo_marca": "Lenovo",
@@ -14792,7 +14806,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Lenovo B575-1450",
         "descripcion": "Guía para reemplazar la RAM en Lenovo B575-1450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+B575-1450+RAM+Replacement/73068",
         "tipo_servicio": "RAM",
         "equipo_marca": "Lenovo",
@@ -14801,7 +14815,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica Mini en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica Mini en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Wireless+Mini+Card+Replacement/73070",
         "tipo_servicio": "Tarjeta inalámbrica Mini",
         "equipo_marca": "Dell",
@@ -14810,7 +14824,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad CD-ROM en Lenovo B575-1450",
         "descripcion": "Guía para reemplazar la unidad CD-ROM en Lenovo B575-1450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+B575-1450+CD-ROM+Drive+Replacement/73074",
         "tipo_servicio": "Unidad CD-ROM",
         "equipo_marca": "Lenovo",
@@ -14819,7 +14833,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar la placa madre en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Motherboard+Replacement/73075",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -14828,7 +14842,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel de pantalla en Lenovo B575-1450",
         "descripcion": "Guía para reemplazar el panel de pantalla en Lenovo B575-1450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+B575-1450+Display+Panel++Replacement/73083",
         "tipo_servicio": "Panel de pantalla",
         "equipo_marca": "Lenovo",
@@ -14837,7 +14851,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta hija en Dell Inspiron 14z-5423",
         "descripcion": "Guía para reemplazar la tarjeta hija en Dell Inspiron 14z-5423.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z-5423+Daughter+Board+Replacement/73087",
         "tipo_servicio": "Tarjeta hija",
         "equipo_marca": "Dell",
@@ -14846,7 +14860,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Toshiba Satellite L35-S2174",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite L35-S2174.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L35-S2174+Keyboard+Replacement/73096",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -14855,7 +14869,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar la RAM en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+RAM+Replacement/73103",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -14864,7 +14878,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel trasero en Gateway LT2514u",
         "descripcion": "Guía para reemplazar el panel trasero en Gateway LT2514u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+LT2514u+Back+Access+Panel+Replacement/73120",
         "tipo_servicio": "Panel trasero",
         "equipo_marca": "Gateway",
@@ -14873,7 +14887,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en IBM ThinkPad 600E",
         "descripcion": "Guía para reemplazar la RAM en IBM ThinkPad 600E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IBM+ThinkPad+600E+RAM+Replacement/73124",
         "tipo_servicio": "RAM",
         "equipo_marca": "IBM",
@@ -14882,7 +14896,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Dell Inspiron 11z-1121",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron 11z-1121.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11z-1121+Keyboard+Replacement/73125",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -14891,7 +14905,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell Inspiron 11z-1121",
         "descripcion": "Guía para reemplazar la RAM en Dell Inspiron 11z-1121.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11z-1121+RAM+Replacement/73128",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -14900,7 +14914,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Toshiba Satellite L755D-S5150",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite L755D-S5150.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L755D-S5150+Keyboard+Replacement/73135",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -14909,7 +14923,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar la batería en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+Battery+Replacement/73148",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -14918,7 +14932,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar el teclado en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+Keyboard+Replacement/73151",
         "tipo_servicio": "Teclado",
         "equipo_marca": "ASUS",
@@ -14927,7 +14941,7 @@ guias = [
     {
         "titulo": "Reemplazo del chip Wi-Fi en ASUS U52F-BBG6",
         "descripcion": "Guía para reemplazar el chip Wi-Fi en ASUS U52F-BBG6.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U52F-BBG6+Wi-Fi+Chip+Replacement/73154",
         "tipo_servicio": "Chip Wi-Fi",
         "equipo_marca": "ASUS",
@@ -14936,7 +14950,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta Wi-Fi en Compaq Presario V2414NR",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en Compaq Presario V2414NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Compaq+Presario+V2414NR+WiFi+Card+Replacement/73172",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Compaq",
@@ -14945,7 +14959,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad óptica en Compaq Presario V2414NR",
         "descripcion": "Guía para reemplazar la unidad óptica en Compaq Presario V2414NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Compaq+Presario+V2414NR+Optical+Drive+Replacement/73173",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "Compaq",
@@ -14954,7 +14968,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Compaq Presario V2414NR",
         "descripcion": "Guía para reemplazar el teclado en Compaq Presario V2414NR.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Compaq+Presario+V2414NR+Keyboard+Replacement/73174",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Compaq",
@@ -14963,7 +14977,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Dell Latitude E5410",
         "descripcion": "Guía para reemplazar el teclado en Dell Latitude E5410.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E5410+Dell+Latitude+E5410+keyboard+Replacement/73178",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -14972,7 +14986,7 @@ guias = [
     {
         "titulo": "Reemplazo del procesador en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar el procesador en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Processor+Replacement/73181",
         "tipo_servicio": "Procesador",
         "equipo_marca": "Dell",
@@ -14981,7 +14995,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta gráfica en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar la tarjeta gráfica en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Video+Card+Replacement/73184",
         "tipo_servicio": "Tarjeta gráfica",
         "equipo_marca": "Dell",
@@ -14990,7 +15004,7 @@ guias = [
     {
         "titulo": "Reemplazo del sistema de altavoces en Dell Inspiron 9300",
         "descripcion": "Guía para reemplazar el sistema de altavoces en Dell Inspiron 9300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+9300+Speaker+System+Replacement/73185",
         "tipo_servicio": "Sistema de altavoces",
         "equipo_marca": "Dell",
@@ -14999,7 +15013,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar la batería en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA+Battery+Replacement/73215",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -15008,7 +15022,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Asus K53E-BBR7",
         "descripcion": "Guía para reemplazar el ventilador en Asus K53E-BBR7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+K53E-BBR7+Fan+Replacement/73228",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -15017,7 +15031,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad óptica en Asus K53E-BBR7",
         "descripcion": "Guía para reemplazar la unidad óptica en Asus K53E-BBR7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+K53E-BBR7+Optical+Drive+Replacement/73251",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "Asus",
@@ -15026,7 +15040,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Compaq Presario CQ62",
         "descripcion": "Guía para reemplazar el disco duro en Compaq Presario CQ62.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Compaq+Presario+CQ62++Hard+Drive+Replacement/73280",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Compaq",
@@ -15035,7 +15049,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Asus K53E-BBR7",
         "descripcion": "Guía para reemplazar la placa madre en Asus K53E-BBR7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+K53E-BBR7+Motherboard+Replacement/73290",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -15044,7 +15058,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Samsung NP-130-JA01US",
         "descripcion": "Guía para reemplazar el teclado en Samsung NP-130-JA01US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-130-JA01US+Keyboard+Replacement/73318",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Samsung",
@@ -15053,7 +15067,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Samsung NP-130-JA01US",
         "descripcion": "Guía para reemplazar el ventilador en Samsung NP-130-JA01US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-130-JA01US+Fan+Replacement/73325",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -15062,7 +15076,7 @@ guias = [
     {
         "titulo": "Reemplazo del touchpad en HP Envy M6-1205DX",
         "descripcion": "Guía para reemplazar el touchpad en HP Envy M6-1205DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+M6-1205DX+Touchpad+Replacement/73329",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "HP",
@@ -15071,7 +15085,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Samsung NP-130-JA01US",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP-130-JA01US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-130-JA01US+Hard+Drive+Replacement/73330",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -15080,7 +15094,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Lenovo IdeaPad U310",
         "descripcion": "Guía para reemplazar el teclado en Lenovo IdeaPad U310.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U310+Keyboard++Replacement/73331",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -15089,7 +15103,7 @@ guias = [
     {
         "titulo": "Reemplazo del touchpad en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar el touchpad en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+Touchpad+Replacement/73337",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Dell",
@@ -15098,7 +15112,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar la placa madre en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+Motherboard+Replacement/73338",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Lenovo",
@@ -15107,7 +15121,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Acer Aspire Switch 10 SW5-011-18R3",
         "descripcion": "Guía para reemplazar la batería en Acer Aspire Switch 10 SW5-011-18R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+Switch+10+SW5-011-18R3+Battery+Replacement/73342",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -15116,7 +15130,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Acer Aspire Switch 10 SW5-011-18R3",
         "descripcion": "Guía para reemplazar la placa madre en Acer Aspire Switch 10 SW5-011-18R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+Switch+10+SW5-011-18R3+Motherboard+Replacement/73343",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -15125,7 +15139,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla de laptop en Toshiba Portege 3110CT",
         "descripcion": "Guía para reemplazar la pantalla de laptop en Toshiba Portege 3110CT.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Portege+3110CT+Laptop+Screen+Replacement/73456",
         "tipo_servicio": "Pantalla de Laptop",
         "equipo_marca": "Toshiba",
@@ -15134,7 +15148,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel trasero en Samsung NP N310 HAA2US",
         "descripcion": "Guía para reemplazar el panel trasero en Samsung NP N310 HAA2US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP+N310+HAA2US+Back+Panel+Replacement/73465",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Samsung",
@@ -15143,7 +15157,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Dell Inspiron 11z-1121",
         "descripcion": "Guía para reemplazar el ventilador en Dell Inspiron 11z-1121.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11z-1121+Fan+Replacement/73469",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -15152,7 +15166,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Compaq C700",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Compaq C700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+C700+RAM+Replacement/73488",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -15161,7 +15175,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus Eee PC 1201N",
         "descripcion": "Guía para reemplazar la memoria RAM en Asus Eee PC 1201N.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1201N+RAM+Replacement/73492",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -15170,7 +15184,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Toshiba Satellite R15-S829",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite R15-S829.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+R15-S829+Keyboard+Replacement/73494",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -15179,7 +15193,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Samsung NP-N102S-B05PH",
         "descripcion": "Guía para reemplazar la memoria RAM en Samsung NP-N102S-B05PH.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N102S-B05PH+RAM+Replacement/73495",
         "tipo_servicio": "RAM",
         "equipo_marca": "Samsung",
@@ -15188,7 +15202,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Asus Eee PC 1201N",
         "descripcion": "Guía para reemplazar la pantalla en Asus Eee PC 1201N.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1201N+Display+Replacement/73496",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -15197,7 +15211,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar el disco duro en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+Hard+Drive++Replacement/73507",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -15206,7 +15220,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en HP Mini 110-3131dx",
         "descripcion": "Guía para reemplazar el teclado en HP Mini 110-3131dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3131dx+Keyboard+Replacement/73510",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -15215,7 +15229,7 @@ guias = [
     {
         "titulo": "Reemplazo del reproductor de CD-ROM en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar el reproductor de CD-ROM en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+CD-ROM+Player+Replacement/73511",
         "tipo_servicio": "Reproductor CD-ROM",
         "equipo_marca": "Asus",
@@ -15224,7 +15238,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en HP Mini 110-3131dx",
         "descripcion": "Guía para reemplazar la pantalla en HP Mini 110-3131dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3131dx+Screen+Replacement/73520",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -15233,7 +15247,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Mini 110-3131dx",
         "descripcion": "Guía para reemplazar el ventilador en HP Mini 110-3131dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3131dx+Fan+Replacement/73521",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -15242,7 +15256,7 @@ guias = [
     {
         "titulo": "Reemplazo del bisel del teclado en HP Mini 110-3131dx",
         "descripcion": "Guía para reemplazar el bisel del teclado en HP Mini 110-3131dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3131dx+Keyboard+Bezel+Replacement/73522",
         "tipo_servicio": "Bisel del Teclado",
         "equipo_marca": "HP",
@@ -15251,7 +15265,7 @@ guias = [
     {
         "titulo": "Reemplazo del touchpad en HP Mini 110-3131dx",
         "descripcion": "Guía para reemplazar el touchpad en HP Mini 110-3131dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3131dx+Touch-pad+Replacement/73523",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "HP",
@@ -15260,7 +15274,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Toshiba Satellite L755D-S5150",
         "descripcion": "Guía para reemplazar la placa madre en Toshiba Satellite L755D-S5150.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L755D-S5150+Motherboard+Replacement/73531",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Toshiba",
@@ -15269,7 +15283,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta Wi-Fi en Lenovo B575-1450",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en Lenovo B575-1450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+B575-1450+Wi-Fi+Card+Replacement/73533",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "Lenovo",
@@ -15278,7 +15292,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar la placa madre en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+Motherboard+Replacement/73534",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -15287,7 +15301,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+Keyboard+Replacement/73535",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -15296,7 +15310,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla LCD en Dell Inspiron 11-3162",
         "descripcion": "Guía para reemplazar la pantalla LCD en Dell Inspiron 11-3162.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3162+LCD+Screen+Replacement/73536",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Dell",
@@ -15305,7 +15319,7 @@ guias = [
     {
         "titulo": "Reemplazo del reposamanos y teclado en Dell Inspiron 11-3162",
         "descripcion": "Guía para reemplazar el reposamanos y teclado en Dell Inspiron 11-3162.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11-3162+Palmrest+Keyboard+Replacement/73537",
         "tipo_servicio": "Reposamanos y Teclado",
         "equipo_marca": "Dell",
@@ -15314,7 +15328,7 @@ guias = [
     {
         "titulo": "Reemplazo del adaptador WiFi en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar el adaptador WiFi en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+WiFi+Adapter+Replacement/73541",
         "tipo_servicio": "Adaptador WiFi",
         "equipo_marca": "Dell",
@@ -15323,7 +15337,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Samsung NP305E5A-A03US",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP305E5A-A03US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP305E5A-A03US+Hard+Drive+Replacement/73543",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -15332,7 +15346,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Acer One 10 S1002-145A",
         "descripcion": "Guía para reemplazar la pantalla en Acer One 10 S1002-145A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+One+10+S1002+145-A+Screen+Replacement/73547",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -15341,7 +15355,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Lenovo IdeaPad U310",
         "descripcion": "Guía para reemplazar el ventilador en Lenovo IdeaPad U310.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U310+Fan+Replacement/73548",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Lenovo",
@@ -15350,7 +15364,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador de calor en HP Pavilion dv4000",
         "descripcion": "Guía para reemplazar el disipador de calor en HP Pavilion dv4000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv4000+Heat+Sink+Replacement/73550",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "HP",
@@ -15359,7 +15373,7 @@ guias = [
     {
         "titulo": "Reemplazo de la cámara frontal en Acer Aspire One A150-1672",
         "descripcion": "Guía para reemplazar la cámara frontal en Acer Aspire One A150-1672.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+A150-1672+Front-facing+Camera+Replacement/73551",
         "tipo_servicio": "Cámara Frontal",
         "equipo_marca": "Acer",
@@ -15368,7 +15382,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel de pantalla en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar el panel de pantalla en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+Display+Panel+Replacement/73552",
         "tipo_servicio": "Panel de Pantalla",
         "equipo_marca": "Dell",
@@ -15377,7 +15391,7 @@ guias = [
     {
         "titulo": "Reemplazo del soporte del reposamanos en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar el soporte del reposamanos en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+Palm+Rest+Bracket+Replacement/73556",
         "tipo_servicio": "Soporte del Reposamanos",
         "equipo_marca": "Dell",
@@ -15386,7 +15400,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Dell Inspiron Mini 10",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron Mini 10.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+Mini+10+Hard+Drive+Replacement/73557",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -15395,7 +15409,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en HP Pavilion dv4000",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion dv4000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv4000+Keyboard+Replacement/73630",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -15404,7 +15418,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de la CPU en HP Pavilion 14-b120dx",
         "descripcion": "Guía para reemplazar el ventilador de la CPU en HP Pavilion 14-b120dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-b120dx+CPU+Cooling+Fan+Replacement/73631",
         "tipo_servicio": "Ventilador de CPU",
         "equipo_marca": "HP",
@@ -15413,7 +15427,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Gateway LT2514u",
         "descripcion": "Guía para reemplazar la RAM en Gateway LT2514u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+LT2514u+RAM+Replacement/73640",
         "tipo_servicio": "RAM",
         "equipo_marca": "Gateway",
@@ -15422,7 +15436,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Gateway LT2514u",
         "descripcion": "Guía para reemplazar el disco duro en Gateway LT2514u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+LT2514u+Hard+Disk+Drive+Replacement/73641",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Gateway",
@@ -15431,7 +15445,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en Asus Transformer Book T100TAF",
         "descripcion": "Guía para reemplazar la placa madre en Asus Transformer Book T100TAF.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Transformer+Book+T100TAF+Motherboard+Replacement/73645",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -15440,7 +15454,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Lenovo IdeaPad U310",
         "descripcion": "Guía para reemplazar la pantalla en Lenovo IdeaPad U310.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U310+Screen++Replacement/73662",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -15449,7 +15463,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Lenovo IdeaPad U310",
         "descripcion": "Guía para reemplazar la RAM en Lenovo IdeaPad U310.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U310+Ram++Replacement/73666",
         "tipo_servicio": "RAM",
         "equipo_marca": "Lenovo",
@@ -15458,7 +15472,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP Envy M6-1205DX",
         "descripcion": "Guía para reemplazar el ventilador en HP Envy M6-1205DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+M6-1205DX+Fan+Replacement/73671",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -15467,7 +15481,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Samsung NP305E5A-A03US",
         "descripcion": "Guía para reemplazar la RAM en Samsung NP305E5A-A03US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP305E5A-A03US+RAM+Replacement/73672",
         "tipo_servicio": "RAM",
         "equipo_marca": "Samsung",
@@ -15476,7 +15490,7 @@ guias = [
     {
         "titulo": "Reemplazo de puerto USB en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar el puerto USB en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+USB+Port+Replacement/73674",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "Lenovo",
@@ -15485,7 +15499,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Dell Inspiron M5110",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron M5110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+M5110+Keyboard+Replacement/73675",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -15494,7 +15508,7 @@ guias = [
     {
         "titulo": "Reemplazo de bisagras en HP Envy M6-1205DX",
         "descripcion": "Guía para reemplazar las bisagras en HP Envy M6-1205DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+M6-1205DX+Hinge+Replacement/73677",
         "tipo_servicio": "Bisagras",
         "equipo_marca": "HP",
@@ -15503,7 +15517,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de disco óptico en Toshiba Satellite L755D-S5150",
         "descripcion": "Guía para reemplazar la unidad de disco óptico en Toshiba Satellite L755D-S5150.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L755D-S5150+Optical+Disc+Drive+Replacement/73687",
         "tipo_servicio": "Unidad de Disco Óptico",
         "equipo_marca": "Toshiba",
@@ -15512,7 +15526,7 @@ guias = [
     {
         "titulo": "Reemplazo de touchpad en HP Compaq C700",
         "descripcion": "Guía para reemplazar el touchpad en HP Compaq C700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+C700+Touchpad+Replacement/73698",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "HP Compaq",
@@ -15521,7 +15535,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Velocity Micro Cruz T301",
         "descripcion": "Guía para reemplazar la batería en Velocity Micro Cruz T301.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Velocity+Micro+Cruz+T301+Battery+Replacement/73700",
         "tipo_servicio": "Batería",
         "equipo_marca": "Velocity Micro",
@@ -15530,7 +15544,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Velocity Micro Cruz T301",
         "descripcion": "Guía para reemplazar los altavoces en Velocity Micro Cruz T301.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Velocity+Micro+Cruz+T301+Speakers+Replacement/73703",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Velocity Micro",
@@ -15539,7 +15553,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Pavilion dv2913cl",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion dv2913cl.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv2913cl+Keyboard+Replacement/73707",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -15548,7 +15562,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en IBM ThinkPad 600E",
         "descripcion": "Guía para reemplazar el disco duro en IBM ThinkPad 600E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IBM+ThinkPad+600E+Hard+Drive+Disk+Replacement/73755",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "IBM",
@@ -15557,7 +15571,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Samsung NP-N102S-B05PH",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP-N102S-B05PH.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N102S-B05PH+Hard+Drive+Replacement/73763",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -15566,7 +15580,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Asus Eee PC 1201N",
         "descripcion": "Guía para reemplazar el ventilador en Asus Eee PC 1201N.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1201N+Cooling+fan+replacement/73772",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -15575,7 +15589,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar los altavoces en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+Speakers+Replacement/73779",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Asus",
@@ -15584,7 +15598,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Toshiba Satellite E45-B4100",
         "descripcion": "Guía para reemplazar la batería en Toshiba Satellite E45-B4100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45-B4100+Battery+Replacement+Replacement/73781",
         "tipo_servicio": "Batería",
         "equipo_marca": "Toshiba",
@@ -15593,7 +15607,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Toshiba Satellite E45-B4100",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite E45-B4100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45-B4100+Hard+Drive+Replacement/73782",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -15602,7 +15616,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar la memoria RAM en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+RAM+Replacement/73783",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -15611,7 +15625,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en HP Mini 110-3131dx",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en HP Mini 110-3131dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+110-3131dx+Wireless+Card+Replacement/73785",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "HP",
@@ -15620,7 +15634,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa de puertos USB en Toshiba Satellite E45-B4100",
         "descripcion": "Guía para reemplazar la placa de puertos USB en Toshiba Satellite E45-B4100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45-B4100+USB+Port+Circuit+Board+Replacement/73791",
         "tipo_servicio": "Placa de Puertos USB",
         "equipo_marca": "Toshiba",
@@ -15629,7 +15643,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en HP Envy M6-1205DX",
         "descripcion": "Guía para reemplazar la pantalla en HP Envy M6-1205DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+M6-1205DX+Screen+Replacement/73807",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -15638,7 +15652,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Sony Vaio PCG-4G1L",
         "descripcion": "Guía para reemplazar el teclado en Sony Vaio PCG-4G1L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-4G1L+Keyboard+Replacement/73877",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Sony",
@@ -15647,7 +15661,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Sony Vaio PCG-4G1L",
         "descripcion": "Guía para reemplazar el disco duro en Sony Vaio PCG-4G1L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-4G1L+Hard+Drive++Replacement/73879",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Sony",
@@ -15656,7 +15670,7 @@ guias = [
     {
         "titulo": "Reemplazo de carcasa plástica en Sony Vaio PCG-4G1L",
         "descripcion": "Guía para reemplazar la carcasa plástica en Sony Vaio PCG-4G1L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-4G1L+Plastic+Casing+Replacement/73881",
         "tipo_servicio": "Carcasa Plástica",
         "equipo_marca": "Sony",
@@ -15665,7 +15679,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en Sony Vaio PCG-4G1L",
         "descripcion": "Guía para reemplazar la unidad óptica en Sony Vaio PCG-4G1L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-4G1L+Optical+Drive+Replacement/73882",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Sony",
@@ -15674,7 +15688,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP Compaq C700",
         "descripcion": "Guía para reemplazar el ventilador en HP Compaq C700.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+C700+Fan+Replacement/73883",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -15683,7 +15697,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba NB305",
         "descripcion": "Guía para reemplazar la RAM en Toshiba NB305.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+NB305+RAM++Replacement/73947",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -15692,7 +15706,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Toshiba NB305",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba NB305.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+NB305+Hard+Drive+Replacement/73948",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -15701,7 +15715,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Toshiba NB305",
         "descripcion": "Guía para reemplazar el teclado en Toshiba NB305.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+NB305+Keyboard++Replacement/73950",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -15710,7 +15724,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire 3000",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire 3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+3000+RAM+Replacement/73955",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -15719,7 +15733,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta Wifi en Toshiba NB305",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Toshiba NB305.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+NB305+Wifi+Card+Replacement/73958",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Toshiba",
@@ -15728,7 +15742,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en Samsung NP305E5A-A03US",
         "descripcion": "Guía para reemplazar la unidad óptica en Samsung NP305E5A-A03US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP305E5A-A03US+Optical+Drive+Replacement/74000",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Samsung",
@@ -15737,7 +15751,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Samsung NP305E5A-A03US",
         "descripcion": "Guía para reemplazar el ventilador en Samsung NP305E5A-A03US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP305E5A-A03US+Fan+Replacement/74003",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -15746,7 +15760,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta WLAN en Samsung NP-NC10-KA02US",
         "descripcion": "Guía para reemplazar la tarjeta WLAN en Samsung NP-NC10-KA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-NC10-KA02US+WLAN+Card+Replacement/74011",
         "tipo_servicio": "Tarjeta WLAN",
         "equipo_marca": "Samsung",
@@ -15755,7 +15769,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Samsung NP-NC10-KA02US",
         "descripcion": "Guía para reemplazar el ventilador en Samsung NP-NC10-KA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-NC10-KA02US+Fan+Replacement/74018",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -15764,7 +15778,7 @@ guias = [
     {
         "titulo": "Reemplazo de panel trasero en Asus Chromebook C202",
         "descripcion": "Guía para reemplazar el panel trasero en Asus Chromebook C202.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C202+Back+Panel+Replacement/74074",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Asus",
@@ -15773,7 +15787,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Samsung NP-NC10-KA02US",
         "descripcion": "Guía para reemplazar la RAM en Samsung NP-NC10-KA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-NC10-KA02US+RAM+Replacement/74076",
         "tipo_servicio": "RAM",
         "equipo_marca": "Samsung",
@@ -15782,7 +15796,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Asus Chromebook C202",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Asus Chromebook C202.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C202+Wireless+Card+Replacement/74077",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Asus",
@@ -15791,7 +15805,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa de entrada/salida en Asus Chromebook C202",
         "descripcion": "Guía para reemplazar la placa de entrada/salida en Asus Chromebook C202.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C202+Input-Output+board+Replacement/74079",
         "tipo_servicio": "Placa de Entrada/Salida",
         "equipo_marca": "Asus",
@@ -15800,7 +15814,7 @@ guias = [
     {
         "titulo": "Reemplazo de cámara en Asus Transformer Book T100TAF",
         "descripcion": "Guía para reemplazar la cámara en Asus Transformer Book T100TAF.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Transformer+Book+T100TAF+Camera+Replacement/74081",
         "tipo_servicio": "Cámara",
         "equipo_marca": "Asus",
@@ -15809,7 +15823,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Samsung NP N310 HAA2US",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP N310 HAA2US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP+N310+HAA2US+Hard+Drive+Replacement/74082",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -15818,7 +15832,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire One D250-1151",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire One D250-1151.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D250-1151+RAM+Replacement/74092",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -15827,7 +15841,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Pavilion zv5000",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion zv5000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+zv5000+Keyboard+Replacement/74093",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -15836,7 +15850,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Dell Inspiron 1100",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron 1100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+1100+Keyboard+Replacement/74099",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -15845,7 +15859,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en Asus Chromebook C202",
         "descripcion": "Guía para reemplazar la placa madre en Asus Chromebook C202.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C202+Motherboard+Replacement/74103",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -15854,7 +15868,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Fujitsu Lifebook A6110",
         "descripcion": "Guía para reemplazar la RAM en Fujitsu Lifebook A6110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Fujitsu+Lifebook+A6110+RAM+Replacement/74112",
         "tipo_servicio": "RAM",
         "equipo_marca": "Fujitsu",
@@ -15863,7 +15877,7 @@ guias = [
     {
         "titulo": "Reemplazo de tecla de teclado en Acer Aspire One D250-1151",
         "descripcion": "Guía para reemplazar una tecla del teclado en Acer Aspire One D250-1151.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D250-1151+Keyboard+Key+Replacement/74114",
         "tipo_servicio": "Teclado (Tecla)",
         "equipo_marca": "Acer",
@@ -15872,7 +15886,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de disco en Fujitsu Lifebook A6110",
         "descripcion": "Guía para reemplazar la unidad de disco en Fujitsu Lifebook A6110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Fujtsu+Lifebook+Model+A6110+Disk+Drive+Replacement/74118",
         "tipo_servicio": "Unidad de Disco",
         "equipo_marca": "Fujitsu",
@@ -15881,7 +15895,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar el teclado en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+Keyboard+Replacement/74123",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -15890,7 +15904,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Fujitsu Lifebook A6110",
         "descripcion": "Guía para reemplazar el teclado en Fujitsu Lifebook A6110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Fujtsu+Lifebook+Model+A6110+Keyboard+Replacement/74124",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Fujitsu",
@@ -15899,7 +15913,7 @@ guias = [
     {
         "titulo": "Reemplazo de monitor en Asus ROG G751JL-BB17T29",
         "descripcion": "Guía para reemplazar el monitor en Asus ROG G751JL-BB17T29.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+G751JL-BB17T29+Monitor+Replacement/74125",
         "tipo_servicio": "Monitor",
         "equipo_marca": "Asus",
@@ -15908,7 +15922,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de CD en Asus K53E-BBR3",
         "descripcion": "Guía para reemplazar la unidad de CD en Asus K53E-BBR3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+K53E-BBR3+CD+Drive+Replacement/74126",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "Asus",
@@ -15917,7 +15931,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Asus Eee PC 1201N",
         "descripcion": "Guía para reemplazar el disco duro en Asus Eee PC 1201N.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Eee+PC+1201N+Hard+Drive+Replacement/74136",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -15926,7 +15940,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador de enfriamiento en Toshiba Satellite E45-B4100",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Toshiba Satellite E45-B4100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45-B4100+Cooling+Fan+Replacement/74141",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Toshiba",
@@ -15935,7 +15949,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Satellite E45-B4100",
         "descripcion": "Guía para reemplazar la RAM en Toshiba Satellite E45-B4100.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45-B4100+RAM+Replacement/74142",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -15944,7 +15958,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador de enfriamiento en Samsung NP N310 HAA2US",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Samsung NP N310 HAA2US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP+N310+HAA2US+Cooling+Fan+Replacement/74151",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Samsung",
@@ -15953,7 +15967,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Dell Inspiron 11z-1121",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron 11z-1121.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+11z-1121+Hard+Drive+Replacement/74152",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -15962,7 +15976,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en IBM ThinkPad 600E",
         "descripcion": "Guía para reemplazar el teclado en IBM ThinkPad 600E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IBM+ThinkPad+600E+Keyboard+Replacement/74153",
         "tipo_servicio": "Teclado",
         "equipo_marca": "IBM",
@@ -15971,7 +15985,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en IBM ThinkPad 600E",
         "descripcion": "Guía para reemplazar la pantalla en IBM ThinkPad 600E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IBM+ThinkPad+600E+Display+Replacement/74155",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "IBM",
@@ -15980,7 +15994,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Satellite C855D-S5303",
         "descripcion": "Guía para reemplazar la memoria RAM en Toshiba Satellite C855D-S5303.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C855D-S5303+RAM+Replacement/74161",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -15989,7 +16003,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Dell Latitude E5500",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Dell Latitude E5500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E5500+Wireless+Card+Replacement/74176",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Dell",
@@ -15998,7 +16012,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta Bluetooth en Dell Latitude E5500",
         "descripcion": "Guía para reemplazar la tarjeta Bluetooth en Dell Latitude E5500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E5500+Bluetooth+Card+Replacement/74177",
         "tipo_servicio": "Tarjeta Bluetooth",
         "equipo_marca": "Dell",
@@ -16007,7 +16021,7 @@ guias = [
     {
         "titulo": "Reemplazo de compuesto térmico en Dell Latitude E5500",
         "descripcion": "Guía para reemplazar el compuesto térmico en Dell Latitude E5500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E5500+Thermal+Compound+Replacement/74179",
         "tipo_servicio": "Compuesto Térmico",
         "equipo_marca": "Dell",
@@ -16016,7 +16030,7 @@ guias = [
     {
         "titulo": "Desmontaje de HP Envy 15-u001dx",
         "descripcion": "Guía para desmontar un HP Envy 15-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+15-u001dx+Disassembly/74200",
         "tipo_servicio": "Desmontaje",
         "equipo_marca": "HP",
@@ -16025,7 +16039,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Gateway LT2514u",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Gateway LT2514u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+LT2514u+Wireless+Card+Replacement/74205",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Gateway",
@@ -16034,7 +16048,7 @@ guias = [
     {
         "titulo": "Reemplazo de módulo de botones en Asus Transformer Book T100TAF",
         "descripcion": "Guía para reemplazar el módulo de botones en Asus Transformer Book T100TAF.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Transformer+Book+T100TAF+Button+Module+Replacement/74225",
         "tipo_servicio": "Módulo de Botones",
         "equipo_marca": "Asus",
@@ -16043,7 +16057,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Asus Transformer Book T100TAF",
         "descripcion": "Guía para reemplazar el teclado en Asus Transformer Book T100TAF.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Transformer+Book+T100TAF+Keyboard+Replacement/74227",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -16052,7 +16066,7 @@ guias = [
     {
         "titulo": "Reemplazo de carcasa trasera en Lenovo Yoga 3 14",
         "descripcion": "Guía para reemplazar la carcasa trasera en Lenovo Yoga 3 14.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+Yoga+3+14+Back+Case+Replacement/74230",
         "tipo_servicio": "Carcasa Trasera",
         "equipo_marca": "Lenovo",
@@ -16061,7 +16075,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Asus Chromebook C202",
         "descripcion": "Guía para reemplazar los altavoces en Asus Chromebook C202.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Chromebook+C202+Speakers+Replacement/74231",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Asus",
@@ -16070,7 +16084,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Acer Aspire Switch 10 SW5-011-18R3",
         "descripcion": "Guía para reemplazar los altavoces en Acer Aspire Switch 10 SW5-011-18R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+Switch+10+SW5-011-18R3+Speakers+Replacement/74232",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Acer",
@@ -16079,7 +16093,7 @@ guias = [
     {
         "titulo": "Reemplazo de cubierta superior en HP Folio 13t-1000",
         "descripcion": "Guía para reemplazar la cubierta superior en HP Folio 13t-1000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Folio+13t-1000+Top+Hardware+Cover+Replacement/74242",
         "tipo_servicio": "Cubierta Superior",
         "equipo_marca": "HP",
@@ -16088,7 +16102,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Folio 13t-1000",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Folio 13t-1000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Folio+13t-1000+RAM+Replacement/74244",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -16097,7 +16111,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador de enfriamiento en HP Folio 13t-1000",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en HP Folio 13t-1000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Folio+13t-1000+Cooling+Fan+Replacement/74246",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "HP",
@@ -16106,7 +16120,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en HP Folio 13t-1000",
         "descripcion": "Guía para reemplazar la batería en HP Folio 13t-1000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Folio+13t-1000+Battery+Replacement/74247",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -16115,7 +16129,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en HP Folio 13t-1000",
         "descripcion": "Guía para reemplazar los altavoces en HP Folio 13t-1000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Folio+13t-1000+Audio+Speakers+Replacement/74250",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -16124,7 +16138,7 @@ guias = [
     {
         "titulo": "Reemplazo de disipador térmico en HP Folio 13t-1000",
         "descripcion": "Guía para reemplazar el disipador térmico en HP Folio 13t-1000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Folio+13t-1000+Heatsink+Replacement/74252",
         "tipo_servicio": "Disipador Térmico",
         "equipo_marca": "HP",
@@ -16133,7 +16147,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en Velocity Micro Cruz T301",
         "descripcion": "Guía para reemplazar la placa madre en Velocity Micro Cruz T301.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Velocity+Micro+Cruz+T301+Motherboard++Replacement/74257",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Velocity Micro",
@@ -16142,7 +16156,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion G7-2235DX",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Pavilion G7-2235DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+G7-2235DX+RAM+Replacement/74313",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -16151,7 +16165,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Acer Aspire 3000",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire 3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+3000+Hard+Drive+Replacement/74342",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -16160,7 +16174,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Samsung NP-N210-JA02US",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP-N210-JA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N210-JA02US+Hard+Drive+Replacement/74362",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -16169,7 +16183,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Samsung NP-N210-JA02US",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Samsung NP-N210-JA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N210-JA02US+Wireless+Card+Replacement/74365",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Samsung",
@@ -16178,7 +16192,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Compaq Presario cq62-214nr",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Compaq Presario cq62-214nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+cq62-214nr+RAM+Replacement/74431",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -16187,7 +16201,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en HP Compaq Presario cq62-214nr",
         "descripcion": "Guía para reemplazar la placa madre en HP Compaq Presario cq62-214nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+cq62-214nr+Motherboard+Replacement/74436",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -16196,7 +16210,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Acer Aspire One A150-1672",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire One A150-1672.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+A150-1672+Display+Screen+Replacement/74447",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -16205,7 +16219,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Acer Aspire 3000",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Acer Aspire 3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+3000+Wireless+Card+Replacement/74461",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Acer",
@@ -16214,7 +16228,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Acer Aspire 3000",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire 3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+3000+Keyboard+Replacement/74462",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -16223,7 +16237,7 @@ guias = [
     {
         "titulo": "Reemplazo del compartimiento del ventilador en Dell Inspiron M5110",
         "descripcion": "Guía para reemplazar el compartimiento del ventilador en Dell Inspiron M5110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+M5110+Fan+Compartment+Replacement/74466",
         "tipo_servicio": "Compartimiento de Ventilador",
         "equipo_marca": "Dell",
@@ -16232,7 +16246,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Dell Inspiron M5110",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron M5110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+M5110+Hard+Drive+Replacement/74467",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -16241,7 +16255,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Satellite L305D-S5900",
         "descripcion": "Guía para reemplazar la memoria RAM en Toshiba Satellite L305D-S5900.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L305D-S5900+RAM+Replacement/74528",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -16250,7 +16264,7 @@ guias = [
     {
         "titulo": "Reemplazo del disipador de calor en Toshiba Satellite C55-C5268",
         "descripcion": "Guía para reemplazar el disipador de calor en Toshiba Satellite C55-C5268.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5268+Heat+Sink+Replacement/74534",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "Toshiba",
@@ -16259,7 +16273,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad óptica en Toshiba Satellite L305D-S5900",
         "descripcion": "Guía para reemplazar la unidad óptica en Toshiba Satellite L305D-S5900.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L305D-S5900+Optical+Drive+%28Disk+Drive%29+Replacement/74536",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Toshiba",
@@ -16268,7 +16282,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Toshiba Satellite L305D-S5900",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite L305D-S5900.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L305D-S5900+Keyboard+Replacement/74538",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -16277,7 +16291,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel trasero en Toshiba Satellite C55-C5268",
         "descripcion": "Guía para reemplazar el panel trasero en Toshiba Satellite C55-C5268.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5268+Back+Panel+Replacement+Guide/74543",
         "tipo_servicio": "Panel Trasero",
         "equipo_marca": "Toshiba",
@@ -16286,7 +16300,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Samsung NP-NC10-KA02US",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP-NC10-KA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-NC10-KA02US+Hard+Drive+Replacement/74549",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -16295,7 +16309,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa trasera en Samsung NP-NC10-KA02US",
         "descripcion": "Guía para reemplazar la placa trasera en Samsung NP-NC10-KA02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-NC10-KA02US+Back+Plate+Replacement/74559",
         "tipo_servicio": "Placa Trasera",
         "equipo_marca": "Samsung",
@@ -16304,7 +16318,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta LAN en Toshiba Satellite C55-C5268",
         "descripcion": "Guía para reemplazar la tarjeta LAN en Toshiba Satellite C55-C5268.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5268+LAN+Card+Replacement/74582",
         "tipo_servicio": "Tarjeta LAN",
         "equipo_marca": "Toshiba",
@@ -16313,7 +16327,7 @@ guias = [
     {
         "titulo": "Reemplazo del ensamblaje de contacto de bisagra en One Education Infinity:One",
         "descripcion": "Guía para reemplazar el ensamblaje de contacto de bisagra en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Hinge+Contact+Assembly+Replacement/74584",
         "tipo_servicio": "Ensamblaje de Contacto de Bisagra",
         "equipo_marca": "One Education",
@@ -16322,7 +16336,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta secundaria en One Education Infinity:One",
         "descripcion": "Guía para reemplazar la tarjeta secundaria (Daughterboard) en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Daughterboard+Replacement/74586",
         "tipo_servicio": "Tarjeta Secundaria",
         "equipo_marca": "One Education",
@@ -16331,7 +16345,7 @@ guias = [
     {
         "titulo": "Requisito previo del marco del teclado en One Education Infinity:One",
         "descripcion": "Guía previa para trabajar en el marco del teclado en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Keyboard+Frame+Prerequisite/74587",
         "tipo_servicio": "Marco del Teclado",
         "equipo_marca": "One Education",
@@ -16340,7 +16354,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Dell Inspiron B130",
         "descripcion": "Guía para reemplazar la pantalla en Dell Inspiron B130.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+B130+Screen+Replacement/74588",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -16349,7 +16363,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en One Education Infinity:One",
         "descripcion": "Guía para reemplazar el teclado en One Education Infinity:One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity%3AOne+Keyboard+Replacement/74589",
         "tipo_servicio": "Teclado",
         "equipo_marca": "One Education",
@@ -16358,7 +16372,7 @@ guias = [
     {
         "titulo": "Reemplazo del touchpad en One Education Infinity One",
         "descripcion": "Guía para reemplazar el touchpad en One Education Infinity One.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/One+Education+Infinity+One+Touchpad+Replacement/74590",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "One Education",
@@ -16367,7 +16381,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Dell Inspiron B130",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron B130.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+B130+Keyboard+Replacement/74593",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -16376,7 +16390,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Dell Inspiron B130",
         "descripcion": "Guía para reemplazar el ventilador en Dell Inspiron B130.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+B130+Fan+Replacement/74594",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -16385,7 +16399,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta inalámbrica interna en Acer Aspire One A150-1570",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica interna en Acer Aspire One A150-1570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+A150-1570+Internal+Wireless+Card+Replacement/74606",
         "tipo_servicio": "Tarjeta Inalámbrica Interna",
         "equipo_marca": "Acer",
@@ -16394,7 +16408,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Acer Aspire One A150-1570",
         "descripcion": "Guía para reemplazar la placa madre (Motherboard) en Acer Aspire One A150-1570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+A150-1570+Motherboard+Replacement/74607",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -16403,7 +16417,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de disco en Toshiba Satellite C55-C5268",
         "descripcion": "Guía para reemplazar la unidad de disco en Toshiba Satellite C55-C5268.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5268+Disk+Drive+Replacement/74610",
         "tipo_servicio": "Unidad de Disco",
         "equipo_marca": "Toshiba",
@@ -16412,7 +16426,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Toshiba Satellite C55-C5268",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite C55-C5268.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5268+Hard+Drive+Replacement/74619",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -16421,7 +16435,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoz en Acer Aspire One A150-1570",
         "descripcion": "Guía para reemplazar el altavoz en Acer Aspire One A150-1570.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+A150-1570+Speaker+Replacement/74624",
         "tipo_servicio": "Altavoz",
         "equipo_marca": "Acer",
@@ -16430,7 +16444,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar la placa madre en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA+Motherboard+Replacement/74628",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -16439,7 +16453,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP Compaq Presario cq62-214nr",
         "descripcion": "Guía para reemplazar el teclado en HP Compaq Presario cq62-214nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+cq62-214nr+Keyboard+Replacement/74630",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -16448,7 +16462,7 @@ guias = [
     {
         "titulo": "Reemplazo de puerto USB en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar el puerto USB en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA++USB+Port+Replacement/74635",
         "tipo_servicio": "Puerto USB",
         "equipo_marca": "Asus",
@@ -16457,7 +16471,7 @@ guias = [
     {
         "titulo": "Reemplazo del TrackPad en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar el TrackPad en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA+TrackPad+Replacement/74636",
         "tipo_servicio": "TrackPad",
         "equipo_marca": "Asus",
@@ -16466,7 +16480,7 @@ guias = [
     {
         "titulo": "Reemplazo de ensamblaje de pantalla en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar el ensamblaje de pantalla en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA+Screen+Assembly+Replacement/74637",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -16475,7 +16489,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en Dell Inspiron E1505",
         "descripcion": "Guía para reemplazar la unidad óptica en Dell Inspiron E1505.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+E1505+Optical+Drive+Replacement/74688",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Dell",
@@ -16484,7 +16498,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Dell Inspiron E1505",
         "descripcion": "Guía para reemplazar la RAM en Dell Inspiron E1505.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+E1505+RAM+Replacement/74689",
         "tipo_servicio": "RAM",
         "equipo_marca": "Dell",
@@ -16493,7 +16507,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Toshiba Satellite R15-S829",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite R15-S829.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+R15-S829+Hard+Drive+Replacement/74694",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -16502,7 +16516,7 @@ guias = [
     {
         "titulo": "Reemplazo del reposamanos en HP Pavilion 14-b120dx",
         "descripcion": "Guía para reemplazar el reposamanos en HP Pavilion 14-b120dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-b120dx+Palm+Rest+Replacement/74695",
         "tipo_servicio": "Reposamanos",
         "equipo_marca": "HP",
@@ -16511,7 +16525,7 @@ guias = [
     {
         "titulo": "Reemplazo de puerto de audio y unidad USB en HP Pavilion 14-b120dx",
         "descripcion": "Guía para reemplazar el puerto de audio y la unidad USB en HP Pavilion 14-b120dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-b120dx+Audio+Port-USB+Drive++Replacement/74696",
         "tipo_servicio": "Puerto de Audio y USB",
         "equipo_marca": "HP",
@@ -16520,7 +16534,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en HP Pavilion 14-b120dx",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en HP Pavilion 14-b120dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-b120dx+Wireless+Card+Replacement/74698",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "HP",
@@ -16529,7 +16543,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Samsung NP-N102S-B05PH",
         "descripcion": "Guía para reemplazar la pantalla en Samsung NP-N102S-B05PH.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N102S-B05PH+Display+Replacement/74706",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -16538,7 +16552,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Toshiba Satellite L305D-S5895",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite L305D-S5895.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L305D-S5895+Keyboard+Replacement/74720",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -16547,7 +16561,7 @@ guias = [
     {
         "titulo": "Reemplazo de placa madre en Dell Inspiron B130",
         "descripcion": "Guía para reemplazar la placa madre en Dell Inspiron B130.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+B130+Motherboard+Replacement/74729",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -16556,7 +16570,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Fujitsu Lifebook A6110",
         "descripcion": "Guía para reemplazar el ventilador en Fujitsu Lifebook A6110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/fujtsu+lifebook+model+a6110+Fan+Replacement/74733",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Fujitsu",
@@ -16565,7 +16579,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en HP Pavilion zv5000",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavilion zv5000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+zv5000+Screen+Replacement/74745",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -16574,7 +16588,7 @@ guias = [
     {
         "titulo": "Reemplazo de módem en Dell Inspiron E1505",
         "descripcion": "Guía para reemplazar el módem en Dell Inspiron E1505.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+E1505+Modem+Replacement/74749",
         "tipo_servicio": "Módem",
         "equipo_marca": "Dell",
@@ -16583,7 +16597,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP Pavilion zv5000",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion zv5000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+zv5000+Hard+Drive+Replacement/74750",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -16592,7 +16606,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en HP Pavilion zv5000",
         "descripcion": "Guía para reemplazar los altavoces en HP Pavilion zv5000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+zv5000+Speaker+Replacement/74756",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -16601,7 +16615,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Acer Aspire 3000",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire 3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+3000+Screen+Replacement/74764",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -16610,7 +16624,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Acer Aspire One D250-1151",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire One D250-1151.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D250-1151+Keyboard+Replacement/74773",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -16619,7 +16633,7 @@ guias = [
     {
         "titulo": "Reemplazo de ensamblaje de pantalla en Dell Inspiron M5110",
         "descripcion": "Guía para reemplazar el ensamblaje de pantalla en Dell Inspiron M5110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+M5110+Display+Assembly+Replacement/74792",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -16628,7 +16642,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en HP Compaq Presario cq62-214nr",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en HP Compaq Presario cq62-214nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+cq62-214nr+Wireless+Card++Replacement/74803",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "HP",
@@ -16637,7 +16651,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta 3G en Acer Aspire One D250-1151",
         "descripcion": "Guía para reemplazar la tarjeta 3G en Acer Aspire One D250-1151.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+D250-1151+3G+Card+Replacement/74854",
         "tipo_servicio": "Tarjeta 3G",
         "equipo_marca": "Acer",
@@ -16646,7 +16660,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en HP G60T-600 CTO",
         "descripcion": "Guía para reemplazar el teclado en HP G60T-600 CTO.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G60T-600+CTO+Keyboard+Replacement/74864",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -16655,7 +16669,7 @@ guias = [
     {
         "titulo": "Reemplazo del marco del botón de encendido en HP G60T-600 CTO",
         "descripcion": "Guía para reemplazar el marco del botón de encendido en HP G60T-600 CTO.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G60T-600+CTO+Power+Button+Frame+Replacement/74867",
         "tipo_servicio": "Marco del botón de encendido",
         "equipo_marca": "HP",
@@ -16664,7 +16678,7 @@ guias = [
     {
         "titulo": "Reemplazo de bisagra en Acer Aspire One A150-1672",
         "descripcion": "Guía para reemplazar la bisagra en Acer Aspire One A150-1672.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+A150-1672+Hinge+Replacement/74868",
         "tipo_servicio": "Bisagra",
         "equipo_marca": "Acer",
@@ -16673,7 +16687,7 @@ guias = [
     {
         "titulo": "Reemplazo de reproductor de CD en HP G60T-600 CTO",
         "descripcion": "Guía para reemplazar el reproductor de CD en HP G60T-600 CTO.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+G60T-600+CTO+CD+Player+Replacement/74871",
         "tipo_servicio": "Reproductor de CD",
         "equipo_marca": "HP",
@@ -16682,7 +16696,7 @@ guias = [
     {
         "titulo": "Reemplazo de reposamuñecas en Dell Inspiron M5110",
         "descripcion": "Guía para reemplazar el reposamuñecas en Dell Inspiron M5110.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+M5110+Palmrest+Replacement/74880",
         "tipo_servicio": "Reposamuñecas",
         "equipo_marca": "Dell",
@@ -16691,7 +16705,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta WiFi en HP Compaq 2510p",
         "descripcion": "Guía para reemplazar la tarjeta WiFi en HP Compaq 2510p.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+2510p+WiFi+Card+Replacement/74888",
         "tipo_servicio": "Tarjeta WiFi",
         "equipo_marca": "HP",
@@ -16700,7 +16714,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta RAM en HP Pavilion dv6500",
         "descripcion": "Guía para reemplazar la tarjeta RAM en HP Pavilion dv6500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6500+RAM+Card+Replacement/74918",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -16709,7 +16723,7 @@ guias = [
     {
         "titulo": "Reemplazo de panel táctil en HP Pavilion dv6500",
         "descripcion": "Guía para reemplazar el panel táctil en HP Pavilion dv6500.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv6500+Touchpad+Replacement/74974",
         "tipo_servicio": "Panel táctil",
         "equipo_marca": "HP",
@@ -16718,7 +16732,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Gateway NV53A24u",
         "descripcion": "Guía para reemplazar el ventilador en Gateway NV53A24u.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Gateway+NV53A24u+Fan+Replacement/75032",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Gateway",
@@ -16727,7 +16741,7 @@ guias = [
     {
         "titulo": "Reemplazo de barra de audio y encendido en HP Compaq 2510p",
         "descripcion": "Guía para reemplazar la barra de audio y encendido en HP Compaq 2510p.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+2510p+Power-audio+bar+Replacement/75037",
         "tipo_servicio": "Barra de audio y encendido",
         "equipo_marca": "HP",
@@ -16736,7 +16750,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoz en Samsung NP-N102S-B05PH",
         "descripcion": "Guía para reemplazar el altavoz en Samsung NP-N102S-B05PH.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N102S-B05PH+Speaker+Replacement/75039",
         "tipo_servicio": "Altavoz",
         "equipo_marca": "Samsung",
@@ -16745,7 +16759,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería CMOS en Acer Aspire 5742",
         "descripcion": "Guía para reemplazar la batería CMOS en Acer Aspire 5742.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5742+CMOS+Battery+Replacement/75160",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Acer",
@@ -16754,7 +16768,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Pavilion G7-2235DX",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion G7-2235DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+G7-2235DX+Fan++Replacement/75242",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -16763,7 +16777,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en HP Pavilion G7-2235DX",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavilion G7-2235DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+G7-2235DX+Screen+Replacement/75243",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -16772,7 +16786,7 @@ guias = [
     {
         "titulo": "Reemplazo del reposamuñecas en Dell Chromebook 11 CB1C13",
         "descripcion": "Guía para reemplazar el reposamuñecas en Dell Chromebook 11 CB1C13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Chromebook+11+CB1C13+Palmrest+Replacement/75480",
         "tipo_servicio": "Reposamuñecas",
         "equipo_marca": "Dell",
@@ -16781,7 +16795,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD M.2 en Microsoft Surface Studio",
         "descripcion": "Guía para reemplazar la SSD M.2 en Microsoft Surface Studio.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Surface+Studio+M.2+SSD+Replacement/75600",
         "tipo_servicio": "SSD M.2",
         "equipo_marca": "Microsoft",
@@ -16790,7 +16804,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro de 2.5 pulgadas en Microsoft Surface Studio",
         "descripcion": "Guía para reemplazar el disco duro de 2.5 pulgadas en Microsoft Surface Studio.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Surface+Studio+2.5-Inch+Hard+Drive+Replacement/75605",
         "tipo_servicio": "Disco duro de 2.5\"",
         "equipo_marca": "Microsoft",
@@ -16799,7 +16813,7 @@ guias = [
     {
         "titulo": "Reemplazo de la fuente de alimentación en Microsoft Surface Studio",
         "descripcion": "Guía para reemplazar la fuente de alimentación en Microsoft Surface Studio.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Surface+Studio+Power+Supply+Unit+Replacement/75662",
         "tipo_servicio": "Fuente de alimentación",
         "equipo_marca": "Microsoft",
@@ -16808,7 +16822,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en Microsoft Surface Studio",
         "descripcion": "Guía para reemplazar la placa madre en Microsoft Surface Studio.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Surface+Studio+Motherboard+Replacement/75668",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Microsoft",
@@ -16817,7 +16831,7 @@ guias = [
     {
         "titulo": "Reemplazo de memoria en Acer Aspire 5742G",
         "descripcion": "Guía para reemplazar la memoria en Acer Aspire 5742G.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5742G+Memory+stick+Replacement/76009",
         "tipo_servicio": "Memoria",
         "equipo_marca": "Acer",
@@ -16826,7 +16840,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD en Dell XPS 13",
         "descripcion": "Guía para reemplazar la SSD en Dell XPS 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+SSD+Replacement/76058",
         "tipo_servicio": "SSD",
         "equipo_marca": "Dell",
@@ -16835,7 +16849,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Dell XPS 13",
         "descripcion": "Guía para reemplazar la batería en Dell XPS 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+Battery+Replacement/76060",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -16844,7 +16858,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta inalámbrica en Dell XPS 13",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Dell XPS 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+Wireless+Card+Replacement/76062",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Dell",
@@ -16853,7 +16867,7 @@ guias = [
     {
         "titulo": "Reemplazo del cable LCD roto en Asus K75VM",
         "descripcion": "Guía para reemplazar el cable LCD roto en Asus K75VM.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/asus+laptop+k75vm+replacing+the+broken+lcd+cable+Replacement/76071",
         "tipo_servicio": "Cable LCD",
         "equipo_marca": "Asus",
@@ -16862,7 +16876,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla LCD en Dell Chromebook 11 Modelo P22T",
         "descripcion": "Guía para reemplazar la pantalla LCD en Dell Chromebook 11 Modelo P22T.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Chromebook+11+Model+P22T+LCD+screen+Replacement/76251",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Dell",
@@ -16871,7 +16885,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro sólido en HP Pavilion 14-c015dx Chromebook",
         "descripcion": "Guía para reemplazar el disco duro sólido en HP Pavilion 14-c015dx Chromebook.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-c015dx+Chromebook+Solid+State+Hard+Drive+Replacement/77151",
         "tipo_servicio": "Disco duro sólido",
         "equipo_marca": "HP",
@@ -16880,7 +16894,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Acer Chromebook CB3-111-C8UB",
         "descripcion": "Guía para reemplazar la pantalla en Acer Chromebook CB3-111-C8UB.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C8UB+Screen+Replacement/77155",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -16889,7 +16903,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Pavilion 14-c015dx Chromebook",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion 14-c015dx Chromebook.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-c015dx+Chromebook+Fan+Replacement/77180",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -16898,7 +16912,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en HP Pavilion 14-c015dx Chromebook",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion 14-c015dx Chromebook.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-c015dx+Chromebook+Keyboard+Replacement/77181",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -16907,7 +16921,7 @@ guias = [
     {
         "titulo": "Reemplazo del jack de audífonos en HP Pavilion 14-c015dx Chromebook",
         "descripcion": "Guía para reemplazar el jack de audífonos en HP Pavilion 14-c015dx Chromebook.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+14-c015dx+Chromebook+Headphone+Jack+Replacement/77182",
         "tipo_servicio": "Jack de audífonos",
         "equipo_marca": "HP",
@@ -16916,7 +16930,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar la batería en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+Battery+Replacement/77265",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -16925,7 +16939,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+Keyboard+Replacement/77270",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -16934,7 +16948,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+Hard+Drive+Replacement/77271",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -16943,7 +16957,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta inalámbrica en HP 15-d076nr",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en HP 15-d076nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+15-d076nr+Wireless+Card+Replacement/77302",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "HP",
@@ -16952,7 +16966,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus X5511M-RCLN03",
         "descripcion": "Guía para reemplazar la batería en Asus X5511M-RCLN03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X5511M-RCLN03+Battery+Replacement/77303",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -16961,7 +16975,7 @@ guias = [
     {
         "titulo": "Reemplazo de la memoria RAM en HP 15-d076nr",
         "descripcion": "Guía para reemplazar la memoria RAM en HP 15-d076nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+15-d076nr+RAM+Replacement/77306",
         "tipo_servicio": "Memoria RAM",
         "equipo_marca": "HP",
@@ -16970,7 +16984,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería CMOS en Toshiba Satellite C55Dt-A5306",
         "descripcion": "Guía para reemplazar la batería CMOS en Toshiba Satellite C55Dt-A5306.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55Dt-A5306+CMOS+Battery+Replacement/77307",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Toshiba",
@@ -16979,7 +16993,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en HP Envy dv7",
         "descripcion": "Guía para reemplazar el disco duro en HP Envy dv7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+dv7+Hard+Drive++Replacement/77326",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "HP",
@@ -16988,7 +17002,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Alienware 17 R3",
         "descripcion": "Guía para reemplazar la batería en Alienware 17 R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Alienware+17+R3+Battery+Replacement/77371",
         "tipo_servicio": "Batería",
         "equipo_marca": "Alienware",
@@ -16997,7 +17011,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus G501JW-BHI7N12",
         "descripcion": "Guía para reemplazar la batería en Asus G501JW-BHI7N12.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G501JW-BHI7N12+Device+Page+Battery+Replacement/77380",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -17006,7 +17020,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Asus G501JW-BHI7N12",
         "descripcion": "Guía para reemplazar el disco duro en Asus G501JW-BHI7N12.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G501JW-BHI7N12+Device+Page+Hard+Drive+Replacement/77382",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Asus",
@@ -17015,7 +17029,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en HP 15-d076nr",
         "descripcion": "Guía para reemplazar la placa madre en HP 15-d076nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+15-d076nr+Motherboard+Replacement/77402",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -17024,7 +17038,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto de carga en HP 15-d076nr",
         "descripcion": "Guía para reemplazar el puerto de carga en HP 15-d076nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+15-d076nr+Charge+Port+Replacement/77406",
         "tipo_servicio": "Puerto de carga",
         "equipo_marca": "HP",
@@ -17033,7 +17047,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces integrados en HP 15-d076nr",
         "descripcion": "Guía para reemplazar los altavoces integrados en HP 15-d076nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+15-d076nr+Onboard+Speakers+Replacement/77407",
         "tipo_servicio": "Altavoces integrados",
         "equipo_marca": "HP",
@@ -17042,7 +17056,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Acer Chromebook CB3-111-C8UB",
         "descripcion": "Guía para reemplazar la batería en Acer Chromebook CB3-111-C8UB.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C8UB+Battery+Replacement/77445",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -17051,7 +17065,7 @@ guias = [
     {
         "titulo": "Reemplazo del touchpad en Acer Chromebook CB3-111-C8UB",
         "descripcion": "Guía para reemplazar el touchpad en Acer Chromebook CB3-111-C8UB.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C8UB+Touchpad+Replacement/77446",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Acer",
@@ -17060,7 +17074,7 @@ guias = [
     {
         "titulo": "Extracción del panel trasero en Acer Chromebook CB3-111-C8UB",
         "descripcion": "Guía para extraer el panel trasero en Acer Chromebook CB3-111-C8UB.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C8UB+Back+Panel+Removal/77447",
         "tipo_servicio": "Panel trasero",
         "equipo_marca": "Acer",
@@ -17069,7 +17083,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+Fan+Replacement/77455",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -17078,7 +17092,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar los altavoces en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+Speakers+Replacement/77456",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -17087,7 +17101,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+Display+Replacement/77457",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -17096,7 +17110,7 @@ guias = [
     {
         "titulo": "Reemplazo de la placa madre en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar la placa madre en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+System+Board+Replacement/77458",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -17105,7 +17119,7 @@ guias = [
     {
         "titulo": "Reemplazo del protector del puerto USB en HP Pavilion x360 m3-u001dx",
         "descripcion": "Guía para reemplazar el protector del puerto USB en HP Pavilion x360 m3-u001dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+x360+m3-u001dx+USB+Port+Shield++Replacement/77460",
         "tipo_servicio": "Protector de puerto USB",
         "equipo_marca": "HP",
@@ -17114,7 +17128,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en Asus Zenbook UX31E",
         "descripcion": "Guía para reemplazar los altavoces en Asus Zenbook UX31E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX31E+Speaker+Replacement/77578",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Asus",
@@ -17123,7 +17137,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Toshiba Satellite L305-S5955",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Toshiba Satellite L305-S5955.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L305-S5955+Wireless+Card+Replacement/77579",
         "tipo_servicio": "Tarjeta inalámbrica",
         "equipo_marca": "Toshiba",
@@ -17132,7 +17146,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Toshiba Satellite L305-S5955",
         "descripcion": "Guía para reemplazar el ventilador en Toshiba Satellite L305-S5955.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+L305-S5955+Fan+Replacement/77582",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Toshiba",
@@ -17141,7 +17155,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Alienware 17 R3",
         "descripcion": "Guía para reemplazar la memoria RAM en Alienware 17 R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Alienware+17+R3+RAM+Replacement/77588",
         "tipo_servicio": "RAM",
         "equipo_marca": "Alienware",
@@ -17150,7 +17164,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Alienware 17 R3",
         "descripcion": "Guía para reemplazar el disco duro en Alienware 17 R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Alienware+17+R3+Hard+Drive+Replacement/77590",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Alienware",
@@ -17159,7 +17173,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla en Alienware 17 R3",
         "descripcion": "Guía para reemplazar la pantalla en Alienware 17 R3.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Alienware+17+R3+Display+Replacement/77591",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Alienware",
@@ -17168,7 +17182,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD en Asus Zenbook UX31E",
         "descripcion": "Guía para reemplazar el SSD en Asus Zenbook UX31E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX31E+SSD+Replacement/77592",
         "tipo_servicio": "SSD",
         "equipo_marca": "Asus",
@@ -17177,7 +17191,7 @@ guias = [
     {
         "titulo": "Apertura del Asus Zenbook UX31E",
         "descripcion": "Guía para abrir el Asus Zenbook UX31E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/How+to+open+the+Asus+Zenbook+UX31E/77593",
         "tipo_servicio": "Cubierta trasera",
         "equipo_marca": "Asus",
@@ -17186,7 +17200,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus Zenbook UX31E",
         "descripcion": "Guía para reemplazar la batería en Asus Zenbook UX31E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX31E+Battery+Replacement/77596",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -17195,7 +17209,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de refrigeración en Asus G501JW-BHI7N12",
         "descripcion": "Guía para reemplazar el ventilador de refrigeración en Asus G501JW-BHI7N12.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G501JW-BHI7N12+Device+Page+Cooling+Fan+Replacement/77599",
         "tipo_servicio": "Ventilador de refrigeración",
         "equipo_marca": "Asus",
@@ -17204,7 +17218,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta Wifi en Asus G501JW-BHI7N12",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Asus G501JW-BHI7N12.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G501JW-BHI7N12+Device+Page+Wifi+Card+Replacement/77600",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Asus",
@@ -17213,7 +17227,7 @@ guias = [
     {
         "titulo": "Extracción del panel del teclado en Asus X502C-RB01",
         "descripcion": "Guía para extraer el panel del teclado en Asus X502C-RB01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X502C-RB01+Keyboard+Panel+Removal/77656",
         "tipo_servicio": "Panel del teclado",
         "equipo_marca": "Asus",
@@ -17222,7 +17236,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Sony Vaio PCG-71312l",
         "descripcion": "Guía para reemplazar el teclado en Sony Vaio PCG-71312l.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-71312l+Keyboard+Replacement/77661",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Sony",
@@ -17231,7 +17245,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador de refrigeración en Sony Vaio PCG-71312l",
         "descripcion": "Guía para reemplazar el ventilador de refrigeración en Sony Vaio PCG-71312l.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-71312l+Cooling+Fan+Replacement/77662",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Sony",
@@ -17240,7 +17254,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta madre en Asus X502C-RB01",
         "descripcion": "Guía para reemplazar la tarjeta madre en Asus X502C-RB01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X502C-RB01+Motherboard+Replacement/77663",
         "tipo_servicio": "Tarjeta madre",
         "equipo_marca": "Asus",
@@ -17249,7 +17263,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta Wifi en Sony Vaio PCG-71312l",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Sony Vaio PCG-71312l.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-71312l+Wifi+Card+Replacement/77664",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Sony",
@@ -17258,7 +17272,7 @@ guias = [
     {
         "titulo": "Reemplazo de la tarjeta de audio en Sony Vaio PCG-71312l",
         "descripcion": "Guía para reemplazar la tarjeta de audio en Sony Vaio PCG-71312l.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-71312l+Audio+Card+Replacement/77669",
         "tipo_servicio": "Tarjeta de audio",
         "equipo_marca": "Sony",
@@ -17267,7 +17281,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Lenovo IdeaPad 300-17ISK",
         "descripcion": "Guía para reemplazar el disco duro en Lenovo IdeaPad 300-17ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+300-17ISK+Hard+Drive+Replacement/77686",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Lenovo",
@@ -17276,7 +17290,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad óptica en Lenovo IdeaPad 300-17ISK",
         "descripcion": "Guía para reemplazar la unidad óptica en Lenovo IdeaPad 300-17ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+300-17ISK+Optical+Drive+Replacement/77689",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "Lenovo",
@@ -17285,7 +17299,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Asus Zenbook UX31E",
         "descripcion": "Guía para reemplazar el ventilador en Asus Zenbook UX31E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX31E+Fan+Replacement/77692",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -17294,7 +17308,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Lenovo IdeaPad 300-17ISK",
         "descripcion": "Guía para reemplazar el teclado en Lenovo IdeaPad 300-17ISK.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+300-17ISK+Keyboard+Replacement/77697",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -17303,7 +17317,7 @@ guias = [
     {
         "titulo": "Reemplazo de la pantalla LCD en Asus Zenbook UX31E",
         "descripcion": "Guía para reemplazar la pantalla LCD en Asus Zenbook UX31E.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Zenbook+UX31E+LCD+Screen+Replacement/77724",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Asus",
@@ -17312,7 +17326,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad óptica en ASUS Q400A-BHI7N03",
         "descripcion": "Guía para reemplazar la unidad óptica en ASUS Q400A-BHI7N03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Q400A-BHI7N03+Optical+Drive+Replacement/77737",
         "tipo_servicio": "Unidad óptica",
         "equipo_marca": "Asus",
@@ -17321,7 +17335,7 @@ guias = [
     {
         "titulo": "Reemplazo de la memoria RAM en ASUS Q400A-BHI7N03",
         "descripcion": "Guía para reemplazar la memoria RAM en ASUS Q400A-BHI7N03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Q400A-BHI7N03+RAM+Replacement/77747",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -17330,7 +17344,7 @@ guias = [
     {
         "titulo": "Reemplazo de la batería en Chromebook 15 CB3-531-C4A5",
         "descripcion": "Guía para reemplazar la batería en Chromebook 15 CB3-531-C4A5.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+15+CB3-531-C4A5+Battery+Replacement/77788",
         "tipo_servicio": "Batería",
         "equipo_marca": "Acer",
@@ -17339,7 +17353,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Asus X502C-RB01",
         "descripcion": "Guía para reemplazar el disco duro en Asus X502C-RB01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X502C-RB01+Hard+Drive+Replacement/77798",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Asus",
@@ -17348,7 +17362,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Asus X502C-RB01",
         "descripcion": "Guía para reemplazar el ventilador en Asus X502C-RB01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X502C-RB01+Fan+Replacement/77802",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -17357,7 +17371,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en Asus G73JH-RBBX05",
         "descripcion": "Guía para reemplazar el teclado en Asus G73JH-RBBX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G73JH-RBBX05+Keyboard+Replacement/77823",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -17366,7 +17380,7 @@ guias = [
     {
         "titulo": "Reemplazo del disco duro en Asus G73JH-RBBX05",
         "descripcion": "Guía para reemplazar el disco duro en Asus G73JH-RBBX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G73JH-RBBX05+Hard+Drive+Replacement/77825",
         "tipo_servicio": "Disco duro",
         "equipo_marca": "Asus",
@@ -17375,7 +17389,7 @@ guias = [
     {
         "titulo": "Reemplazo de la memoria RAM en Asus G73JH-RBBX05",
         "descripcion": "Guía para reemplazar la memoria RAM en Asus G73JH-RBBX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G73JH-RBBX05+RAM+Replacement/77826",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -17384,7 +17398,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Asus G73JH-RBBX05",
         "descripcion": "Guía para reemplazar el ventilador en Asus G73JH-RBBX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+G73JH-RBBX05+Fan+Replacement/77827",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Asus",
@@ -17393,7 +17407,7 @@ guias = [
     {
         "titulo": "Reemplazo del teclado en IdeaPad Yoga 13",
         "descripcion": "Guía para reemplazar el teclado en IdeaPad Yoga 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IdeaPad+Yoga+13+Keyboard+Replacement/77904",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -17402,7 +17416,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Samsung NP-N145-JP02US",
         "descripcion": "Guía para reemplazar el ventilador en Samsung NP-N145-JP02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N145-JP02US+Fan+Replacement/77972",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -17411,7 +17425,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador/disipador en Toshiba Satellite C55Dt-A5306",
         "descripcion": "Guía para reemplazar el ventilador y disipador en Toshiba Satellite C55Dt-A5306.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55Dt-A5306++Fan+Replacement/78009",
         "tipo_servicio": "Ventilador/Disipador",
         "equipo_marca": "Toshiba",
@@ -17420,7 +17434,7 @@ guias = [
     {
         "titulo": "Reemplazo de la cubierta trasera en Toshiba Satellite C55Dt-A5306",
         "descripcion": "Guía para reemplazar la cubierta trasera en Toshiba Satellite C55Dt-A5306.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55Dt-A5306+Back+Cover+Replacement/78010",
         "tipo_servicio": "Cubierta Trasera",
         "equipo_marca": "Toshiba",
@@ -17429,7 +17443,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto de energía en Toshiba Satellite C55Dt-A5306",
         "descripcion": "Guía para reemplazar el puerto de energía en Toshiba Satellite C55Dt-A5306.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55Dt-A5306+DC+Power+Jack+Replacement/78013",
         "tipo_servicio": "Puerto de Energía",
         "equipo_marca": "Toshiba",
@@ -17438,7 +17452,7 @@ guias = [
     {
         "titulo": "Reemplazo de la unidad de disco en Toshiba Satellite C55Dt-A5306",
         "descripcion": "Guía para reemplazar la unidad de disco en Toshiba Satellite C55Dt-A5306.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55Dt-A5306+Disc+Drive+Replacement/78014",
         "tipo_servicio": "Unidad de Disco",
         "equipo_marca": "Toshiba",
@@ -17447,7 +17461,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel superior en Dell Inspiron 14z N114z",
         "descripcion": "Guía para reemplazar el panel superior en Dell Inspiron 14z N114z.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z+N114z+Top+Panel+Replacement/78024",
         "tipo_servicio": "Panel Superior",
         "equipo_marca": "Dell",
@@ -17456,7 +17470,7 @@ guias = [
     {
         "titulo": "Reemplazo de la carcasa trasera en Toshiba Satellite P55t-A5116",
         "descripcion": "Guía para reemplazar la carcasa trasera en Toshiba Satellite P55t-A5116.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55t-A5116+Back+Casing+Replacement/78027",
         "tipo_servicio": "Carcasa Trasera",
         "equipo_marca": "Toshiba",
@@ -17465,7 +17479,7 @@ guias = [
     {
         "titulo": "Reemplazo del ventilador en Dell Inspiron 14z N114z",
         "descripcion": "Guía para reemplazar el ventilador en Dell Inspiron 14z N114z.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z+N114z+fan+Replacement/78029",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -17474,7 +17488,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en ASUS U46E-RAL7",
         "descripcion": "Guía para reemplazar la pantalla en ASUS U46E-RAL7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U46E-RAL7+Screen+Replacement/78030",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "ASUS",
@@ -17483,7 +17497,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Toshiba Satellite P55t-A5116",
         "descripcion": "Guía para reemplazar la batería en Toshiba Satellite P55t-A5116.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55t-A5116+Battery+Replacement/78031",
         "tipo_servicio": "Batería",
         "equipo_marca": "Toshiba",
@@ -17492,7 +17506,7 @@ guias = [
     {
         "titulo": "Reemplazo de memoria/RAM en Dell Inspiron 14z N114z",
         "descripcion": "Guía para reemplazar la memoria RAM en Dell Inspiron 14z N114z.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z+N114z++Memory-RAM+Replacement/78032",
         "tipo_servicio": "Memoria/RAM",
         "equipo_marca": "Dell",
@@ -17501,7 +17515,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en Dell Studio 1558",
         "descripcion": "Guía para reemplazar el ventilador en Dell Studio 1558.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Studio+1558+Fan+Replacement/78145",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -17510,7 +17524,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Acer Aspire 5750-6667",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire 5750-6667.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5750-6667+Keyboard+Replacement/78160",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -17519,7 +17533,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad óptica en Acer Aspire 5750-6667",
         "descripcion": "Guía para reemplazar la unidad óptica en Acer Aspire 5750-6667.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5750-6667+Optical+Drive+Replacement/78170",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Acer",
@@ -17528,7 +17542,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Acer Aspire One 532h-2806",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire One 532h-2806.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+532h-2806+Screen+Replacement/78222",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -17537,7 +17551,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Satellite P55t-A5116",
         "descripcion": "Guía para reemplazar la memoria RAM en Toshiba Satellite P55t-A5116.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55t-A5116+RAM++Replacement/78223",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -17546,7 +17560,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador y enfriador de CPU en Toshiba Satellite P55t-A5116",
         "descripcion": "Guía para reemplazar el ventilador y el enfriador de CPU en Toshiba Satellite P55t-A5116.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55t-A5116+Fan+%26+CPU+Cooler+Replacement/78229",
         "tipo_servicio": "Ventilador y Enfriador de CPU",
         "equipo_marca": "Toshiba",
@@ -17555,7 +17569,7 @@ guias = [
     {
         "titulo": "Reemplazo del puerto de energía en Toshiba Satellite P55t-A5116",
         "descripcion": "Guía para reemplazar el puerto de energía en Toshiba Satellite P55t-A5116.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55t-A5116+Power+Jack+Replacement/78230",
         "tipo_servicio": "Puerto de Energía",
         "equipo_marca": "Toshiba",
@@ -17564,7 +17578,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Toshiba Satellite P55t-A5116",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Satellite P55t-A5116.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55t-A5116+Keyboard+Replacement/78231",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -17573,7 +17587,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en Asus X751L",
         "descripcion": "Guía para reemplazar el teclado en Asus X751L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X751L+Keyboard+Replacement/78237",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -17582,7 +17596,7 @@ guias = [
     {
         "titulo": "Reemplazo de conector de audio en Acer Chromebook CB3-111-C8UB",
         "descripcion": "Guía para reemplazar el conector de audio en Acer Chromebook CB3-111-C8UB.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Chromebook+CB3-111-C8UB+Audio+Jack+Replacement/78411",
         "tipo_servicio": "Conector de Audio",
         "equipo_marca": "Acer",
@@ -17591,7 +17605,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en Samsung NP-N145-JP02US",
         "descripcion": "Guía para reemplazar la pantalla en Samsung NP-N145-JP02US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-N145-JP02US+Screen+Replacement/78415",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -17600,7 +17614,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería CMOS en Asus X502C-RB01",
         "descripcion": "Guía para reemplazar la batería CMOS en Asus X502C-RB01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X502C-RB01+CMOS+Battery+Replacement/78421",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Asus",
@@ -17609,7 +17623,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta de red en Asus X502C-RB01",
         "descripcion": "Guía para reemplazar la tarjeta de red en Asus X502C-RB01.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X502C-RB01+Network+Card+Replacement/78422",
         "tipo_servicio": "Tarjeta de Red",
         "equipo_marca": "Asus",
@@ -17618,7 +17632,7 @@ guias = [
     {
         "titulo": "Reemplazo de tarjeta inalámbrica en Asus Q501LA-BBI6T03",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Asus Q501LA-BBI6T03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Q501LA-BBI6T03+Wireless+Card+Replacement/78464",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Asus",
@@ -17627,7 +17641,7 @@ guias = [
     {
         "titulo": "Reemplazo de tapa trasera en Asus Q501LA-BBI6T03",
         "descripcion": "Guía para reemplazar la tapa trasera en Asus Q501LA-BBI6T03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Q501LA-BBI6T03+Back+Panel+Replacement/78465",
         "tipo_servicio": "Tapa Trasera",
         "equipo_marca": "Asus",
@@ -17636,7 +17650,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro (HDD) en ACER Aspire E1-572-6870",
         "descripcion": "Guía para reemplazar el disco duro (HDD) en ACER Aspire E1-572-6870.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ACER+Aspire+E1-572-6870+Hard+Drive+%28HDD%29+Replacement/78466",
         "tipo_servicio": "Disco Duro (HDD)",
         "equipo_marca": "ACER",
@@ -17645,7 +17659,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus Q501LA-BBI6T03",
         "descripcion": "Guía para reemplazar la batería en Asus Q501LA-BBI6T03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Q501LA-BBI6T03+Battery+Replacement/78467",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -17654,7 +17668,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en Asus Q501LA-BBI6T03",
         "descripcion": "Guía para reemplazar el disco duro en Asus Q501LA-BBI6T03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Q501LA-BBI6T03+Hard+Drive+Replacement/78469",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -17663,7 +17677,7 @@ guias = [
     {
         "titulo": "Desmontaje de disipador de calor en Asus Q501LA-BBI6T03",
         "descripcion": "Guía para desmontar el disipador de calor en Asus Q501LA-BBI6T03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Q501LA-BBI6T03+Heat+Sink+Disassembly/78470",
         "tipo_servicio": "Disipador de Calor/Ventilador",
         "equipo_marca": "Asus",
@@ -17672,7 +17686,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus Q501LA-BBI6T03",
         "descripcion": "Guía para reemplazar la memoria RAM en Asus Q501LA-BBI6T03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Q501LA-BBI6T03+RAM+Replacement/78472",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -17681,7 +17695,7 @@ guias = [
     {
         "titulo": "Reemplazo de teclado en ACER Aspire E1-572-6870",
         "descripcion": "Guía para reemplazar el teclado en ACER Aspire E1-572-6870.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ACER+Aspire+E1-572-6870+Keyboard+Replacement/78476",
         "tipo_servicio": "Teclado",
         "equipo_marca": "ACER",
@@ -17690,7 +17704,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en ACER Aspire E1-572-6870",
         "descripcion": "Guía para reemplazar la pantalla en ACER Aspire E1-572-6870.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ACER+Aspire+E1-572-6870+Screen+Replacement/78541",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "ACER",
@@ -17699,7 +17713,7 @@ guias = [
     {
         "titulo": "Desmontaje del ASUS ROG G75VX-BHI7N11",
         "descripcion": "Guía para desmontar el ASUS ROG G75VX-BHI7N11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+ROG+G75VX-BHI7N11+Disassembly/78544",
         "tipo_servicio": "Desmontaje",
         "equipo_marca": "Asus",
@@ -17708,7 +17722,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventiladores en ASUS ROG G75VX-BHI7N11",
         "descripcion": "Guía para reemplazar los ventiladores en ASUS ROG G75VX-BHI7N11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+ROG+G75VX-BHI7N11+Fans+Replacement/78546",
         "tipo_servicio": "Ventiladores",
         "equipo_marca": "Asus",
@@ -17717,7 +17731,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel de acceso inferior en Acer Aspire 5750-6667",
         "descripcion": "Guía para reemplazar el panel de acceso inferior en Acer Aspire 5750-6667.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5750-6667+Bottom+Access+Panel+Replacement/78549",
         "tipo_servicio": "Panel Inferior",
         "equipo_marca": "Acer",
@@ -17726,7 +17740,7 @@ guias = [
     {
         "titulo": "Reemplazo de altavoces en ASUS ROG G75VX-BHI7N11",
         "descripcion": "Guía para reemplazar los altavoces en ASUS ROG G75VX-BHI7N11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+ROG+G75VX-BHI7N11+Speakers+Replacement/78550",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Asus",
@@ -17735,7 +17749,7 @@ guias = [
     {
         "titulo": "Reemplazo de chip de comunicación inalámbrica en ASUS ROG G75VX-BHI7N11",
         "descripcion": "Guía para reemplazar el chip de comunicación inalámbrica en ASUS ROG G75VX-BHI7N11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+ROG+G75VX-BHI7N11+Wireless+Communication+Chip+Replacement/78552",
         "tipo_servicio": "Chip Inalámbrico",
         "equipo_marca": "Asus",
@@ -17744,7 +17758,7 @@ guias = [
     {
         "titulo": "Reemplazo de memoria en Acer Aspire 5750-6667",
         "descripcion": "Guía para reemplazar la memoria RAM en Acer Aspire 5750-6667.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+5750-6667+Memory+Replacement/78554",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -17753,7 +17767,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla LCD en ASUS ROG G75VX-BHI7N11",
         "descripcion": "Guía para reemplazar la pantalla LCD en ASUS ROG G75VX-BHI7N11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+ROG+G75VX-BHI7N11+LCD+Screen+Replacement/78556",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Asus",
@@ -17762,7 +17776,7 @@ guias = [
     {
         "titulo": "Reemplazo de módulos RAM en ASUS ROG G75VX-BHI7N11",
         "descripcion": "Guía para reemplazar los módulos de memoria RAM en ASUS ROG G75VX-BHI7N11.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+ROG+G75VX-BHI7N11+RAM+Modules+Replacement/78562",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -17771,7 +17785,7 @@ guias = [
     {
         "titulo": "Reemplazo de ventilador en HP Pavilion G60-235DX",
         "descripcion": "Guía para reemplazar el ventilador en HP Pavilion G60-235DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+G60-235DX+Fan+Replacement/78575",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -17780,7 +17794,7 @@ guias = [
     {
         "titulo": "Reemplazo de pantalla en HP Pavilion G60-235DX",
         "descripcion": "Guía para reemplazar la pantalla en HP Pavilion G60-235DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+G60-235DX+Screen+Replacement/78577",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "HP",
@@ -17789,7 +17803,7 @@ guias = [
     {
         "titulo": "Reemplazo de disco duro en HP Omen 15-ax280nd",
         "descripcion": "Guía para reemplazar el disco duro en HP Omen 15-ax280nd.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Omen+15-ax280nd+Hard+Drive+Replacement/78582",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -17798,7 +17812,7 @@ guias = [
     {
         "titulo": "Reemplazo de batería en Asus X751L",
         "descripcion": "Guía para reemplazar la batería en Asus X751L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X751L+Battery+Replacement/78584",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -17807,7 +17821,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Satellite C75D-A7370",
         "descripcion": "Guía para reemplazar la memoria RAM en Toshiba Satellite C75D-A7370.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C75D-A7370+RAM+Replacement/78587",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -17816,7 +17830,7 @@ guias = [
     {
         "titulo": "Reemplazo del panel de acceso posterior en Toshiba Satellite C75D-A7370",
         "descripcion": "Guía para reemplazar el panel de acceso posterior en Toshiba Satellite C75D-A7370.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C75D-A7370+Back+Access+Panel+Replacement/78588",
         "tipo_servicio": "Panel Posterior",
         "equipo_marca": "Toshiba",
@@ -17825,7 +17839,7 @@ guias = [
     {
         "titulo": "Reemplazo de unidad de disco óptico en Toshiba Satellite C75D-A7370",
         "descripcion": "Guía para reemplazar la unidad de disco óptico en Toshiba Satellite C75D-A7370.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C75D-A7370+Optical+Disk+Drive+Replacement/78593",
         "tipo_servicio": "Unidad de Disco Óptico",
         "equipo_marca": "Toshiba",
@@ -17834,7 +17848,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en ASUS UX50V-RX05",
         "descripcion": "Guía para reemplazar el disco duro en ASUS UX50V-RX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+UX50V-RX05+Hard+Drive+Replacement/78596",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -17843,7 +17857,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Dell Inspiron 14z N114z",
         "descripcion": "Guía para reemplazar los altavoces en Dell Inspiron 14z N114z.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z+N114z+Speaker+Replacement/78608",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -17852,7 +17866,7 @@ guias = [
     {
         "titulo": "Reemplazo de Touch-Pad en Dell Inspiron 14z N114z",
         "descripcion": "Guía para reemplazar el touch-pad en Dell Inspiron 14z N114z.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+14z+N114z+Touch-pad+Replacement/78610",
         "tipo_servicio": "Touch-Pad",
         "equipo_marca": "Dell",
@@ -17861,7 +17875,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa de Audio en ASUS U46E-RAL7",
         "descripcion": "Guía para reemplazar la placa de audio en ASUS U46E-RAL7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U46E-RAL7+Audio+Board+Replacement/78611",
         "tipo_servicio": "Placa de Audio",
         "equipo_marca": "Asus",
@@ -17870,7 +17884,7 @@ guias = [
     {
         "titulo": "Guía de Remoción del Panel Posterior en ASUS U46E-RAL7",
         "descripcion": "Guía para remover el panel posterior en ASUS U46E-RAL7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U46E-RAL7+Back+Panel+Removal+Guide/78614",
         "tipo_servicio": "Panel Posterior",
         "equipo_marca": "Asus",
@@ -17879,7 +17893,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad Óptica en Asus X5511M-RCLN03",
         "descripcion": "Guía para reemplazar la unidad óptica en Asus X5511M-RCLN03.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X5511M-RCLN03+Optical+Drive+Replacement/78629",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Asus",
@@ -17888,7 +17902,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Asus X751L",
         "descripcion": "Guía para reemplazar la pantalla en Asus X751L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X751L+Screen+Replacement/78738",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -17897,7 +17911,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad de DVD en Asus X751L",
         "descripcion": "Guía para reemplazar la unidad de DVD en Asus X751L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X751L+DVD+Drive+Replacement/78739",
         "tipo_servicio": "Unidad de DVD",
         "equipo_marca": "Asus",
@@ -17906,7 +17920,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en Asus X751L",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Asus X751L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X751L+Wireless+Card+Replacement/78740",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Asus",
@@ -17915,7 +17929,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en HP 15-d076nr",
         "descripcion": "Guía para reemplazar el ventilador en HP 15-d076nr.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+15-d076nr+Fan+Replacement/78741",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "HP",
@@ -17924,7 +17938,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería CMOS en Toshiba Satellite C75D-A7370",
         "descripcion": "Guía para reemplazar la batería CMOS en Toshiba Satellite C75D-A7370.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C75D-A7370+CMOS+Battery+Replacement/78749",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "Toshiba",
@@ -17933,7 +17947,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Toshiba Satellite C75D-A7370",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite C75D-A7370.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C75D-A7370+Hard-Drive+Replacement/78752",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -17942,7 +17956,7 @@ guias = [
     {
         "titulo": "Desensamblado de Toshiba Satellite P55-A5312",
         "descripcion": "Guía para desensamblar Toshiba Satellite P55-A5312.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+P55-A5312+Disassembly/78947",
         "tipo_servicio": "Desensamblado",
         "equipo_marca": "Toshiba",
@@ -17951,7 +17965,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en ASUS U46E-RAL7",
         "descripcion": "Guía para reemplazar la placa madre en ASUS U46E-RAL7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U46E-RAL7+Motherboard+Replacement/79051",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -17960,7 +17974,7 @@ guias = [
     {
         "titulo": "Evaluación de Reparabilidad en Acer Predator 17.3\"",
         "descripcion": "Guía para evaluar la reparabilidad de Acer Predator 17.3\".",
-        "categoria_id": "Evaluación",
+        'categoria_id': categoria_ids['Evaluación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Predator+17.3-Inch+Repairability+Assessment/79132",
         "tipo_servicio": "Evaluación de Reparabilidad",
         "equipo_marca": "Acer",
@@ -17969,7 +17983,7 @@ guias = [
     {
         "titulo": "Evaluación de Reparabilidad en Dell XPS 13",
         "descripcion": "Guía para evaluar la reparabilidad de Dell XPS 13.",
-        "categoria_id": "Evaluación",
+        'categoria_id': categoria_ids['Evaluación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+Repairability+Assessment/79134",
         "tipo_servicio": "Evaluación de Reparabilidad",
         "equipo_marca": "Dell",
@@ -17978,7 +17992,7 @@ guias = [
     {
         "titulo": "Evaluación de Reparabilidad en HP EliteBook 840 G3",
         "descripcion": "Guía para evaluar la reparabilidad de HP EliteBook 840 G3.",
-        "categoria_id": "Evaluación",
+        'categoria_id': categoria_ids['Evaluación'],
         "manual": "https://www.ifixit.com/Guide/HP+EliteBook+840+G3+Repairability+Assessment/79139",
         "tipo_servicio": "Evaluación de Reparabilidad",
         "equipo_marca": "HP",
@@ -17987,7 +18001,7 @@ guias = [
     {
         "titulo": "Evaluación de Reparabilidad en Dell Latitude E5270",
         "descripcion": "Guía para evaluar la reparabilidad de Dell Latitude E5270.",
-        "categoria_id": "Evaluación",
+        'categoria_id': categoria_ids['Evaluación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E5270+Repairability+Assessment/79140",
         "tipo_servicio": "Evaluación de Reparabilidad",
         "equipo_marca": "Dell",
@@ -17996,7 +18010,7 @@ guias = [
     {
         "titulo": "Evaluación de Reparabilidad en LG Gram 15\"",
         "descripcion": "Guía para evaluar la reparabilidad de LG Gram 15\".",
-        "categoria_id": "Evaluación",
+        'categoria_id': categoria_ids['Evaluación'],
         "manual": "https://www.ifixit.com/Guide/LG+Gram+15-Inch+Repairability+Assessment/79142",
         "tipo_servicio": "Evaluación de Reparabilidad",
         "equipo_marca": "LG",
@@ -18005,7 +18019,7 @@ guias = [
     {
         "titulo": "Evaluación de Reparabilidad en Samsung Series 9 15\"",
         "descripcion": "Guía para evaluar la reparabilidad de Samsung Series 9 15\".",
-        "categoria_id": "Evaluación",
+        'categoria_id': categoria_ids['Evaluación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+Series+9+15-Inch+Repairability+Assessment/79143",
         "tipo_servicio": "Evaluación de Reparabilidad",
         "equipo_marca": "Samsung",
@@ -18014,7 +18028,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en ASUS U46E-RAL7",
         "descripcion": "Guía para reemplazar la memoria RAM en ASUS U46E-RAL7.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+U46E-RAL7+RAM+Replacement/79514",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -18023,7 +18037,7 @@ guias = [
     {
         "titulo": "Reemplazo de Módulo de RAM en IdeaPad Yoga 13",
         "descripcion": "Guía para reemplazar el módulo de RAM en IdeaPad Yoga 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IdeaPad+Yoga+13+RAM+Module+Replacement/79683",
         "tipo_servicio": "Módulo de RAM",
         "equipo_marca": "Lenovo",
@@ -18032,7 +18046,7 @@ guias = [
     {
         "titulo": "Reemplazo del Bisel del Teclado en IdeaPad Yoga 13",
         "descripcion": "Guía para reemplazar el bisel del teclado en IdeaPad Yoga 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IdeaPad+Yoga+13+Keyboard+Bezel+Replacement/79690",
         "tipo_servicio": "Bisel del Teclado",
         "equipo_marca": "Lenovo",
@@ -18041,7 +18055,7 @@ guias = [
     {
         "titulo": "Reemplazo de Parlantes en Toshiba Chromebook CB35-A3120",
         "descripcion": "Guía para reemplazar los parlantes en Toshiba Chromebook CB35-A3120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Chromebook+CB35-A3120+Speakers+Replacement/79755",
         "tipo_servicio": "Parlantes",
         "equipo_marca": "Toshiba",
@@ -18050,7 +18064,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en HP Compaq Presario V3000",
         "descripcion": "Guía para reemplazar el teclado en HP Compaq Presario V3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+V3000+Keyboard+Replacement/80011",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -18059,7 +18073,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Dell XPS 13 L321X",
         "descripcion": "Guía para reemplazar el ventilador en Dell XPS 13 L321X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+L321X+Fan+Replacement/80020",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Dell",
@@ -18068,7 +18082,7 @@ guias = [
     {
         "titulo": "Reemplazo del Procesador en HP Envy 17-J013CL",
         "descripcion": "Guía para reemplazar el procesador en HP Envy 17-J013CL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+17-J013CL+Processor+Replacement/80538",
         "tipo_servicio": "Procesador",
         "equipo_marca": "HP",
@@ -18077,7 +18091,7 @@ guias = [
     {
         "titulo": "Extracción de la Carcasa en ASUS UX50V-RX05",
         "descripcion": "Guía para remover la carcasa en ASUS UX50V-RX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+UX50V-RX05+Case+Removal/80663",
         "tipo_servicio": "Carcasa",
         "equipo_marca": "Asus",
@@ -18086,7 +18100,7 @@ guias = [
     {
         "titulo": "Reemplazo del Teclado en HP Pavilion dv7-3065dx",
         "descripcion": "Guía para reemplazar el teclado en HP Pavilion dv7-3065dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv7-3065dx+Keyboard+Replacement/81178",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -18095,7 +18109,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Compaq Presario V3000",
         "descripcion": "Guía para reemplazar la memoria RAM en HP Compaq Presario V3000.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+V3000+RAM+Replacement/82503",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -18104,7 +18118,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Asus Vivobook S500CA",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Asus Vivobook S500CA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+Vivobook+S500CA+Fan+Replacement/82669",
         "tipo_servicio": "Ventilador de enfriamiento",
         "equipo_marca": "Asus",
@@ -18113,7 +18127,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en ASUS Vivobook S500CA",
         "descripcion": "Guía para reemplazar la batería en ASUS Vivobook S500CA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+Vivobook+S500CA+Battery+Replacement/83052",
         "tipo_servicio": "Batería",
         "equipo_marca": "Asus",
@@ -18122,7 +18136,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Chromebook 15 CB3-531-C4A5",
         "descripcion": "Guía para reemplazar la placa madre en Chromebook 15 CB3-531-C4A5.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+15+CB3-531-C4A5+Motherboard+Replacement/83055",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Acer",
@@ -18131,7 +18145,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Chromebook 15 CB3-531-C4A5",
         "descripcion": "Guía para reemplazar la pantalla en Chromebook 15 CB3-531-C4A5.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+15+CB3-531-C4A5++Screen+Replacement/83056",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -18140,7 +18154,7 @@ guias = [
     {
         "titulo": "Reemplazo de Carcasa en Chromebook 15 CB3-531-C4A5",
         "descripcion": "Guía para reemplazar la carcasa en Chromebook 15 CB3-531-C4A5.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+15+CB3-531-C4A5+Case+Replacement/83202",
         "tipo_servicio": "Carcasa",
         "equipo_marca": "Acer",
@@ -18149,7 +18163,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en Chromebook 15 CB3-531-C4A5",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Chromebook 15 CB3-531-C4A5.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+15+CB3-531-C4A5+Wireless+Card+Replacement/83219",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Acer",
@@ -18158,7 +18172,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire One 532h-2806",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire One 532h-2806.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+532h-2806+RAM+Replacement/83223",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -18167,7 +18181,7 @@ guias = [
     {
         "titulo": "Reemplazo de Parlantes en Chromebook 15 CB3-531-C4A5",
         "descripcion": "Guía para reemplazar los parlantes en Chromebook 15 CB3-531-C4A5.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+15+CB3-531-C4A5+Speakers+Replacement/83227",
         "tipo_servicio": "Parlantes",
         "equipo_marca": "Acer",
@@ -18176,7 +18190,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en IdeaPad Yoga 13",
         "descripcion": "Guía para reemplazar el disco duro en IdeaPad Yoga 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IdeaPad+Yoga+13+Hard+Drive+Replacement/83255",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Lenovo",
@@ -18185,7 +18199,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en IdeaPad Yoga 13",
         "descripcion": "Guía para reemplazar la batería en IdeaPad Yoga 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IdeaPad+Yoga+13+Battery+Replacement/83325",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -18194,7 +18208,7 @@ guias = [
     {
         "titulo": "Reemplazo del Módulo WiFi en IdeaPad Yoga 13",
         "descripcion": "Guía para reemplazar el módulo WiFi en IdeaPad Yoga 13.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/IdeaPad+Yoga+13+WiFi+Module+Replacement/84689",
         "tipo_servicio": "Módulo WiFi",
         "equipo_marca": "Lenovo",
@@ -18203,7 +18217,7 @@ guias = [
     {
         "titulo": "Actualización/Reemplazo de Memoria en Dell Latitude E5400",
         "descripcion": "Guía para actualizar o reemplazar la memoria en Dell Latitude E5400.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Latitude+E5400+Memory+Upgrade+-+Replacement/84858",
         "tipo_servicio": "Memoria",
         "equipo_marca": "Dell",
@@ -18212,7 +18226,7 @@ guias = [
     {
         "titulo": "Reemplazo del Touchpad en HP Chromebook 14-x010wm",
         "descripcion": "Guía para reemplazar el touchpad en HP Chromebook 14-x010wm.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-x010wm+Touchpad+Replacement/84900",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "HP",
@@ -18221,7 +18235,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Dell XPS 13 L321X",
         "descripcion": "Guía para reemplazar la batería en Dell XPS 13 L321X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+L321X+Battery+Replacement/84975",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -18230,7 +18244,7 @@ guias = [
     {
         "titulo": "Reemplazo del Trackpad en Asus X401A",
         "descripcion": "Guía para reemplazar el trackpad en Asus X401A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X401A+Trackpad+Replacement/84977",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Asus",
@@ -18239,7 +18253,7 @@ guias = [
     {
         "titulo": "Reemplazo del Mousepad en Dell XPS 13 L321X",
         "descripcion": "Guía para reemplazar el mousepad en Dell XPS 13 L321X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+L321X+Mouse+pad+Replacement/84978",
         "tipo_servicio": "Mousepad",
         "equipo_marca": "Dell",
@@ -18248,7 +18262,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en HP Envy 17-J013CL",
         "descripcion": "Guía para reemplazar la placa madre en HP Envy 17-J013CL.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Envy+17-J013CL+Motherboard+Replacement/84996",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -18257,7 +18271,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en ASUS UX50V-RX05",
         "descripcion": "Guía para reemplazar la placa madre en ASUS UX50V-RX05.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+UX50V-RX05+Motherboard+Replacement/85020",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -18266,7 +18280,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Asus U47VC-DS51",
         "descripcion": "Guía para reemplazar el disco duro en Asus U47VC-DS51.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+U47VC-DS51++Hard+Drive+Replacement/85028",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -18275,7 +18289,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador de Enfriamiento en Asus U47VC-DS51",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Asus U47VC-DS51.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+U47VC-DS51+Cooling+Fan+Replacement/85029",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Asus",
@@ -18284,7 +18298,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Toshiba Portege R835-P88",
         "descripcion": "Guía para reemplazar la pantalla en Toshiba Portege R835-P88.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Portege+R835-P88+Screen+Replacement/85032",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Toshiba",
@@ -18293,7 +18307,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ventilador de Enfriamiento en Toshiba Portege R835-P88",
         "descripcion": "Guía para reemplazar el ventilador de enfriamiento en Toshiba Portege R835-P88.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Portege+R835-P88+Cooling+Fan+Replacement/85033",
         "tipo_servicio": "Ventilador de Enfriamiento",
         "equipo_marca": "Toshiba",
@@ -18302,7 +18316,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla LCD en Asus U47VC-DS51",
         "descripcion": "Guía para reemplazar la pantalla LCD en Asus U47VC-DS51.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+U47VC-DS51+LCD+Screen+Replacement/85034",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Asus",
@@ -18311,7 +18325,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Unidad Óptica en Toshiba Portege R835-P88",
         "descripcion": "Guía para reemplazar la unidad óptica en Toshiba Portege R835-P88.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Portege+R835-P88+Optical+Drive+Replacement/85035",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Toshiba",
@@ -18320,7 +18334,7 @@ guias = [
     {
         "titulo": "Reemplazo del Puerto de Carga en HP Chromebook 14-ak013dx",
         "descripcion": "Guía para reemplazar el puerto de carga en HP Chromebook 14-ak013dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+14-ak013dx+Charging+Port+Replacement/85124",
         "tipo_servicio": "Puerto de Carga",
         "equipo_marca": "HP",
@@ -18329,7 +18343,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Dell Inspiron 7568",
         "descripcion": "Guía para reemplazar el teclado en Dell Inspiron 7568.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+7568+Keyboard+Replacement+Guide/85135",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -18338,7 +18352,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Asus ROG GL551J",
         "descripcion": "Guía para reemplazar el disco duro en Asus ROG GL551J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+GL551J+Hard+Drive+Replacement/85276",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Asus",
@@ -18347,7 +18361,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Acer Aspire One 725-0845",
         "descripcion": "Guía para reemplazar el disco duro en Acer Aspire One 725-0845.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+725-0845+Hard+Drive+Replacement/85389",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Acer",
@@ -18356,7 +18370,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla LCD en Sony Vaio PCG-71713L",
         "descripcion": "Guía para reemplazar la pantalla LCD en Sony Vaio PCG-71713L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-71713L+LCD+Screen+Replacement/85427",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Sony",
@@ -18365,7 +18379,7 @@ guias = [
     {
         "titulo": "Reemplazo de Memoria RAM en Sony Vaio PCG-71713L",
         "descripcion": "Guía para reemplazar la memoria RAM en Sony Vaio PCG-71713L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Replacement+Ram/85429",
         "tipo_servicio": "Memoria RAM",
         "equipo_marca": "Sony",
@@ -18374,7 +18388,7 @@ guias = [
     {
         "titulo": "Reemplazo de CPU en Sony Vaio PCG-71713L",
         "descripcion": "Guía para reemplazar la CPU en Sony Vaio PCG-71713L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/CPU+Replacement/85430",
         "tipo_servicio": "CPU",
         "equipo_marca": "Sony",
@@ -18383,7 +18397,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador/Disipador en Sony Vaio PCG-71713L",
         "descripcion": "Guía para reemplazar el ventilador o disipador en Sony Vaio PCG-71713L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Fan+Replacement/85431",
         "tipo_servicio": "Ventilador/Disipador",
         "equipo_marca": "Sony",
@@ -18392,7 +18406,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Sony Vaio PCG-71713L",
         "descripcion": "Guía para reemplazar el disco duro en Sony Vaio PCG-71713L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-71713L+Hard+Drive+Replacement/85432",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Sony",
@@ -18401,7 +18415,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Sony Vaio PCG-71713L",
         "descripcion": "Guía para reemplazar el teclado en Sony Vaio PCG-71713L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Keyboad+Replacement/85433",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Sony",
@@ -18410,7 +18424,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en HP Pavilion dv7-3065dx",
         "descripcion": "Guía para reemplazar el disco duro en HP Pavilion dv7-3065dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv7-3065dx+Hard+Drive+Replacement/85504",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "HP",
@@ -18419,7 +18433,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Pavilion dv7-3065dx",
         "descripcion": "Guía para reemplazar la RAM en HP Pavilion dv7-3065dx.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Pavilion+dv7-3065dx+RAM+Replacement/85506",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -18428,7 +18442,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Samsung NP-QX411L",
         "descripcion": "Guía para reemplazar el disco duro en Samsung NP-QX411L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-QX411L+Hard+Drive+Replacement/85693",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Samsung",
@@ -18437,7 +18451,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en HP Chromebook CB2L",
         "descripcion": "Guía para reemplazar la batería en HP Chromebook CB2L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+CB2L+Battery+Replacement/85855",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -18446,7 +18460,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en HP Chromebook CB2L",
         "descripcion": "Guía para reemplazar los altavoces en HP Chromebook CB2L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+CB2L+Speaker+Replacement/85895",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "HP",
@@ -18455,7 +18469,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Toshiba Satellite C55-C5240",
         "descripcion": "Guía para reemplazar la RAM en Toshiba Satellite C55-C5240.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5240++RAM+Replacement/85949",
         "tipo_servicio": "RAM",
         "equipo_marca": "Toshiba",
@@ -18464,7 +18478,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en HP Split x2",
         "descripcion": "Guía para reemplazar la batería en HP Split x2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Split+x2+Battery+Replacement/85980",
         "tipo_servicio": "Batería",
         "equipo_marca": "HP",
@@ -18473,7 +18487,7 @@ guias = [
     {
         "titulo": "Reemplazo de Trackpad en HP Split x2",
         "descripcion": "Guía para reemplazar el trackpad en HP Split x2.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Split+x2+Trackpad+Replacement/85982",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "HP",
@@ -18482,7 +18496,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en HP Compaq Presario CQ56-110US",
         "descripcion": "Guía para reemplazar la RAM en HP Compaq Presario CQ56-110US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+CQ56-110US+RAM+Replacement/86034",
         "tipo_servicio": "RAM",
         "equipo_marca": "HP",
@@ -18491,7 +18505,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Acer Aspire One 725-0845",
         "descripcion": "Guía para reemplazar la RAM en Acer Aspire One 725-0845.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+725-0845+RAM+Replacement/86111",
         "tipo_servicio": "RAM",
         "equipo_marca": "Acer",
@@ -18500,7 +18514,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wi-Fi en HP Compaq Presario CQ56-110US",
         "descripcion": "Guía para reemplazar la tarjeta Wi-Fi en HP Compaq Presario CQ56-110US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+CQ56-110US+Repair+Wi-Fi+Card+Replacement/86113",
         "tipo_servicio": "Tarjeta Wi-Fi",
         "equipo_marca": "HP",
@@ -18509,7 +18523,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Asus ROG GL551J",
         "descripcion": "Guía para reemplazar la pantalla en Asus ROG GL551J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+ROG+GL551J+Screen+Replacement/86118",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -18518,7 +18532,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador Interno en Asus X401A",
         "descripcion": "Guía para reemplazar el ventilador interno en Asus X401A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X401A+Internal+Fan+Replacement/86126",
         "tipo_servicio": "Ventilador Interno",
         "equipo_marca": "Asus",
@@ -18527,7 +18541,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Asus U47VC-DS51",
         "descripcion": "Guía para reemplazar la placa madre en Asus U47VC-DS51.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+U47VC-DS51+Motherboard+Replacement/86157",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -18536,7 +18550,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en HP Chromebook CB2L",
         "descripcion": "Guía para reemplazar la placa madre en HP Chromebook CB2L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+CB2L+Motherboard+Replacement/86202",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "HP",
@@ -18545,7 +18559,7 @@ guias = [
     {
         "titulo": "Reemplazo de Trackpad en Dell Inspiron 7568",
         "descripcion": "Guía para reemplazar el trackpad en Dell Inspiron 7568.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+7568+Trackpad+Replacement+Guide/86218",
         "tipo_servicio": "Trackpad",
         "equipo_marca": "Dell",
@@ -18554,7 +18568,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Samsung 351U",
         "descripcion": "Guía para reemplazar el ventilador en Samsung 351U.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+351U+Fan+Replacement/86255",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Samsung",
@@ -18563,7 +18577,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Samsung 351U",
         "descripcion": "Guía para reemplazar la batería en Samsung 351U.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+351U+Battery++Replacement/86256",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -18572,7 +18586,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad de CD en HP Compaq Presario CQ56-110US",
         "descripcion": "Guía para reemplazar la unidad de CD en HP Compaq Presario CQ56-110US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+CQ56-110US+CD+Drive+Replacement/86262",
         "tipo_servicio": "Unidad de CD",
         "equipo_marca": "HP",
@@ -18581,7 +18595,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en HP Compaq Presario CQ56-110US",
         "descripcion": "Guía para reemplazar el teclado en HP Compaq Presario CQ56-110US.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Compaq+Presario+CQ56-110US+Keyboard+Replacement/86264",
         "tipo_servicio": "Teclado",
         "equipo_marca": "HP",
@@ -18590,7 +18604,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Dell Inspiron 17-5755",
         "descripcion": "Guía para reemplazar el disco duro en Dell Inspiron 17-5755.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+17-5755+Hard+Drive+Replacement/86272",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Dell",
@@ -18599,7 +18613,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Lenovo IdeaPad U430 Touch",
         "descripcion": "Guía para reemplazar la batería en Lenovo IdeaPad U430 Touch.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U430+Touch+Battery+Replacement/86318",
         "tipo_servicio": "Batería",
         "equipo_marca": "Lenovo",
@@ -18608,7 +18622,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Chromebook Pixel (2013)",
         "descripcion": "Guía para reemplazar la batería en Chromebook Pixel (2013).",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Chromebook+Pixel+%282013%29+Battery+Replacement/86369",
         "tipo_servicio": "Batería",
         "equipo_marca": "Google",
@@ -18617,7 +18631,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Samsung NP-QX411L",
         "descripcion": "Guía para reemplazar la batería en Samsung NP-QX411L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-QX411L+Battery+Replacement/86393",
         "tipo_servicio": "Batería",
         "equipo_marca": "Samsung",
@@ -18626,7 +18640,7 @@ guias = [
     {
         "titulo": "Reemplazo de Bisagras en Samsung NP-QX411L",
         "descripcion": "Guía para reemplazar las bisagras en Samsung NP-QX411L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-QX411L+Hinges+Replacement/86394",
         "tipo_servicio": "Bisagras",
         "equipo_marca": "Samsung",
@@ -18635,7 +18649,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Samsung NP-QX411L",
         "descripcion": "Guía para reemplazar la pantalla en Samsung NP-QX411L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Samsung+NP-QX411L+Screen+Replacement/86415",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Samsung",
@@ -18644,7 +18658,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Sony Vaio VPCW21FX",
         "descripcion": "Guía para reemplazar el teclado en Sony Vaio VPCW21FX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+VPCW21FX+Keyboard+Replacement/86429",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Sony",
@@ -18653,7 +18667,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Dell Studio 1737",
         "descripcion": "Guía para reemplazar el teclado en Dell Studio 1737.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Studio+1737+Keyboard+Replacement/86477",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Dell",
@@ -18662,7 +18676,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Toshiba Satellite C55-C5240",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite C55-C5240.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5240+Hard+Drive+Replacement/86522",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -18671,7 +18685,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Lenovo IdeaPad U450",
         "descripcion": "Guía para reemplazar la pantalla en Lenovo IdeaPad U450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U450+Screen+Replacement/86533",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -18680,7 +18694,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Toshiba Dynabook AX 53D",
         "descripcion": "Guía para reemplazar el teclado en Toshiba Dynabook AX 53D.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Dynabook+AX+53D+Keyboard++Replacement/86562",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Toshiba",
@@ -18689,7 +18703,7 @@ guias = [
     {
         "titulo": "Reemplazo de Touchpad en Toshiba Dynabook AX 53D",
         "descripcion": "Guía para reemplazar el touchpad en Toshiba Dynabook AX 53D.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Dynabook+AX+53D+Touchpad+Replacement/86580",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Toshiba",
@@ -18698,7 +18712,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Toshiba Satellite U925T-S2120",
         "descripcion": "Guía para reemplazar la batería en Toshiba Satellite U925T-S2120.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+U925T-S2120+Battery++Replacement/86648",
         "tipo_servicio": "Batería",
         "equipo_marca": "Toshiba",
@@ -18707,7 +18721,7 @@ guias = [
     {
         "titulo": "Reemplazo de HDD, RAM, WiFi y Batería CMOS en Lenovo B50-80",
         "descripcion": "Guía para reemplazar HDD, RAM, WiFi y batería CMOS en Lenovo B50-80.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+B50-80+HDD+RAM+WiFi+CMOS+Battery+Replacement/86668",
         "tipo_servicio": "HDD, RAM, WiFi, Batería CMOS",
         "equipo_marca": "Lenovo",
@@ -18716,7 +18730,7 @@ guias = [
     {
         "titulo": "Reemplazo de Batería en Dell Inspiron 13z 5323",
         "descripcion": "Guía para reemplazar la batería en Dell Inspiron 13z 5323.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+13z+5323+Battery+Replacement/86671",
         "tipo_servicio": "Batería",
         "equipo_marca": "Dell",
@@ -18725,7 +18739,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Microsoft Surface Book",
         "descripcion": "Guía para reemplazar la pantalla en Microsoft Surface Book.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Microsoft+Surface+Book+Screen+Replacement/86674",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Microsoft",
@@ -18734,7 +18748,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Asus UL80J",
         "descripcion": "Guía para reemplazar el teclado en Asus UL80J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+UL80J+Keyboard+Replacement/86689",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Asus",
@@ -18743,7 +18757,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Asus UL80J",
         "descripcion": "Guía para reemplazar la pantalla en Asus UL80J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+UL80J+Screen+Replacement/86690",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Asus",
@@ -18752,7 +18766,7 @@ guias = [
     {
         "titulo": "Reemplazo del Puerto de Audio en HP Chromebook CB2L",
         "descripcion": "Guía para reemplazar el puerto de audio en HP Chromebook CB2L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Chromebook+CB2L+Audio+Port+Replacement/86713",
         "tipo_servicio": "Puerto de Audio",
         "equipo_marca": "HP",
@@ -18761,7 +18775,7 @@ guias = [
     {
         "titulo": "Reemplazo de Clave en Asus UL80J",
         "descripcion": "Guía para reemplazar una clave específica en Asus UL80J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+UL80J+Key+Replacement/86717",
         "tipo_servicio": "Clave",
         "equipo_marca": "Asus",
@@ -18770,7 +18784,7 @@ guias = [
     {
         "titulo": "Reemplazo de SSD en ASUS EEE PC701SD-WHI004X",
         "descripcion": "Guía para reemplazar el SSD en ASUS EEE PC701SD-WHI004X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+EEE+PC701SD-WHI004X+HardDrive-SSD+Replacement/86730",
         "tipo_servicio": "SSD",
         "equipo_marca": "Asus",
@@ -18779,7 +18793,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ventilador en Acer Aspire One 751h-1948",
         "descripcion": "Guía para reemplazar el ventilador en Acer Aspire One 751h-1948.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+751h-1948+Fan+Replacement/86743",
         "tipo_servicio": "Ventilador",
         "equipo_marca": "Acer",
@@ -18788,7 +18802,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Dell XPS 13 L321X",
         "descripcion": "Guía para reemplazar la pantalla en Dell XPS 13 L321X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+L321X+Screen+Replacement/86800",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Dell",
@@ -18797,7 +18811,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en Dell XPS 13 L321X",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Dell XPS 13 L321X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+XPS+13+L321X+Wireless+Card+Replacement/86803",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Dell",
@@ -18806,7 +18820,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Acer Aspire One 725-0845",
         "descripcion": "Guía para reemplazar los altavoces en Acer Aspire One 725-0845.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+725-0845+Speaker+Replacement/86804",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Acer",
@@ -18815,7 +18829,7 @@ guias = [
     {
         "titulo": "Reemplazo de Touchpad en Acer Aspire One 725-0845",
         "descripcion": "Guía para reemplazar el touchpad en Acer Aspire One 725-0845.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+725-0845+Touchpad+Replacement/86806",
         "tipo_servicio": "Touchpad",
         "equipo_marca": "Acer",
@@ -18824,7 +18838,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Acer Aspire One 725-0845",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire One 725-0845.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+One+725-0845+Keyboard+Replacement/86808",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -18833,7 +18847,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar los altavoces en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA+Speakers+Replacement/86875",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Asus",
@@ -18842,7 +18856,7 @@ guias = [
     {
         "titulo": "Reemplazo de Webcam en Sony Vaio PCG-61112L",
         "descripcion": "Guía para reemplazar la webcam en Sony Vaio PCG-61112L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-61112L+Webcam+Replacement/86886",
         "tipo_servicio": "Webcam",
         "equipo_marca": "Sony",
@@ -18851,7 +18865,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Lenovo IdeaPad U450",
         "descripcion": "Guía para reemplazar el teclado en Lenovo IdeaPad U450.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U450+Keyboard+Replacement/86906",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -18860,7 +18874,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Lenovo IdeaPad U430 Touch",
         "descripcion": "Guía para reemplazar la placa madre en Lenovo IdeaPad U430 Touch.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U430+Touch+Motherboard+Replacement/86948",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Lenovo",
@@ -18869,7 +18883,7 @@ guias = [
     {
         "titulo": "Reemplazo de Memoria en Lenovo IdeaPad U430 Touch",
         "descripcion": "Guía para reemplazar la memoria en Lenovo IdeaPad U430 Touch.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U430+Touch+Memory+Replacement/86952",
         "tipo_servicio": "Memoria",
         "equipo_marca": "Lenovo",
@@ -18878,7 +18892,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Toshiba Satellite C55-C5240",
         "descripcion": "Guía para reemplazar la placa madre en Toshiba Satellite C55-C5240.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+C55-C5240+Motherboard+Replacement/86953",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Toshiba",
@@ -18887,7 +18901,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disipador de Calor en Dell Inspiron 3542",
         "descripcion": "Guía para reemplazar el disipador de calor en Dell Inspiron 3542.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+3542+Heat+Sink+Replacement/86977",
         "tipo_servicio": "Disipador de Calor",
         "equipo_marca": "Dell",
@@ -18896,7 +18910,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla LCD en Sony Vaio PCG-61112L",
         "descripcion": "Guía para reemplazar la pantalla LCD en Sony Vaio PCG-61112L.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Sony+Vaio+PCG-61112L+LCD+Screen+Replacement/86985",
         "tipo_servicio": "Pantalla LCD",
         "equipo_marca": "Sony",
@@ -18905,7 +18919,7 @@ guias = [
     {
         "titulo": "Reemplazo de Touchpad y Botones de Ratón en ASUS EEE PC701SD-WHI004X",
         "descripcion": "Guía para reemplazar el touchpad y/o botones de ratón en ASUS EEE PC701SD-WHI004X.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ASUS+EEE+PC701SD-WHI004X+Touchpad+and-or+Mouse+Button+Replacement/87031",
         "tipo_servicio": "Touchpad y Botones de Ratón",
         "equipo_marca": "ASUS",
@@ -18914,7 +18928,7 @@ guias = [
     {
         "titulo": "Limpieza Interna de Inspiron",
         "descripcion": "Guía para realizar la limpieza interna de Dell Inspiron.",
-        "categoria_id": "Mantenimiento",
+        'categoria_id': categoria_ids['Mantenimiento'],
         "manual": "https://www.ifixit.com/Guide/Cleaning+Inside+Your+Inspiron/87084",
         "tipo_servicio": "Limpieza Interna",
         "equipo_marca": "Dell",
@@ -18923,7 +18937,7 @@ guias = [
     {
         "titulo": "Extracción de la Cubierta Inferior en Lenovo IdeaPad U430 Touch",
         "descripcion": "Guía para remover la cubierta inferior en Lenovo IdeaPad U430 Touch.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U430+Touch+Bottom+Cover+Removal/87143",
         "tipo_servicio": "Cubierta Inferior",
         "equipo_marca": "Lenovo",
@@ -18932,7 +18946,7 @@ guias = [
     {
         "titulo": "Reemplazo del Puerto de Carga en Lenovo IdeaPad U430 Touch",
         "descripcion": "Guía para reemplazar el puerto de carga en Lenovo IdeaPad U430 Touch.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Lenovo+IdeaPad+U430+Touch+Charging+Port+Replacement/87144",
         "tipo_servicio": "Puerto de Carga",
         "equipo_marca": "Lenovo",
@@ -18941,7 +18955,7 @@ guias = [
     {
         "titulo": "Reemplazo de la Batería CMOS en HP Mini 210-1199DX",
         "descripcion": "Guía para reemplazar la batería CMOS en HP Mini 210-1199DX.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/HP+Mini+210-1199DX+CMOS+Battery+Replacement/87152",
         "tipo_servicio": "Batería CMOS",
         "equipo_marca": "HP",
@@ -18950,7 +18964,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Dell Inspiron 3542",
         "descripcion": "Guía para reemplazar la placa madre en Dell Inspiron 3542.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inpiron+3542+Motherboard++Replacement/87155",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -18959,7 +18973,7 @@ guias = [
     {
         "titulo": "Reemplazo de Ensamblaje de Reposamanos en Dell Studio 1737",
         "descripcion": "Guía para reemplazar el ensamblaje de reposamanos en Dell Studio 1737.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Studio+1737+Palmrest+Assembly+Replacement/87157",
         "tipo_servicio": "Ensamblaje de Reposamanos",
         "equipo_marca": "Dell",
@@ -18968,7 +18982,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Dell Studio 1737",
         "descripcion": "Guía para reemplazar los altavoces en Dell Studio 1737.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Studio+1737+Speaker+Replacement/87158",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Dell",
@@ -18977,7 +18991,7 @@ guias = [
     {
         "titulo": "Reemplazo del Ensamblaje de Pantalla en Razer Blade 14\" (2014)",
         "descripcion": "Guía para reemplazar el ensamblaje de pantalla en Razer Blade 14\" (2014).",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Razer+Blade+14-Inch+%282014%29+Screen+Assembly+Replacement/87163",
         "tipo_servicio": "Ensamblaje de Pantalla",
         "equipo_marca": "Razer",
@@ -18986,7 +19000,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en ThinkPad Edge E31",
         "descripcion": "Guía para reemplazar la pantalla en ThinkPad Edge E31.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ThinkPad+Edge+E31+Screen+Replacement/87164",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Lenovo",
@@ -18995,7 +19009,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad de DVD en Acer Aspire 4743-6481",
         "descripcion": "Guía para reemplazar la unidad de DVD en Acer Aspire 4743-6481.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+4743-6481+DVD+Drive+Replacement/87171",
         "tipo_servicio": "Unidad de DVD",
         "equipo_marca": "Acer",
@@ -19004,7 +19018,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus A52F",
         "descripcion": "Guía para reemplazar la RAM en Asus A52F.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+A52F+RAM+Replacement/87194",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -19013,7 +19027,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wifi en Asus A52F",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Asus A52F.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+A52F+Wifi+Card+Replacement/87200",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Asus",
@@ -19022,7 +19036,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Wifi en Asus UL80J",
         "descripcion": "Guía para reemplazar la tarjeta Wifi en Asus UL80J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+UL80J+Wifi+Card+Replacement/87211",
         "tipo_servicio": "Tarjeta Wifi",
         "equipo_marca": "Asus",
@@ -19031,7 +19045,7 @@ guias = [
     {
         "titulo": "Reemplazo de Unidad Óptica (CD/DVD) en Dell Studio 1737",
         "descripcion": "Guía para reemplazar la unidad óptica (CD/DVD) en Dell Studio 1737.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Studio+1737+Optical+Drive+%28CD+Drive%29+Replacement/87212",
         "tipo_servicio": "Unidad Óptica",
         "equipo_marca": "Dell",
@@ -19040,7 +19054,7 @@ guias = [
     {
         "titulo": "Reemplazo de madre en Dell Inspiron 17-5755",
         "descripcion": "Guía para reemplazar la placa madre en Dell Inspiron 17-5755.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+17-5755+Motherboard+Replacement/87255",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Dell",
@@ -19049,7 +19063,7 @@ guias = [
     {
         "titulo": "Reemplazo de Procesador en Asus X401A",
         "descripcion": "Guía para reemplazar el procesador en Asus X401A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X401A+Processor+Replacement/87270",
         "tipo_servicio": "Procesador",
         "equipo_marca": "Asus",
@@ -19058,7 +19072,7 @@ guias = [
     {
         "titulo": "Reemplazo de Altavoces en Toshiba Satellite E45t-B4300",
         "descripcion": "Guía para reemplazar los altavoces en Toshiba Satellite E45t-B4300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45t-B4300+Speakers+Replacement/87310",
         "tipo_servicio": "Altavoces",
         "equipo_marca": "Toshiba",
@@ -19067,7 +19081,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta Inalámbrica en Asus X401A",
         "descripcion": "Guía para reemplazar la tarjeta inalámbrica en Asus X401A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X401A+Wireless+Card+Replacement/87335",
         "tipo_servicio": "Tarjeta Inalámbrica",
         "equipo_marca": "Asus",
@@ -19076,7 +19090,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en ThinkPad T420",
         "descripcion": "Guía para reemplazar el teclado en ThinkPad T420.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ThinkPad+T420+Keyboard+Replacement/87337",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Lenovo",
@@ -19085,7 +19099,7 @@ guias = [
     {
         "titulo": "Reemplazo de Memoria en ThinkPad T420",
         "descripcion": "Guía para reemplazar la memoria en ThinkPad T420.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/ThinkPad+T420+Memory+Replacement/87338",
         "tipo_servicio": "Memoria",
         "equipo_marca": "Lenovo",
@@ -19094,7 +19108,7 @@ guias = [
     {
         "titulo": "Reemplazo de Carcasa Inferior en Toshiba Satellite E45t-B4300",
         "descripcion": "Guía para reemplazar la carcasa inferior en Toshiba Satellite E45t-B4300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45t-B4300+Bottom+Case+Replacement/87339",
         "tipo_servicio": "Carcasa Inferior",
         "equipo_marca": "Toshiba",
@@ -19103,7 +19117,7 @@ guias = [
     {
         "titulo": "Reemplazo de Disco Duro en Toshiba Satellite E45t-B4300",
         "descripcion": "Guía para reemplazar el disco duro en Toshiba Satellite E45t-B4300.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Toshiba+Satellite+E45t-B4300+Hard+Drive+Replacement/87340",
         "tipo_servicio": "Disco Duro",
         "equipo_marca": "Toshiba",
@@ -19112,7 +19126,7 @@ guias = [
     {
         "titulo": "Reemplazo de RAM en Asus X401A",
         "descripcion": "Guía para reemplazar la RAM en Asus X401A.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+X401A+RAM+Replacement/87353",
         "tipo_servicio": "RAM",
         "equipo_marca": "Asus",
@@ -19121,7 +19135,7 @@ guias = [
     {
         "titulo": "Reemplazo de Tarjeta de RAM en Acer Aspire 4743-6481",
         "descripcion": "Guía para reemplazar la tarjeta de RAM en Acer Aspire 4743-6481.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+4743-6481+Ram+Card+Replacement/87354",
         "tipo_servicio": "Tarjeta de RAM",
         "equipo_marca": "Acer",
@@ -19130,7 +19144,7 @@ guias = [
     {
         "titulo": "Reemplazo de Pantalla en Acer Aspire 4743-6481",
         "descripcion": "Guía para reemplazar la pantalla en Acer Aspire 4743-6481.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+4743-6481+Screen+Replacement/87360",
         "tipo_servicio": "Pantalla",
         "equipo_marca": "Acer",
@@ -19139,7 +19153,7 @@ guias = [
     {
         "titulo": "Reemplazo de Teclado en Acer Aspire 4743-6481",
         "descripcion": "Guía para reemplazar el teclado en Acer Aspire 4743-6481.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Acer+Aspire+4743-6481+Keyboard+Replacement/87372",
         "tipo_servicio": "Teclado",
         "equipo_marca": "Acer",
@@ -19148,7 +19162,7 @@ guias = [
     {
         "titulo": "Reemplazo de Placa madre en Asus UL80J",
         "descripcion": "Guía para reemplazar la placa madre en Asus UL80J.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+UL80J+Motherboard+Replacement/87373",
         "tipo_servicio": "Placa madre",
         "equipo_marca": "Asus",
@@ -19157,7 +19171,7 @@ guias = [
     {
         "titulo": "Reemplazo de Panel de Pantalla en Dell Inspiron 17-5755",
         "descripcion": "Guía para reemplazar el panel de pantalla en Dell Inspiron 17-5755.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Dell+Inspiron+17-5755+Display+Panel+Replacement/87376",
         "tipo_servicio": "Panel de Pantalla",
         "equipo_marca": "Dell",
@@ -19166,13 +19180,13 @@ guias = [
     {
         "titulo": "Reemplazo de Chip de Panel LED en Asus EeeBook X205TA",
         "descripcion": "Guía para reemplazar el chip de panel LED en Asus EeeBook X205TA.",
-        "categoria_id": "Reparación",
+        'categoria_id': categoria_ids['Reparación'],
         "manual": "https://www.ifixit.com/Guide/Asus+EeeBook+X205TA+LED+Screen+Panel+Chip+Replacement/87449",
         "tipo_servicio": "Chip de Panel LED",
         "equipo_marca": "Asus",
         "equipo_modelo": "EeeBook X205TA"
     },
-{
+    {
         'titulo': 'Reemplazo de memoria en ThinkPad T420',
         'descripcion': 'Guía detallada para reemplazar la memoria de una laptop Lenovo ThinkPad T420.',
         'categoria_id': categoria_ids['Reparación'],

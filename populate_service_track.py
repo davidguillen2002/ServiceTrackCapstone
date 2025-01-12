@@ -350,17 +350,6 @@ for tecnico in tecnicos:
 
 print("Servicios generados y progreso actualizado exitosamente.")
 
-# Crear categorías y guías
-categorias = ["Mantenimiento", "Reparación", "Diagnóstico"]
-for categoria in categorias:
-    cat, _ = Categoria.objects.get_or_create(nombre=categoria)
-    for i in range(3):
-        Guia.objects.create(
-            titulo=f"Guía {categoria} {i + 1}",
-            descripcion=f"Guía detallada sobre {categoria.lower()}.",
-            categoria=cat,
-        )
-
 # Crear medallas y retos dinámicos automáticamente
 medallas_por_nivel = {
     1: [

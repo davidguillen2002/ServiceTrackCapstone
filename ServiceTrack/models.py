@@ -857,3 +857,11 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.user_message[:30]} - {self.bot_response[:30]}"
+
+class Capacitacion(models.Model):
+    titulo = models.CharField(max_length=255)
+    descripcion_corta = models.TextField(max_length=500)
+    link = models.URLField()
+
+    def __str__(self):
+        return self.titulo
