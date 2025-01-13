@@ -187,17 +187,22 @@ def perfil_gamificacion(request):
         reto__temporada=temporada_actual
     )
 
+    # Actualizar progreso de todos los retos
+    for reto_usuario in retos_usuario:
+        reto_usuario.actualizar_progreso()
+        reto_usuario.verificar_cumplimiento()
+
     # Calcular número de retos cumplidos y el total de retos
     retos_completados = retos_usuario.filter(cumplido=True).count()
     total_retos_nivel = retos_usuario.count()
 
-    # Calcular progreso basado en retos completados
+    # Calcular progreso basado en retos cumplidos
     progreso_nivel = (
         round((retos_completados / total_retos_nivel) * 100, 2)
         if total_retos_nivel > 0 else 0
     )
 
-    # Sincronizar experiencia basada en retos completados
+    # Sincronizar experiencia basada en retos cumplidos
     experiencia_total = sum(
         reto_usuario.reto.puntos_otorgados
         for reto_usuario in retos_usuario if reto_usuario.cumplido
@@ -237,18 +242,21 @@ def perfil_gamificacion(request):
     )
 
     # Calcular el promedio de calificaciones de la temporada actual
-    calificacion_promedio = (
-        Servicio.objects.filter(
-            tecnico=usuario,
-            estado="completado",
-            fecha_fin__range=[temporada_actual.fecha_inicio, temporada_actual.fecha_fin]
-        ).aggregate(promedio=Avg("calificacion"))["promedio"]
-        or 0
-    )
+    calificacion_promedio = usuario.calificacion_promedio_temporada(temporada_actual)
+
+    # Sincronizar la calificación promedio del usuario
+    if usuario.calificacion_promedio != calificacion_promedio:
+        usuario.calificacion_promedio = calificacion_promedio
+        usuario.save()
+
+    # Obtener el total de puntos obtenidos en la temporada
+    puntos_temporada = usuario.puntos_en_temporada(temporada_actual)
+
+    # Obtener los servicios completados dentro de la temporada
+    servicios_temporada = usuario.servicios_en_temporada(temporada_actual).count()
 
     # Generar recomendaciones personalizadas basadas en el rendimiento
     recomendaciones = generar_recomendaciones_con_ia(usuario)
-    recomendaciones_procesadas = [recomendacion for recomendacion in recomendaciones]
 
     # Renderizar la página de perfil gamificado
     return render(request, "gamificacion/perfil_gamificacion.html", {
@@ -262,9 +270,12 @@ def perfil_gamificacion(request):
         "retos_completados": retos_completados,  # Número de retos completados
         "total_retos_nivel": total_retos_nivel,  # Total de retos del nivel actual
         "retos_disponibles": retos_disponibles,
-        "recomendaciones": recomendaciones_procesadas,
+        "puntos_temporada": puntos_temporada,  # Puntos acumulados en la temporada actual
+        "servicios_temporada": servicios_temporada,  # Número de servicios completados en la temporada
+        "recomendaciones": recomendaciones,
         "animaciones": animaciones,
     })
+
 
 @login_required
 def admin_dashboard(request):
@@ -383,9 +394,12 @@ def recompensas_disponibles(request):
     usuario = request.user
     temporada_actual = Temporada.obtener_temporada_actual()
 
-    if temporada_actual:
-        # Verificar y asignar recompensas basadas en retos cumplidos
-        verificar_y_asignar_recompensas(usuario, temporada_actual)
+    if not temporada_actual:
+        messages.warning(request, "No hay una temporada activa en este momento.")
+        return redirect("home")
+
+    # Verificar y asignar recompensas basadas en retos cumplidos dentro de la temporada
+    verificar_y_asignar_recompensas(usuario, temporada_actual)
 
     recompensas_disponibles = Recompensa.objects.filter(
         usuario=usuario,
@@ -530,23 +544,28 @@ def retos_disponibles(request):
         messages.error(request, "Acceso denegado.")
         return redirect("home")
 
-    # Asignar retos dinámicos si aún no los tiene
-    asignar_retos_dinamicos(usuario)
+    # Obtener la temporada actual
+    temporada_actual = Temporada.obtener_temporada_actual()
+    if not temporada_actual:
+        messages.warning(request, "No hay una temporada activa en este momento.")
+        return redirect("home")
 
-    # Consultar retos pendientes y completados
+    # Consultar retos pendientes y completados dentro de la temporada actual
     retos_pendientes = RetoUsuario.objects.filter(
         usuario=usuario,
         cumplido=False,
-        reto__nivel=usuario.nivel
+        reto__nivel=usuario.nivel,
+        reto__temporada=temporada_actual
     ).select_related('reto')
 
     retos_cumplidos = RetoUsuario.objects.filter(
         usuario=usuario,
         cumplido=True,
-        reto__nivel=usuario.nivel
+        reto__nivel=usuario.nivel,
+        reto__temporada=temporada_actual
     ).select_related('reto')
 
-    # Generar enlaces para redirigir a los servicios relacionados con cada reto
+    # Generar enlaces para los retos pendientes
     for reto_usuario in retos_pendientes:
         reto_usuario.servicios_url = f"/servicios/tecnico_services/"
 

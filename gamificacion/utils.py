@@ -228,6 +228,7 @@ def verificar_y_asignar_medallas_y_retos(usuario):
 
     for reto_usuario in retos:
         reto_usuario.actualizar_progreso()
+        reto_usuario.verificar_cumplimiento()
         experiencia_total += (reto_usuario.progreso / 100) * reto_usuario.reto.puntos_otorgados  # Progresión proporcional
 
         if reto_usuario.progreso >= 100 and not reto_usuario.cumplido:

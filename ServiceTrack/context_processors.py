@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Sum, Count
 from ServiceTrack.models import Usuario, Servicio, Medalla, RetoUsuario, Temporada
 from django.utils.timezone import now
 
@@ -10,6 +10,20 @@ def gamificacion_context(request):
         if request.user.is_authenticated:
             usuario = request.user
             if hasattr(usuario, 'rol') and usuario.rol.nombre == "tecnico":
+                # Obtener la temporada activa
+                fecha_actual = now().date()
+                temporada_activa = Temporada.objects.filter(
+                    fecha_inicio__lte=fecha_actual,
+                    fecha_fin__gte=fecha_actual
+                ).first()
+
+                # Verificar si hay una temporada activa
+                if not temporada_activa:
+                    return {
+                        "usuario": usuario,
+                        "temporada_activa": None,
+                    }
+
                 # Experiencia y progreso de nivel
                 experiencia_actual = usuario.experiencia
                 experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
@@ -18,40 +32,53 @@ def gamificacion_context(request):
                     if experiencia_requerida > 0 else 0
                 )
 
-                # Calificación promedio
-                calificacion_promedio = (
-                    Servicio.objects.filter(tecnico=usuario, estado="completado")
-                    .aggregate(promedio=Avg("calificacion"))["promedio"]
-                    or 0
-                )
+                # Calificación promedio dentro de la temporada
+                calificacion_promedio_temporada = usuario.calificacion_promedio_temporada(temporada_activa)
 
                 # Progreso de medallas
-                total_medallas = Medalla.objects.count()
+                total_medallas_nivel = Medalla.objects.filter(
+                    retos_asociados__nivel=usuario.nivel,
+                    temporada=temporada_activa
+                ).distinct().count()
+                medallas_obtenidas = usuario.medallas.filter(
+                    retos_asociados__nivel=usuario.nivel,
+                    temporada=temporada_activa
+                ).distinct().count()
                 progreso_medallas = (
-                    round((usuario.medallas.count() / total_medallas) * 100, 2)
-                    if total_medallas > 0 else 0
+                    round((medallas_obtenidas / total_medallas_nivel) * 100, 2)
+                    if total_medallas_nivel > 0 else 0
                 )
 
-                # Retos completados y disponibles
-                retos_disponibles = RetoUsuario.objects.filter(usuario=usuario, cumplido=False).count()
-                retos_completados = RetoUsuario.objects.filter(usuario=usuario, cumplido=True).count()
+                # Retos cumplidos y pendientes en la temporada activa
+                retos_cumplidos = RetoUsuario.objects.filter(
+                    usuario=usuario,
+                    cumplido=True,
+                    reto__temporada=temporada_activa
+                ).count()
+                retos_pendientes = RetoUsuario.objects.filter(
+                    usuario=usuario,
+                    cumplido=False,
+                    reto__temporada=temporada_activa
+                ).count()
 
-                # Temporada activa
-                fecha_actual = now().date()
-                temporada_activa = Temporada.objects.filter(
-                    fecha_inicio__lte=fecha_actual, fecha_fin__gte=fecha_actual
-                ).first()
+                # Puntos obtenidos dentro de la temporada
+                puntos_temporada = usuario.puntos_en_temporada(temporada_activa)
+
+                # Total de servicios completados dentro de la temporada
+                servicios_temporada = usuario.servicios_en_temporada(temporada_activa).count()
 
                 return {
                     "usuario": usuario,
+                    "temporada_activa": temporada_activa,
                     "experiencia_actual": experiencia_actual,
                     "experiencia_requerida": experiencia_requerida,
                     "progreso_nivel": progreso_nivel,
-                    "calificacion_promedio": round(calificacion_promedio, 2),
+                    "calificacion_promedio_temporada": round(calificacion_promedio_temporada, 2),
                     "progreso_medallas": progreso_medallas,
-                    "retos_disponibles": retos_disponibles,
-                    "retos_completados": retos_completados,
-                    "temporada_activa": temporada_activa,  # Agregado
+                    "retos_cumplidos": retos_cumplidos,
+                    "retos_pendientes": retos_pendientes,
+                    "puntos_temporada": puntos_temporada,
+                    "servicios_temporada": servicios_temporada,
                 }
     except Exception as e:
         # Registrar errores para depuración

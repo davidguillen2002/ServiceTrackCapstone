@@ -85,6 +85,36 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.nombre
 
+    def servicios_en_temporada(self, temporada):
+        """
+        Obtiene los servicios completados dentro del intervalo de la temporada.
+        """
+        return Servicio.objects.filter(
+            tecnico=self,
+            estado="completado",
+            fecha_fin__range=(temporada.fecha_inicio, temporada.fecha_fin)
+        )
+
+    def calificacion_promedio_temporada(self, temporada):
+        """
+        Calcula el promedio de calificaciones dentro del intervalo de la temporada.
+        """
+        promedio = Servicio.objects.filter(
+            tecnico=self,
+            estado="completado",
+            fecha_fin__range=(temporada.fecha_inicio, temporada.fecha_fin)
+        ).aggregate(promedio=Avg('calificacion'))['promedio'] or 0
+        return round(promedio, 2)
+
+    def puntos_en_temporada(self, temporada):
+        """
+        Obtiene la suma de puntos obtenidos dentro del intervalo de la temporada.
+        """
+        return RegistroPuntos.objects.filter(
+            usuario=self,
+            fecha__range=(temporada.fecha_inicio, temporada.fecha_fin)
+        ).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
+
     def calcular_proximo_nivel_cliente(self):
         """
         Calcula los puntos necesarios para que el cliente suba de nivel.
@@ -695,7 +725,7 @@ class Reto(models.Model):
     nivel = models.IntegerField(
         default=1,
         help_text="Nivel asociado al reto. Define el nivel necesario para desbloquear este reto."
-    )  # Nuevo campo para nivel
+    )
     criterio = models.CharField(
         max_length=50,
         choices=[
@@ -706,12 +736,13 @@ class Reto(models.Model):
         help_text="Define cómo se valida el cumplimiento del reto."
     )
     valor_objetivo = models.IntegerField(help_text="Ejemplo: 500 puntos, 10 servicios, o calificación promedio de 4")
-    completado_por = models.ManyToManyField('Usuario', through='RetoUsuario', related_name='retos_completados')
+    completado_por = models.ManyToManyField(
+        'Usuario',
+        through='RetoUsuario',  # Relación explícita al modelo intermedio
+        related_name='retos_completados'
+    )
 
     def clean(self):
-        """
-        Validación del modelo Reto.
-        """
         if self.puntos_otorgados <= 0:
             raise ValidationError("Los puntos otorgados deben ser mayores que 0.")
         if self.valor_objetivo <= 0:
@@ -721,9 +752,6 @@ class Reto(models.Model):
         super().clean()
 
     def validar_cumplimiento(self, usuario):
-        """
-        Verifica si un usuario cumple con el criterio del reto.
-        """
         if self.criterio == 'puntos' and usuario.puntos >= self.valor_objetivo:
             return True
         elif self.criterio == 'servicios' and usuario.servicios_completados >= self.valor_objetivo:
@@ -746,20 +774,40 @@ class RetoUsuario(models.Model):
     def actualizar_progreso(self):
         """
         Actualiza el progreso basado en el criterio del reto.
+        Asegura que el cálculo de calificaciones considere solo la temporada actual.
         """
+        temporada_actual = Temporada.obtener_temporada_actual()
+        if not temporada_actual:
+            self.progreso = 0
+            self.save()
+            return
+
         if self.reto.criterio == "puntos":
-            self.cantidad_actual = min(self.usuario.puntos, self.reto.valor_objetivo)
+            puntos_temporada = RegistroPuntos.objects.filter(
+                usuario=self.usuario,
+                fecha__range=(temporada_actual.fecha_inicio, temporada_actual.fecha_fin)
+            ).aggregate(total=Sum('puntos_obtenidos'))['total'] or 0
+            self.cantidad_actual = min(puntos_temporada, self.reto.valor_objetivo)
             self.progreso = min((self.cantidad_actual / self.reto.valor_objetivo) * 100, 100)
+
         elif self.reto.criterio == "servicios":
-            self.cantidad_actual = Servicio.objects.filter(tecnico=self.usuario, estado="completado").count()
+            servicios_temporada = Servicio.objects.filter(
+                tecnico=self.usuario,
+                estado="completado",
+                fecha_fin__range=(temporada_actual.fecha_inicio, temporada_actual.fecha_fin)
+            ).count()
+            self.cantidad_actual = servicios_temporada
             self.progreso = min((self.cantidad_actual / self.reto.valor_objetivo) * 100, 100)
+
         elif self.reto.criterio == "calificaciones":
-            promedio_calificacion = (
-                Servicio.objects.filter(tecnico=self.usuario, estado="completado")
-                .aggregate(promedio=Avg("calificacion"))["promedio"] or 0
-            )
+            promedio_calificacion = Servicio.objects.filter(
+                tecnico=self.usuario,
+                estado="completado",
+                fecha_fin__range=(temporada_actual.fecha_inicio, temporada_actual.fecha_fin)
+            ).aggregate(promedio=Avg("calificacion"))["promedio"] or 0
             self.cantidad_actual = round(promedio_calificacion, 2)
             self.progreso = 100 if promedio_calificacion >= self.reto.valor_objetivo else 0
+
         else:
             self.progreso = 0
 
@@ -775,11 +823,23 @@ class RetoUsuario(models.Model):
             self.save()
 
             # Otorgar puntos al usuario
-            self.otorgar_puntos_usuario()
+            self.usuario.puntos += self.reto.puntos_otorgados
+            self.usuario.save()
 
-            # Asignar medallas relacionadas al reto
-            for medalla in self.reto.medallas_asociadas.all():
-                medalla.asignar_si_cumple(self.usuario)
+            # Registrar puntos otorgados
+            RegistroPuntos.objects.create(
+                usuario=self.usuario,
+                puntos_obtenidos=self.reto.puntos_otorgados,
+                descripcion=f"Reto completado: {self.reto.nombre}"
+            )
+
+            # Notificar al usuario
+            from gamificacion.notifications import notificar_tecnico
+            notificar_tecnico(
+                usuario=self.usuario,
+                mensaje=f"¡Has completado el reto '{self.reto.nombre}'! 🏆",
+                tipo="success"
+            )
 
     def otorgar_puntos_usuario(self):
         """

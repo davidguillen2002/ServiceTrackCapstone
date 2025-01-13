@@ -1,4 +1,3 @@
-# servicios/urls.py
 from django.urls import path
 from . import views
 
@@ -27,4 +26,7 @@ urlpatterns = [
     path('capacitaciones/crear/', views.capacitacion_create, name='capacitacion_create'),
     path('capacitaciones/<int:capacitacion_id>/editar/', views.capacitacion_edit, name='capacitacion_edit'),
     path('capacitaciones/<int:capacitacion_id>/eliminar/', views.capacitacion_delete, name='capacitacion_delete'),
+
+    # Nueva ruta para previsualización de guías
+    path('api/guide_preview/<int:guide_id>/', views.guide_preview, name='guide_preview'),
 ]

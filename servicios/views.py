@@ -4,7 +4,7 @@ from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
 from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion
 from seguimiento.forms import ServicioEstadoForm
-from .ai_utils import get_similar_guides
+from .ai_utils import get_similar_guides, get_similar_guides_with_context
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm, CapacitacionForm
@@ -158,17 +158,6 @@ def tecnico_services_list(request):
     return render(request, 'servicios/tecnico_services_list.html', {'services': services})
 
 @login_required
-@user_passes_test(is_tecnico)
-def register_service(request, service_id):
-    """Vista para obtener guías recomendadas para un servicio específico del técnico."""
-    current_service = get_object_or_404(Servicio, id=service_id, tecnico=request.user)
-    similar_guides = get_similar_guides(current_service)
-    return render(request, 'servicios/similar_guides.html', {
-        'current_service': current_service,
-        'similar_guides': similar_guides,
-    })
-
-@login_required
 @user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
 def chat(request):
     chat_history = ChatMessage.objects.all().order_by('created_at')
@@ -263,11 +252,20 @@ def guia_detalle(request, guia_id):
     guia = get_object_or_404(Guia, id=guia_id)
     return render(request, 'servicios/guia_detalle.html', {'guia': guia})
 
+
+# Vista para obtener guías recomendadas basadas en un servicio específico
 @login_required
-@user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
+@user_passes_test(is_tecnico)
 def register_service(request, service_id):
-    current_service = get_object_or_404(Servicio, id=service_id)
-    similar_guides = get_similar_guides(current_service)
+    """
+    Vista para obtener guías recomendadas basadas en el servicio actual del técnico.
+    Incluye recomendaciones contextuales según el historial del técnico.
+    """
+    current_service = get_object_or_404(Servicio, id=service_id, tecnico=request.user)
+
+    # Obtener guías similares con contexto (servicio actual y técnico)
+    similar_guides = get_similar_guides_with_context(current_service, request.user)
+
     return render(request, 'servicios/similar_guides.html', {
         'current_service': current_service,
         'similar_guides': similar_guides,
@@ -383,3 +381,28 @@ def capacitacion_delete(request, capacitacion_id):
         capacitacion.delete()
         return redirect('capacitacion_index')
     return render(request, 'servicios/capacitacion_confirm_delete.html', {'capacitacion': capacitacion})
+
+
+@login_required
+@user_passes_test(is_tecnico)
+def guide_preview(request, guide_id):
+    """
+    Endpoint para obtener detalles de una guía específica.
+    """
+    try:
+        guia = get_object_or_404(Guia, id=guide_id)
+
+        # Validar si el enlace del manual es una URL válida
+        manual_url = guia.manual if isinstance(guia.manual, str) else None
+        video_url = guia.video if isinstance(guia.video, str) else None
+
+        data = {
+            "titulo": guia.titulo,
+            "descripcion": guia.descripcion,
+            "manual_url": manual_url,
+            "video_url": video_url,
+        }
+        return JsonResponse(data, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
