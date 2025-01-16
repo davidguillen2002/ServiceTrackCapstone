@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from ServiceTrack.models import Equipo, Servicio, Notificacion, Usuario
@@ -25,15 +26,33 @@ def lista_equipos_cliente(request):
         'servicios': servicios,
     })
 
+
 @login_required
 @user_passes_test(is_cliente)
 def detalle_equipo_cliente(request, equipo_id):
-    # Verificar que el equipo pertenece al cliente
+    """
+    Vista para mostrar el detalle de un equipo específico para un cliente,
+    junto con el historial de servicios y la calificación de cada servicio.
+    """
+    # Obtener el equipo del cliente autenticado
     equipo = get_object_or_404(Equipo, id=equipo_id, cliente=request.user)
-    servicios = Servicio.objects.filter(equipo=equipo)
+
+    # Obtener los servicios asociados al equipo, ordenados por fecha de inicio descendente
+    servicios = Servicio.objects.filter(equipo=equipo).order_by('-fecha_inicio')
+
+    # Configurar la paginación (5 servicios por página)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(servicios, 5)
+    servicios_paginados = paginator.get_page(page)
+
+    # Definir un rango para las estrellas (de 1 a 5)
+    rango_estrellas = list(range(1, 6))
+
+    # Renderizar el template con el equipo, servicios paginados y rango de estrellas
     return render(request, 'seguimiento/detalle_equipo_cliente.html', {
         'equipo': equipo,
-        'servicios': servicios,
+        'servicios': servicios_paginados,
+        'rango_estrellas': rango_estrellas,
     })
 
 @login_required
@@ -101,20 +120,21 @@ def detalle_servicio_tecnico(request, servicio_id):
 @user_passes_test(is_cliente)
 def panel_cliente(request):
     # Filtrar los servicios del cliente actual
-    servicios = Servicio.objects.filter(equipo__cliente=request.user)
+    servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
 
-    # Calcular las estadísticas necesarias para el gráfico
-    promedio_calificacion = servicios.filter(estado='completado').aggregate(
-        models.Avg('calificacion')
-    )['calificacion__avg'] or 0
+    # Configurar paginación
+    page = request.GET.get('page', 1)
+    paginator = Paginator(servicios, 5)  # Mostrar 5 servicios por página
+    servicios_paginados = paginator.get_page(page)
+
+    # Calcular estadísticas para los gráficos
+    promedio_calificacion = servicios.filter(estado='completado').aggregate(models.Avg('calificacion'))['calificacion__avg'] or 0
     servicios_completados = servicios.filter(estado='completado').count()
-    costo_total = servicios.aggregate(
-        models.Sum('costo')
-    )['costo__sum'] or 0
+    costo_total = servicios.aggregate(models.Sum('costo'))['costo__sum'] or 0
 
     return render(request, 'seguimiento/panel_cliente.html', {
-        'servicios': servicios,
-        'promedio_calificacion': round(promedio_calificacion, 2),  # Redondeamos para evitar decimales largos
+        'servicios': servicios_paginados,  # Servicios paginados
+        'promedio_calificacion': round(promedio_calificacion, 2),
         'servicios_completados': servicios_completados,
-        'costo_total': round(costo_total, 2),  # Si es monetario, redondeamos a dos decimales
+        'costo_total': round(costo_total, 2),
     })

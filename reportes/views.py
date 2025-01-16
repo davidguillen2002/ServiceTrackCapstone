@@ -7,6 +7,7 @@ from ServiceTrack.models import Servicio, HistorialReporte, Notificacion, Usuari
 from datetime import datetime
 import pandas as pd
 import io
+from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Sum, F, ExpressionWrapper, DurationField
 
 # Helper para verificar roles
@@ -156,36 +157,29 @@ def analizar_repuestos(request):
 @login_required
 @user_passes_test(lambda u: u.rol.nombre == "tecnico")
 def panel_reportes_tecnicos(request):
-    """
-    Vista principal del panel de reportes para técnicos.
-    Muestra su progreso en servicios y calificaciones obtenidas.
-    """
     usuario = request.user
-    servicios = Servicio.objects.filter(tecnico=usuario, estado='completado')
+    servicios = Servicio.objects.filter(tecnico=usuario).order_by('-fecha_inicio')
 
-    # KPIs específicos para el técnico
-    total_servicios = servicios.count()
-    promedio_calificacion = servicios.aggregate(Avg('calificacion'))['calificacion__avg'] or 0
+    # Paginación
+    paginator = Paginator(servicios, 10)  # 10 servicios por página
+    page_number = request.GET.get('page')
+    servicios_paginados = paginator.get_page(page_number)
 
-    # Calcular tiempo promedio de resolución en días
-    servicios_con_tiempo = servicios.annotate(
+    # KPIs
+    total_servicios = servicios.filter(estado='completado').count()
+    promedio_calificacion = servicios.filter(estado='completado').aggregate(Avg('calificacion'))['calificacion__avg'] or 0
+    tiempo_promedio_resolucion = servicios.filter(estado='completado').annotate(
         dias_resolucion=ExpressionWrapper(
             F('fecha_fin') - F('fecha_inicio'),
             output_field=DurationField()
         )
-    ).aggregate(
-        promedio=Avg('dias_resolucion')
-    )
-
-    tiempo_promedio_resolucion = (
-        servicios_con_tiempo['promedio'].days if servicios_con_tiempo['promedio'] else None
-    )
+    ).aggregate(Avg('dias_resolucion'))['dias_resolucion__avg']
 
     context = {
         'total_servicios': total_servicios,
         'promedio_calificacion': round(promedio_calificacion, 2),
-        'tiempo_promedio_resolucion': tiempo_promedio_resolucion if tiempo_promedio_resolucion else "N/A",
-        'servicios': servicios,
+        'tiempo_promedio_resolucion': round(tiempo_promedio_resolucion.days, 1) if tiempo_promedio_resolucion else "N/A",
+        'servicios': servicios_paginados,
     }
 
     return render(request, 'reportes/reporte_tecnicos.html', context)

@@ -2,7 +2,8 @@ import json
 
 import pandas as pd
 from django.db.models import Count, Min, Sum
-from ServiceTrack.models import Usuario, Servicio, Reto, RetoUsuario, RegistroPuntos, Medalla, ObservacionIncidente, Temporada, EstadisticaTemporada, Recompensa
+from ServiceTrack.models import Usuario, Servicio, Reto, RetoUsuario, RegistroPuntos, Medalla, ObservacionIncidente, \
+    Temporada, EstadisticaTemporada, Recompensa, Notificacion
 from django.utils.timezone import now
 from .notifications import notificar_tecnico, notificar_tecnico_con_animacion
 import joblib
@@ -127,7 +128,7 @@ def generar_recomendaciones_con_ia(tecnico):
 def otorgar_puntos_por_servicio(usuario):
     """
     Otorga puntos por servicios completados no procesados. Ajusta los puntos otorgados
-    para evitar un avance excesivo en niveles.
+    para evitar un avance excesivo en niveles y considera el rendimiento del técnico.
     """
     servicios_completados = usuario.tecnico_servicios.filter(estado='completado').exclude(
         id__in=RegistroPuntos.objects.filter(usuario=usuario).values_list('servicio_id', flat=True)
@@ -163,6 +164,7 @@ def otorgar_puntos_por_servicio(usuario):
     usuario.save()
 
     return puntos_totales
+
 
 from django.utils.timezone import now
 from ServiceTrack.models import RegistroPuntos, RetoUsuario, Medalla
@@ -257,10 +259,6 @@ def verificar_y_asignar_medallas_y_retos(usuario):
                 descripcion=f"Reto completado: {reto_usuario.reto.nombre}"
             )
 
-    # Sincronizar experiencia del usuario
-    if usuario.experiencia < experiencia_total:
-        usuario.experiencia = experiencia_total
-
     # Verificar si el usuario tiene experiencia suficiente para subir de nivel
     experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
     while usuario.experiencia >= experiencia_requerida and usuario.nivel < 5:
@@ -294,6 +292,7 @@ def verificar_y_asignar_medallas_y_retos(usuario):
 
     usuario.save()
     return animaciones  # Devolver la lista de animaciones para el frontend
+
 
 def generar_recomendaciones_para_tecnico(tecnico):
     """
@@ -360,22 +359,28 @@ def asignar_retos_dinamicos(tecnico):
         else:
             print(f"Reto ya existente: {reto.nombre} para usuario {tecnico.nombre}")
 
-def otorgar_experiencia(usuario, cantidad):
+def otorgar_experiencia(self, cantidad):
     """
     Otorga experiencia al usuario, verifica si sube de nivel y ajusta retos asociados.
     """
-    usuario.experiencia += cantidad
-    while usuario.experiencia >= usuario.calcular_experiencia_nivel_siguiente():
-        exceso = usuario.experiencia - usuario.calcular_experiencia_nivel_siguiente()
-        usuario.nivel += 1
-        usuario.experiencia = exceso
-        notificar_tecnico(
-            usuario=usuario,
-            mensaje=f"¡Felicidades {usuario.nombre}, alcanzaste el nivel {usuario.nivel}! 🎉",
-            tipo="info"
+    self.experiencia += cantidad
+    while self.experiencia >= self.calcular_experiencia_nivel_siguiente() and self.nivel < 5:
+        exceso = self.experiencia - self.calcular_experiencia_nivel_siguiente()
+        self.nivel += 1
+        self.experiencia = exceso
+
+        # Crear notificación para el usuario
+        Notificacion.crear_notificacion(
+            usuario=self,
+            tipo="nivel_cliente",
+            mensaje=f"¡Felicidades {self.nombre}, has alcanzado el nivel {self.nivel}! 🎉"
         )
-        usuario.asignar_retos_por_nivel(usuario)  # Asignar retos nuevos para el nivel actual
-    usuario.save()
+
+        # Asignar retos del nuevo nivel
+        self.asignar_retos_por_nivel()
+
+    self.save()
+
 
 def limpiar_duplicados_retousuario():
     """
@@ -445,38 +450,90 @@ def finalizar_temporada():
 
 def verificar_y_asignar_recompensas(usuario, temporada_actual):
     """
-    Asigna recompensas a los usuarios que han cumplido retos en la temporada actual.
+    Asigna recompensas específicas al usuario basadas en su nivel, temporada actual y retos cumplidos,
+    asegurando que no haya duplicados en recompensas o notificaciones.
     """
-    # Obtener retos cumplidos por el usuario en la temporada actual
-    retos_cumplidos = RetoUsuario.objects.filter(
+    tipos_recompensa = ["bono", "herramienta", "trofeo"]
+    nivel_actual = usuario.nivel
+    notificaciones_enviadas = set()
+
+    # Obtener todas las recompensas existentes para evitar duplicados
+    recompensas_existentes = Recompensa.objects.filter(
         usuario=usuario,
-        cumplido=True,
-        reto__temporada=temporada_actual
-    )
+        temporada=temporada_actual
+    ).values_list("reto_id", "tipo")
+    recompensas_existentes_set = set(recompensas_existentes)
 
-    for reto_usuario in retos_cumplidos:
-        # Verificar si ya existe una recompensa asociada al reto cumplido
-        recompensa_existente = Recompensa.objects.filter(
+    # Iterar por todos los niveles desde 1 hasta el nivel actual
+    for nivel in range(1, nivel_actual + 1):
+        # Retos cumplidos por el usuario en el nivel actual dentro de la temporada
+        retos_cumplidos = RetoUsuario.objects.filter(
             usuario=usuario,
-            reto=reto_usuario.reto
-        ).exists()
+            cumplido=True,
+            reto__temporada=temporada_actual,
+            reto__nivel=nivel
+        )
 
-        if not recompensa_existente:
-            # Crear y asignar recompensa
-            Recompensa.objects.create(
-                usuario=usuario,
-                reto=reto_usuario.reto,
-                temporada=temporada_actual,
-                tipo="herramienta",  # Cambia según corresponda
-                puntos_necesarios=reto_usuario.reto.valor_objetivo,
-                descripcion=f"Recompensa por completar el reto '{reto_usuario.reto.nombre}'",
-                valor=50.00  # Ajusta el valor según corresponda
-            )
+        # Generar recompensas faltantes según retos cumplidos
+        for reto_asociado in retos_cumplidos:
+            recompensa_notificada = False  # Control para evitar notificar múltiples veces por el mismo reto
+            for tipo in tipos_recompensa:
+                recompensa_clave = (reto_asociado.reto.id, tipo)
 
-            # Notificar al usuario
-            notificar_tecnico(
-                usuario=usuario,
-                mensaje=f"¡Has obtenido una recompensa por el reto '{reto_usuario.reto.nombre}'! 🎉",
-                tipo="success"
-            )
+                if recompensa_clave not in recompensas_existentes_set:
+                    # Descripciones personalizadas por nivel y tipo de recompensa
+                    descripcion_base = {
+                        "bono": {
+                            1: "Bono de $100 para tus primeros logros en retos iniciales. ¡Excelente comienzo!",
+                            2: "Bono de $150 por cumplir consistentemente tus metas. ¡Sigue destacando!",
+                            3: "Bono de $200 por superar retos técnicos avanzados con excelencia.",
+                            4: "Bono de $300 por liderar tareas complejas y mantener altos estándares.",
+                            5: "Bono de $500 como reconocimiento por alcanzar la maestría técnica. ¡Eres un referente!"
+                        },
+                        "herramienta": {
+                            1: "Kit básico de herramientas técnicas ideal para principiantes.",
+                            2: "Multímetro digital avanzado para diagnósticos precisos.",
+                            3: "Juego profesional de destornilladores y pinzas para equipos complejos.",
+                            4: "Estación de soldadura de precisión para reparaciones avanzadas.",
+                            5: "Maletín premium con herramientas especializadas para expertos."
+                        },
+                        "trofeo": {
+                            1: "Trofeo: Técnico en Entrenamiento por completar tus primeros retos.",
+                            2: "Trofeo: Técnico en Progreso como reconocimiento a tu dedicación.",
+                            3: "Trofeo: Técnico Experto por destacarte en retos avanzados.",
+                            4: "Trofeo: Técnico Avanzado por liderar proyectos técnicos complejos.",
+                            5: "Trofeo: Maestro Técnico como símbolo de excelencia y experiencia."
+                        }
+                    }
+
+                    # Valores ajustados por nivel y tipo
+                    valor_base = {
+                        "bono": {1: 100, 2: 150, 3: 200, 4: 300, 5: 500},
+                        "herramienta": {1: 150, 2: 200, 3: 300, 4: 400, 5: 600},
+                        "trofeo": {1: 200, 2: 300, 3: 400, 4: 600, 5: 800},
+                    }
+
+                    # Crear y asignar recompensa
+                    nueva_recompensa = Recompensa.objects.create(
+                        usuario=usuario,
+                        reto=reto_asociado.reto,
+                        temporada=temporada_actual,
+                        tipo=tipo,
+                        puntos_necesarios=20 * nivel,  # Ajustar según nivel
+                        descripcion=descripcion_base[tipo][nivel],
+                        valor=valor_base[tipo][nivel]
+                    )
+
+                    # Enviar una única notificación por recompensa asignada para un reto
+                    if not recompensa_notificada:
+                        notificar_tecnico(
+                            usuario=usuario,
+                            mensaje=f"¡Has ganado una nueva recompensa por el reto '{reto_asociado.reto.nombre}': {nueva_recompensa.descripcion}! 🎉",
+                            tipo="success"
+                        )
+                        recompensa_notificada = True
+
+
+
+
 

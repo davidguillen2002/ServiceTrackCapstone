@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes Asignados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Barra de navegación secundaria -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'tecnico_services_list' %}">Mis Servicios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Clientes Asignados</li>
+        </ol>
+    </nav>
+
+    <h1 class="text-center">Clientes Asignados</h1>
+
+    <!-- Tabla de Clientes -->
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Correo</th>
+                <th>Celular</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.cedula }}</td>
+                <td>{{ cliente.correo }}</td>
+                <td>{{ cliente.celular }}</td>
+                <td>
+                    <a href="{% url 'detalle_cliente' cliente.id %}" class="btn btn-info btn-sm">Ver Detalles</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No hay clientes asignados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center">
+        {% if clientes.has_other_pages %}
+            <ul class="pagination">
+                {% if clientes.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ clientes.previous_page_number }}">Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Anterior</span>
+                    </li>
+                {% endif %}
+
+                {# Rango de páginas a mostrar #}
+                {% for i in clientes.paginator.page_range %}
+                    {% if i >= clientes.number|add:'-2' and i <= clientes.number|add:'2' %}
+                        {% if clientes.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% elif i == 1 or i == clientes.paginator.num_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% elif i == clientes.number|add:'-3' or i == clientes.number|add:'3' %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if clientes.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ clientes.next_page_number }}">Siguiente</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Siguiente</span>
+                    </li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Volver a Mis Servicios</a>
+        <a href="{% url 'crear_servicio' %}" class="btn btn-primary">Crear Servicio</a>
+    </div>
+</div>
+{% endblock %}

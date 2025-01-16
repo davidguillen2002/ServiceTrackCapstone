@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Repuesto{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Agregar Repuesto</h1>
+
+    <!-- Información del Servicio -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Información del Servicio</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Equipo:</strong> {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</p>
+                    <p><strong>Estado:</strong>
+                        <span class="badge
+                            {% if servicio.estado == 'completado' %}bg-success
+                            {% elif servicio.estado == 'en_progreso' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ servicio.estado|capfirst }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d/m/Y" }}</p>
+                    <p><strong>Técnico a Cargo:</strong> {{ servicio.tecnico.nombre }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario para agregar repuesto -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Formulario de Repuesto</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus-circle me-2"></i>Agregar Repuesto
+                    </button>
+                    <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times-circle me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

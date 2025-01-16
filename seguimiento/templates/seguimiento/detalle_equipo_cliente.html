@@ -3,40 +3,117 @@
 {% block title %}Detalle del Equipo - Cliente{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Detalle del Equipo</h1>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Detalle del Equipo</h1>
 
-    <!-- Device Information -->
-    <div class="card mb-4">
+    <!-- Información del Equipo -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Equipo: {{ equipo.marca }} {{ equipo.modelo }}</h5>
+        </div>
         <div class="card-body">
-            <h5 class="card-title">Equipo: {{ equipo.marca }} {{ equipo.modelo }}</h5>
             <p><strong>Año:</strong> {{ equipo.anio }}</p>
             <p><strong>Tipo de Equipo:</strong> {{ equipo.tipo_equipo }}</p>
-            <p><strong>Observaciones:</strong> {{ equipo.observaciones|default:"No hay observaciones." }}</p>
+            <p><strong>Observaciones:</strong>
+                <span class="text-muted">{{ equipo.observaciones|default:"No hay observaciones." }}</span>
+            </p>
         </div>
     </div>
 
-    <!-- Repair History Section -->
-    <h3 class="mt-5">Historial de Servicios</h3>
-    <ul class="list-group">
-        {% for servicio in servicios %}
-            <li class="list-group-item">
-                <strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d/m/Y" }} <br>
-                <strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin|date:"d/m/Y" }} <br>
-                <strong>Estado:</strong>
-                <span class="{% if servicio.estado == 'completado' %}estado-completado{% elif servicio.estado == 'pendiente' %}estado-pendiente{% elif servicio.estado == 'en_progreso' %}estado-en-progreso{% endif %}">
-                    {{ servicio.estado|capfirst }}
-                </span><br>
-                <strong>Costo:</strong> ${{ servicio.costo }} <br>
-                <strong>Calificación:</strong> {{ servicio.calificacion|default:"Sin calificar" }} <br>
-                <strong>Comentario del Cliente:</strong> {{ servicio.comentario_cliente|default:"Sin comentarios." }}
-            </li>
-        {% empty %}
-            <li class="list-group-item text-center">No hay historial de servicios para este equipo.</li>
-        {% endfor %}
-    </ul>
+    <!-- Historial de Servicios -->
+    <h3 class="mt-5 mb-4">Historial de Servicios</h3>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Finalización</th>
+                    <th>Estado</th>
+                    <th>Costo</th>
+                    <th>Calificación</th>
+                    <th>Comentario del Cliente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
+                        <td>{{ servicio.fecha_fin|default:"N/A"|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge
+                                {% if servicio.estado == 'completado' %}bg-success
+                                {% elif servicio.estado == 'en_progreso' %}bg-warning
+                                {% else %}bg-secondary{% endif %}">
+                                {{ servicio.estado|capfirst }}
+                            </span>
+                        </td>
+                        <td>${{ servicio.costo }}</td>
+                        <td>
+                            {% if servicio.calificacion %}
+                                <span class="text-warning">
+                                    {% for star in rango_estrellas %}
+                                        <i class="fas fa-star{% if star > servicio.calificacion %}-o{% endif %}"></i>
+                                    {% endfor %}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">Sin calificar</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ servicio.comentario_cliente|default:"Sin comentarios." }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No hay historial de servicios para este equipo.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <!-- Back Button -->
-    <a href="{% url 'lista_equipos_cliente' %}" class="btn btn-secondary mt-4">Volver</a>
+    <!-- Paginación -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if servicios.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ servicios.previous_page_number }}" aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in servicios.paginator.page_range %}
+                <li class="page-item {% if servicios.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endfor %}
+
+            {% if servicios.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ servicios.next_page_number }}" aria-label="Siguiente">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" aria-label="Siguiente">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Botón Volver -->
+    <div class="text-center mt-4">
+        <a href="{% url 'lista_equipos_cliente' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
 </div>
 {% endblock %}

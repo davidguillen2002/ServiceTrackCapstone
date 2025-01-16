@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Incidente{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Crear Incidente para el Servicio #{{ servicio.id }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <small class="form-text text-muted">
+            Si no encuentras el tipo de observación, ingresa uno nuevo.
+        </small>
+        <button type="submit" class="btn btn-danger">Reportar Incidente</button>
+        <a href="{% url 'listar_incidentes' servicio.id %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

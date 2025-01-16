@@ -10,6 +10,14 @@
     <!-- Filtros -->
     <form method="get" class="row mb-4">
         <div class="col-md-3">
+            <select name="anio" class="form-select">
+                <option value="">Seleccionar Año</option>
+                {% for anio in anios %}
+                    <option value="{{ anio.year }}" {% if anio_filtrado == anio.year|stringformat:"d" %}selected{% endif %}>{{ anio.year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
             <select name="mes" class="form-select">
                 <option value="">Seleccionar Mes</option>
                 {% for mes in meses %}
@@ -74,12 +82,36 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Paginación -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if servicios.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1&anio={{ anio_filtrado }}&mes={{ mes_filtrado }}">Primero</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ servicios.previous_page_number }}&anio={{ anio_filtrado }}&mes={{ mes_filtrado }}">Anterior</a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <a class="page-link">{{ servicios.number }}</a>
+            </li>
+            {% if servicios.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ servicios.next_page_number }}&anio={{ anio_filtrado }}&mes={{ mes_filtrado }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ servicios.paginator.num_pages }}&anio={{ anio_filtrado }}&mes={{ mes_filtrado }}">Último</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 
 <!-- Gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Gráfico de Progreso Mensual
     const monthlyProgressData = {{ servicios_por_dia|safe }};
     if (monthlyProgressData.length > 0) {
         const days = monthlyProgressData.map(item => item.fecha);
@@ -96,24 +128,13 @@
                     borderColor: '#4CAF50',
                     backgroundColor: 'rgba(76, 175, 80, 0.2)',
                     borderWidth: 2,
-                    pointBackgroundColor: '#FF9800',
-                    pointBorderColor: '#FF9800',
-                    pointHoverBackgroundColor: '#FF5722',
-                    pointHoverBorderColor: '#FF5722',
-                    tension: 0.4, // Hace el gráfico más suave
+                    tension: 0.4,
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
                     legend: { display: true, position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return `Servicios: ${tooltipItem.raw}`;
-                            }
-                        }
-                    }
                 },
                 scales: {
                     x: { title: { display: true, text: 'Días del Mes' } },
@@ -121,14 +142,11 @@
                 }
             }
         });
-    } else {
-        console.error("No hay datos para mostrar en el gráfico de progreso mensual.");
     }
 
-    // Gráfico de Tiempos de Resolución
     const resolutionTimeData = {{ tiempos_resolucion_data|safe }};
     if (resolutionTimeData.length > 0) {
-        const sortedData = resolutionTimeData.sort((a, b) => a.tiempo - b.tiempo); // Ordenar por tiempo
+        const sortedData = resolutionTimeData.sort((a, b) => a.tiempo - b.tiempo);
         const serviceLabels = sortedData.map(item => `Servicio ${item.servicio}`);
         const resolutionTimes = sortedData.map(item => item.tiempo);
 
@@ -143,23 +161,12 @@
                     backgroundColor: resolutionTimes.map((_, index) =>
                         index % 2 === 0 ? 'rgba(33, 150, 243, 0.7)' : 'rgba(255, 87, 34, 0.7)'
                     ),
-                    borderColor: resolutionTimes.map((_, index) =>
-                        index % 2 === 0 ? 'rgba(33, 150, 243, 1)' : 'rgba(255, 87, 34, 1)'
-                    ),
-                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
                     legend: { display: true, position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return `${tooltipItem.raw.toFixed(2)} horas`;
-                            }
-                        }
-                    }
                 },
                 scales: {
                     x: { title: { display: true, text: 'Servicios (Ordenados por Tiempo)' } },
@@ -167,8 +174,6 @@
                 }
             }
         });
-    } else {
-        console.error("No hay datos para mostrar en el gráfico de tiempos de resolución.");
     }
 </script>
 {% endblock %}

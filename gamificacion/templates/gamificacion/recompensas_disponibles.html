@@ -9,8 +9,10 @@
 
     <div class="row justify-content-center mb-4">
         <div class="col-md-6 text-center">
-            <p class="text-info">
-                ¡Estás en el <strong>nivel {{ nivel_actual }}</strong>! Abre el cofre para descubrir tus recompensas.
+            <!-- Texto destacado para el nivel actual -->
+            <p class="nivel-actual-text">
+                ¡Estás en el <strong>nivel {{ nivel_actual }}</strong>! <br>
+                <span>Abre el cofre para descubrir tus recompensas.</span>
             </p>
             <div id="cofre-container" class="cofre-container">
                 <img id="cofre-img" src="{% static 'img/cofre-cerrado.png' %}" alt="Cofre cerrado" class="cofre">
@@ -27,18 +29,31 @@
     <div id="recompensas-container" class="d-none">
         <!-- Recompensas disponibles -->
         <div class="col-md-8 mx-auto mt-4">
-            <h4 class="text-center">🌟 Recompensas Disponibles</h4>
+            <h4 class="text-center text-primary">🌟 Tus Recompensas Disponibles</h4>
             <div id="recompensas-disponibles">
                 {% if recompensas_disponibles %}
                     {% for recompensa in recompensas_disponibles %}
                     <div class="card mb-3 animate__animated animate__fadeIn">
-                        <div class="card-body text-center">
-                            <h5 class="card-title"><i class="fas fa-gem"></i> {{ recompensa.tipo }}</h5>
-                            <p class="card-text">{{ recompensa.descripcion }}</p>
-                            <span class="badge bg-success">Requiere: {{ recompensa.puntos_necesarios }} puntos</span>
-                            <button class="btn btn-success mt-2 reclamar-btn" data-id="{{ recompensa.id }}">
-                                Redimir
-                            </button>
+                        <div class="row g-0">
+                            <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
+                                <img src="{% static 'img/' %}{{ recompensa.tipo }}.png" alt="{{ recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
+                                    <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
+                                    <p class="card-text"><strong>Puntos necesarios:</strong> {{ recompensa.puntos_necesarios }}</p>
+                                    {% if forloop.counter <= retos_cumplidos %}
+                                        <button class="btn btn-success mt-2 reclamar-btn" data-id="{{ recompensa.id }}">
+                                            Redimir <i class="fas fa-check-circle"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-secondary mt-2" disabled>
+                                            Completa más retos para redimir
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
@@ -48,17 +63,24 @@
             </div>
         </div>
 
-        <!-- Recompensas ya redimidas -->
+        <!-- Recompensas redimidas -->
         <div class="col-md-8 mx-auto mt-4">
-            <h4 class="text-center">✅ Recompensas Redimidas</h4>
+            <h4 class="text-center text-success">✅ Recompensas Redimidas</h4>
             <div id="recompensas-redimidas">
                 {% if recompensas_redimidas %}
                     {% for recompensa in recompensas_redimidas %}
                     <div class="card mb-3 animate__animated animate__fadeIn">
-                        <div class="card-body text-center">
-                            <h5 class="card-title"><i class="fas fa-check-circle"></i> {{ recompensa.tipo }}</h5>
-                            <p class="card-text">{{ recompensa.descripcion }}</p>
-                            <span class="badge bg-info">Redimida</span>
+                        <div class="row g-0">
+                            <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
+                                <img src="{% static 'img/' %}{{ recompensa.tipo }}-redimido.png" alt="{{ recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
+                                    <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
+                                    <span class="badge bg-info">Redimida</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
@@ -119,18 +141,27 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        mensajeAnimacion.textContent = data.mensaje.mensaje;
+                        mensajeAnimacion.textContent = data.mensaje.descripcion;
                         animacionCofre.classList.remove("d-none");
 
                         // Actualizar la recompensa redimida
                         const recompensaCard = btn.closest(".card");
                         recompensasDisponiblesDiv.removeChild(recompensaCard);
+
                         recompensasRedimidasDiv.insertAdjacentHTML('beforeend', `
                             <div class="card mb-3 animate__animated animate__fadeIn">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title"><i class="fas fa-check-circle"></i> ${data.mensaje.tipo}</h5>
-                                    <p class="card-text">${data.mensaje.mensaje}</p>
-                                    <span class="badge bg-info">Redimida</span>
+                                <div class="row g-0">
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
+                                        <img src="{% static 'img/' %}${data.mensaje.tipo}-redimido.png" alt="${data.mensaje.tipo}" class="img-fluid" style="max-height: 100px;">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-uppercase"><strong>${data.mensaje.tipo}</strong></h5>
+                                            <p class="card-text"><strong>Descripción:</strong> ${data.mensaje.descripcion}</p>
+                                            <p class="card-text"><strong>Valor estimado:</strong> ${data.mensaje.valor}</p>
+                                            <span class="badge bg-info">Redimida</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `);
@@ -197,6 +228,24 @@
         50% {
             transform: scale(1.2);
         }
+    }
+    .nivel-actual-text {
+        font-size: 2rem; /* Tamaño grande del texto */
+        font-weight: bold;
+        color: #ff9800; /* Color llamativo */
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3); /* Sombra para destacar */
+        line-height: 1.5;
+    }
+
+    .nivel-actual-text strong {
+        font-size: 2.5rem; /* Tamaño aún mayor para el nivel */
+        color: #4caf50; /* Diferente color para destacar más */
+    }
+
+    .nivel-actual-text span {
+        display: block;
+        font-size: 1.8rem; /* Texto adicional también llamativo */
+        margin-top: 0.5rem;
     }
 </style>
 {% endblock %}

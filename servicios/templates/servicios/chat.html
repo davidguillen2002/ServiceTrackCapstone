@@ -1,59 +1,126 @@
 {% extends "base.html" %}
 
-{% block title %}Chat con IA{% endblock %}
+{% block title %}Chat Personalizado{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="mb-4">Preguntas</h1>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Chat Personalizado con IA</h1>
 
     <!-- Contenedor del historial del chat -->
-    <div id="chatbox" class="chatbox">
+    <div id="chatbox" class="chatbox mb-4">
         {% for chat in chat_history %}
             <div class="message user">
-                <strong>Tú:</strong> {{ chat.user_message }}
+                <div class="bubble user-bubble">
+                    <strong>Tú:</strong> {{ chat.user_message }}
+                </div>
             </div>
             <div class="message bot">
-                <strong>Bot:</strong> {{ chat.bot_response }}
+                <div class="bubble bot-bubble">
+                    <strong>Bot:</strong>
+                    <div class="formatted-response">
+                        {{ chat.bot_response|safe }}
+                    </div>
+                </div>
             </div>
         {% endfor %}
     </div>
 
-    <!-- Formulario de entrada para enviar preguntas -->
+    <!-- Formulario de entrada -->
     <form id="chat-form" method="post">
         {% csrf_token %}
-        <div class="input-group mt-4">
+        <div class="input-group">
             <input type="text" id="message" name="message" class="form-control" placeholder="Escribe tu mensaje..." required>
             <button type="submit" class="btn btn-primary">Enviar</button>
         </div>
     </form>
 </div>
 
-<!-- Estilos para el chat -->
+<!-- Estilos -->
 <style>
     .chatbox {
         border: 1px solid #ddd;
         padding: 20px;
+        border-radius: 10px;
         max-height: 500px;
         overflow-y: auto;
-        background-color: #f9f9f9;
-        margin-bottom: 20px;
+        background-color: #f8f9fa;
     }
     .message {
         margin-bottom: 15px;
-        padding: 10px;
-        border-radius: 10px;
     }
-    .user {
+    .bubble {
+        padding: 15px;
+        border-radius: 15px;
+        max-width: 70%;
+        line-height: 1.5;
+    }
+    .user .bubble {
         background-color: #d1e7ff;
         text-align: right;
+        margin-left: auto;
     }
-    .bot {
-        background-color: #e9ecef;
+    .bot .bubble {
+        background-color: #f0f0f0;
         text-align: left;
+        margin-right: auto;
+    }
+    .formatted-response {
+        font-size: 0.95rem;
+        color: #333;
+    }
+    .formatted-response h1,
+    .formatted-response h2,
+    .formatted-response h3 {
+        color: #007bff;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+    .formatted-response ul {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+    .formatted-response ol {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+    .formatted-response li {
+        margin-bottom: 5px;
+    }
+    .formatted-response strong {
+        font-weight: bold;
+    }
+    .formatted-response em {
+        font-style: italic;
+    }
+    .user-bubble {
+        animation: slideInRight 0.3s ease-in-out;
+    }
+    .bot-bubble {
+        animation: slideInLeft 0.3s ease-in-out;
+    }
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 </style>
 
-<!-- Script para enviar mensajes dinámicamente con AJAX -->
+<!-- Script para enviar mensajes dinámicamente -->
 <script>
     document.getElementById('chat-form').onsubmit = function(event) {
         event.preventDefault();
@@ -66,27 +133,34 @@
                 "Content-Type": "application/x-www-form-urlencoded",
                 "X-CSRFToken": "{{ csrf_token }}"
             },
-            body: `message=${message}`
+            body: `message=${encodeURIComponent(message)}`
         })
         .then(response => response.json())
         .then(data => {
             const chatbox = document.getElementById('chatbox');
 
-            // Agregar mensaje del usuario
+            // Añadir mensaje del usuario
             chatbox.innerHTML += `
                 <div class='message user'>
-                    <strong>Tú:</strong> ${message}
+                    <div class='bubble user-bubble'>
+                        <strong>Tú:</strong> ${message}
+                    </div>
                 </div>`;
 
-            // Agregar respuesta del bot
+            // Añadir respuesta del bot
             chatbox.innerHTML += `
                 <div class='message bot'>
-                    <strong>Bot:</strong> ${data.response}
+                    <div class='bubble bot-bubble'>
+                        <strong>Bot:</strong>
+                        <div class='formatted-response'>${data.response}</div>
+                    </div>
                 </div>`;
+
+            // Desplazar el chat hacia abajo
+            chatbox.scrollTop = chatbox.scrollHeight;
 
             // Limpiar el campo de entrada
             messageInput.value = "";
-            chatbox.scrollTop = chatbox.scrollHeight;
         });
     };
 </script>

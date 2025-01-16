@@ -1,4 +1,4 @@
-# Crear servicios masivos para los años 2023 y 2024 con datos detallados
+# Crear servicios masivos, repuestos y observaciones con datos detallados
 import os
 import random
 from faker import Faker
@@ -9,7 +9,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ServiceTrack.settings")
 django.setup()
 
-from ServiceTrack.models import Servicio, Equipo, Usuario, Temporada
+from ServiceTrack.models import Servicio, Equipo, Usuario, Temporada, Repuesto, ObservacionIncidente, TipoObservacion
 
 fake = Faker("es_ES")  # Generador en español
 
@@ -49,6 +49,33 @@ diagnosticos_iniciales = [
     "El cargador del equipo está defectuoso.",
 ]
 
+# Repuestos reales basados en diagnósticos
+repuestos_por_diagnostico = {
+    "Problemas con el encendido del equipo.": ["Fuente de poder", "Placa base"],
+    "Pantalla con líneas o defectos de visualización.": ["Pantalla LCD", "Cable flex"],
+    "El equipo presenta sobrecalentamiento.": ["Ventilador", "Pasta térmica"],
+    "Problemas de conexión Wi-Fi.": ["Tarjeta de red", "Antena Wi-Fi"],
+    "Reemplazo de batería necesario.": ["Batería original"],
+    "El teclado no responde correctamente.": ["Teclado", "Controlador interno"],
+    "Actualización del sistema operativo requerida.": [],
+    "El equipo no reconoce dispositivos USB.": ["Puerto USB", "Placa controladora"],
+    "Fallos intermitentes en la tarjeta gráfica.": ["Tarjeta gráfica", "Cable interno"],
+    "El cargador del equipo está defectuoso.": ["Cargador original"],
+}
+
+# Tipos de observaciones
+observaciones_posibles = [
+    "Retraso en repuestos",
+    "Problema no diagnosticado",
+    "Cliente no disponible",
+    "Herramienta faltante",
+    "Revisión pendiente",
+]
+
+# Crear tipos de observaciones si no existen
+for observacion in observaciones_posibles:
+    TipoObservacion.objects.get_or_create(nombre=observacion)
+
 # Fechas de inicio y fin para 2023 y 2024
 fecha_inicio_servicio = datetime(2023, 1, 1)
 fecha_fin_servicio = datetime(2024, 12, 31)
@@ -58,10 +85,13 @@ temporada_actual = Temporada.obtener_temporada_actual()
 if not temporada_actual:
     print("Advertencia: No se encontró una temporada activa. Los servicios creados no estarán asociados a una temporada específica.")
 
-# Crear servicios detallados
+# Variables de progreso
 servicios_creados = 0
+repuestos_creados = 0
+observaciones_creadas = 0
 errores = 0
 
+# Crear servicios masivos
 for _ in range(5000):  # Crear 5000 servicios
     try:
         tecnico = random.choice(tecnicos)
@@ -74,6 +104,10 @@ for _ in range(5000):  # Crear 5000 servicios
         estado = random.choice(["pendiente", "en_progreso", "completado"])
         calificacion = random.uniform(1, 5) if estado == "completado" else None
 
+        # Seleccionar diagnóstico inicial y repuestos relacionados
+        diagnostico = random.choice(diagnosticos_iniciales)
+        repuestos_diagnostico = repuestos_por_diagnostico.get(diagnostico, [])
+
         # Crear servicio
         servicio = Servicio(
             equipo=equipo,
@@ -84,14 +118,45 @@ for _ in range(5000):  # Crear 5000 servicios
             calificacion=round(calificacion, 2) if calificacion else None,
             costo=round(random.uniform(50.00, 500.00), 2),
             comentario_cliente=random.choice(comentarios_cliente) if estado == "completado" else None,
-            diagnostico_inicial=random.choice(diagnosticos_iniciales),
+            diagnostico_inicial=diagnostico,
         )
         servicio.save()
         servicios_creados += 1
+
+        # Asignar repuestos al servicio
+        for nombre_repuesto in repuestos_diagnostico:
+            repuesto = Repuesto(
+                nombre=nombre_repuesto,
+                descripcion=f"Repuesto para {diagnostico.lower()}",
+                costo=round(random.uniform(10.0, 200.0), 2),
+                proveedor=fake.company(),
+                cantidad=random.randint(1, 3),
+                servicio=servicio,
+            )
+            repuesto.save()
+            repuestos_creados += 1
+
+        # Agregar observaciones a servicios no completados
+        if estado in ["pendiente", "en_progreso"]:
+            tipo_observacion = random.choice(TipoObservacion.objects.all())
+            observacion = ObservacionIncidente(
+                servicio=servicio,
+                autor=tecnico,
+                descripcion=fake.sentence(),
+                tipo_observacion=tipo_observacion,
+                estado="En progreso",
+                fecha_reportada=fake.date_between(start_date=fecha_inicio, end_date=fecha_fin or datetime.now()),
+            )
+            observacion.save()
+            observaciones_creadas += 1
+
     except Exception as e:
         print(f"Error al crear servicio: {e}")
         errores += 1
 
+# Resumen de creación
 print(f"Servicios generados exitosamente: {servicios_creados}")
+print(f"Repuestos asignados exitosamente: {repuestos_creados}")
+print(f"Observaciones creadas exitosamente: {observaciones_creadas}")
 if errores > 0:
     print(f"Errores encontrados al crear servicios: {errores}")

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Actualizar Estado del Servicio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Actualizar Estado del Servicio</h1>
+
+    <!-- Botones de navegación -->
+    <div class="mb-3">
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-outline-secondary">Volver a Mis Servicios</a>
+    </div>
+
+    <!-- Formulario para actualizar el estado -->
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+        <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-secondary">Detalle</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Servicio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Barra de navegación secundaria -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'tecnico_services_list' %}">Mis Servicios</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'listar_clientes_tecnico' %}">Clientes Asignados</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Crear Servicio</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Crear Servicio</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" id="crear-servicio-form">
+                {% csrf_token %}
+
+                <!-- Campo de Cliente (solo lectura) -->
+                <div class="form-group">
+                    <label for="cliente">Cliente</label>
+                    <input type="text" id="id_cliente" class="form-control" readonly>
+                </div>
+
+                <!-- Campo de Equipo -->
+                <div class="form-group">
+                    <label for="equipo">Equipo</label>
+                    {{ form.equipo }}
+                </div>
+
+                <!-- Campo de Fecha de Inicio -->
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio</label>
+                    {{ form.fecha_inicio }}
+                </div>
+
+                <!-- Campo de Estado -->
+                <div class="form-group">
+                    <label for="estado">Estado</label>
+                    {{ form.estado }}
+                </div>
+
+                <!-- Campo de Diagnóstico Inicial -->
+                <div class="form-group">
+                    <label for="diagnostico_inicial">Diagnóstico Inicial</label>
+                    {{ form.diagnostico_inicial }}
+                </div>
+
+                <!-- Campo de Costo -->
+                <div class="form-group">
+                    <label for="costo">Costo</label>
+                    {{ form.costo }}
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Volver a Mis Servicios</a>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Script para obtener el cliente asociado al equipo seleccionado -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const equipoField = document.getElementById('id_equipo');  // Campo de selección de equipo
+        const clienteField = document.getElementById('id_cliente'); // Campo de cliente (solo lectura)
+
+        // Escuchar cambios en el campo de equipo
+        equipoField.addEventListener('change', function () {
+            const equipoId = equipoField.value; // Obtener el ID del equipo seleccionado
+
+            if (equipoId) {
+                // Actualiza la URL para que coincida con tu ruta correcta
+                fetch(`/servicios/ajax/obtener-cliente/?equipo_id=${equipoId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la solicitud al servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.cliente) {
+                            clienteField.value = data.cliente; // Mostrar el cliente en el campo de texto
+                        } else {
+                            clienteField.value = ''; // Vaciar el campo si no se encuentra cliente
+                            alert(data.error || 'Error al obtener el cliente.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ocurrió un error al obtener el cliente.');
+                    });
+            } else {
+                clienteField.value = ''; // Vaciar el campo si no se selecciona equipo
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -4,12 +4,24 @@
 
 {% block content %}
 <div class="container mt-5">
+    <!-- Barra de navegación secundaria -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'tecnico_services_list' %}">Mis Servicios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Confirmar Entrega</li>
+        </ol>
+    </nav>
+
     <h1>Confirmar Entrega</h1>
     <p>Por favor, ingrese el código de entrega proporcionado al cliente para confirmar.</p>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Confirmar</button>
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Volver a Mis Servicios</a>
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+        </div>
     </form>
 </div>
 {% endblock %}

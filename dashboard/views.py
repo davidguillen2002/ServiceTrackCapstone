@@ -9,8 +9,11 @@ from django.contrib.auth.hashers import make_password
 from django import forms
 from django.db.models import Avg, Count, F, Sum, Value, FloatField, Case, When, DurationField, ExpressionWrapper, Q
 from django.db.models.functions import TruncMonth, Coalesce
+from django.core.paginator import Paginator
 from datetime import datetime
 from calendar import monthrange
+from django.utils.translation import gettext_lazy as _
+from django.db.models.functions import TruncYear
 
 @login_required
 def dashboard_view(request):
@@ -90,14 +93,22 @@ def dashboard_view(request):
     }
     return render(request, 'dashboard/dashboard.html', context)
 
+from django.core.paginator import Paginator
+
 @login_required
 def tecnico_dashboard_view(request):
     usuario = request.user
-    mes_filtrado = request.GET.get('mes', None)
+    anio_filtrado = request.GET.get('anio')
+    mes_filtrado = request.GET.get('mes')
+    page_number = request.GET.get('page', 1)
 
-    # Filtrar servicios por técnico y mes
+    # Filtrar servicios por técnico
     servicios = Servicio.objects.filter(tecnico=usuario)
-    if mes_filtrado:
+
+    # Validar y aplicar filtros de año y mes
+    if anio_filtrado and anio_filtrado.isdigit():
+        servicios = servicios.filter(fecha_inicio__year=int(anio_filtrado))
+    if mes_filtrado and mes_filtrado.isdigit():
         servicios = servicios.filter(fecha_inicio__month=int(mes_filtrado))
 
     # KPIs
@@ -113,11 +124,9 @@ def tecnico_dashboard_view(request):
         .annotate(total=Count('id'))
         .order_by('dia')
     )
-
-    # Formatear las fechas para el gráfico
     servicios_por_dia_formateado = [
         {'fecha': servicio['dia'].strftime('%Y-%m-%d'), 'total': servicio['total']}
-        for servicio in servicios_por_dia if servicio['dia']  # Verificar que haya fecha
+        for servicio in servicios_por_dia if servicio['dia']
     ]
 
     # Tiempo promedio de resolución por servicio completado
@@ -129,30 +138,44 @@ def tecnico_dashboard_view(request):
 
     tiempos_resolucion_data = [
         {'servicio': t['id'], 'tiempo': t['tiempo_resolucion'].total_seconds() / 3600}
-        for t in tiempos_resolucion if t['tiempo_resolucion']  # Verificar que haya tiempo
+        for t in tiempos_resolucion if t['tiempo_resolucion']
     ]
 
+    # Obtener años disponibles para el filtro
+    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
+
+    # Paginación de servicios
+    paginator = Paginator(servicios, 5)  # 5 servicios por página
+    servicios_paginados = paginator.get_page(page_number)
+
     context = {
-        'servicios': servicios,
+        'servicios': servicios_paginados,
         'total_servicios': total_servicios,
         'promedio_calificacion': promedio_calificacion,
         'servicios_en_progreso': servicios_en_progreso,
+        'anios': anios_disponibles,
+        'anio_filtrado': anio_filtrado,
         'meses': range(1, 13),
         'mes_filtrado': mes_filtrado,
-        'servicios_por_dia': servicios_por_dia_formateado,  # Datos para el gráfico
-        'tiempos_resolucion_data': tiempos_resolucion_data,  # Datos para el gráfico
+        'servicios_por_dia': servicios_por_dia_formateado,
+        'tiempos_resolucion_data': tiempos_resolucion_data,
     }
     return render(request, 'dashboard/tecnico_dashboard.html', context)
 
 @login_required
 def cliente_dashboard_view(request):
     usuario = request.user
-    mes_filtrado = request.GET.get('mes', None)
+    anio_filtrado = request.GET.get('anio', None)  # Obtener filtro de año
+    mes_filtrado = request.GET.get('mes', None)  # Obtener filtro de mes
 
-    # Equipos y servicios asociados al cliente
+    # Filtrar servicios y equipos del cliente
     equipos = Equipo.objects.filter(cliente=usuario)
     servicios = Servicio.objects.filter(equipo__cliente=usuario)
-    if mes_filtrado:
+
+    # Aplicar filtros de año y mes
+    if anio_filtrado and anio_filtrado.isdigit():
+        servicios = servicios.filter(fecha_inicio__year=int(anio_filtrado))
+    if mes_filtrado and mes_filtrado.isdigit():
         servicios = servicios.filter(fecha_inicio__month=int(mes_filtrado))
 
     # KPIs
@@ -160,23 +183,29 @@ def cliente_dashboard_view(request):
     costos_totales = servicios.aggregate(Sum('costo'))['costo__sum'] or 0
 
     # Estados de servicios
-    estados_servicios = (
-        servicios.values('estado')
-        .annotate(total=Count('id'))
-        .order_by('estado')
-    )
-
-    # Datos para el gráfico de barras apiladas
+    estados_servicios = servicios.values('estado').annotate(total=Count('id'))
     estados_totales = {"pendiente": 0, "en_progreso": 0, "completado": 0}
     for estado in estados_servicios:
         estados_totales[estado['estado']] = estado['total']
+
+    # Años disponibles
+    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC').distinct()
+
+    # Lista de meses con nombres
+    meses_nombres = [
+        ("1", _("Enero")), ("2", _("Febrero")), ("3", _("Marzo")), ("4", _("Abril")),
+        ("5", _("Mayo")), ("6", _("Junio")), ("7", _("Julio")), ("8", _("Agosto")),
+        ("9", _("Septiembre")), ("10", _("Octubre")), ("11", _("Noviembre")), ("12", _("Diciembre"))
+    ]
 
     context = {
         'equipos': equipos,
         'total_equipos': total_equipos,
         'costos_totales': costos_totales,
+        'anio_filtrado': anio_filtrado,
         'mes_filtrado': mes_filtrado,
-        'meses': range(1, 13),
+        'anios': anios_disponibles,
+        'meses': meses_nombres,
         'estados_servicios': estados_totales,  # Datos para el gráfico
     }
     return render(request, 'dashboard/cliente_dashboard.html', context)

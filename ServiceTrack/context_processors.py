@@ -24,6 +24,9 @@ def gamificacion_context(request):
                         "temporada_activa": None,
                     }
 
+                # Convertir experiencia acumulada a puntos en tiempo real
+                puntos_obtenidos = usuario.convertir_experiencia_a_puntos()
+
                 # Experiencia y progreso de nivel
                 experiencia_actual = usuario.experiencia
                 experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
@@ -79,6 +82,7 @@ def gamificacion_context(request):
                     "retos_pendientes": retos_pendientes,
                     "puntos_temporada": puntos_temporada,
                     "servicios_temporada": servicios_temporada,
+                    "puntos_obtenidos": puntos_obtenidos,  # Incluye los puntos obtenidos en tiempo real
                 }
     except Exception as e:
         # Registrar errores para depuración

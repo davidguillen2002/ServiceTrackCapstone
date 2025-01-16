@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles del Cliente{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Detalles del Cliente</h1>
+    <table class="table mt-4">
+        <tr>
+            <th>Nombre:</th>
+            <td>{{ cliente.nombre }}</td>
+        </tr>
+        <tr>
+            <th>Cédula:</th>
+            <td>{{ cliente.cedula }}</td>
+        </tr>
+        <tr>
+            <th>Correo:</th>
+            <td>{{ cliente.correo }}</td>
+        </tr>
+        <tr>
+            <th>Celular:</th>
+            <td>{{ cliente.celular }}</td>
+        </tr>
+    </table>
+
+    <h3 class="mt-5">Equipos Asociados</h3>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Año</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipo in equipos %}
+            <tr>
+                <td>{{ equipo.marca }}</td>
+                <td>{{ equipo.modelo }}</td>
+                <td>{{ equipo.anio }}</td>
+                <td>{{ equipo.tipo_equipo }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No hay equipos asociados a este cliente.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'listar_clientes_tecnico' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+</div>
+{% endblock %}

@@ -7,6 +7,7 @@ from channels.layers import get_channel_layer
 import random
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
+import re
 
 # Manager para el modelo Usuario
 class UsuarioManager(BaseUserManager):
@@ -169,8 +170,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         Verifica si el usuario tiene suficiente experiencia para subir de nivel y ajusta los valores.
         Se asegura de que no se exceda del nivel máximo permitido.
         """
-        from gamificacion.notifications import notificar_tecnico  # Importación local para evitar el ciclo
-
         experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
 
         while self.experiencia >= experiencia_requerida and self.nivel < 5:  # Limitar al nivel máximo permitido
@@ -178,11 +177,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             self.nivel += 1
             experiencia_requerida = self.calcular_experiencia_nivel_siguiente()
 
-            # Notificar al usuario sobre el nuevo nivel
-            notificar_tecnico(
+            # Crear notificación para el usuario
+            Notificacion.crear_notificacion(
                 usuario=self,
-                mensaje=f"¡Felicidades {self.nombre}, alcanzaste el nivel {self.nivel}! 🎉",
-                tipo="info"
+                tipo="nivel_cliente",
+                mensaje=f"¡Felicidades {self.nombre}, has alcanzado el nivel {self.nivel}! 🎉"
             )
 
             # Asignar retos del nuevo nivel
@@ -432,6 +431,46 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             else:
                 print(f"[INFO] Reto '{reto.nombre}' ya existe.")
 
+    def convertir_experiencia_a_puntos(self):
+        """
+        Convierte experiencia acumulada en puntos redimibles.
+        Ratio: 10 experiencia = 20 puntos.
+        Verifica si ya se realizó la conversión para evitar duplicidad.
+        """
+        # Verificar si ya se procesó la conversión de experiencia hoy
+        conversion_existente = RegistroPuntos.objects.filter(
+            usuario=self,
+            es_conversion_experiencia=True,
+            fecha__date=now().date()
+        ).exists()
+
+        if conversion_existente:
+            return 0  # No realizar conversión si ya se procesó hoy
+
+        # Proceso de conversión
+        if self.experiencia >= 10:  # Ratio: 10 experiencia = 20 puntos
+            puntos_convertidos = (self.experiencia // 10) * 20  # 10 experiencia -> 20 puntos
+            self.experiencia %= 10  # Mantener el remanente como experiencia
+            self.puntos += puntos_convertidos
+            self.save()
+
+            # Registrar conversión
+            RegistroPuntos.objects.create(
+                usuario=self,
+                puntos_obtenidos=puntos_convertidos,
+                descripcion="Conversión de experiencia a puntos",
+                es_conversion_experiencia=True
+            )
+            return puntos_convertidos
+        return 0
+
+    def actualizar_puntos_totales(self):
+        """
+        Calcula y actualiza el total de puntos considerando la experiencia convertida.
+        """
+        self.convertir_experiencia_a_puntos()  # Asegura la conversión de experiencia a puntos
+        self.save()
+
     def clean(self):
         if Usuario.objects.filter(correo=self.correo).exclude(id=self.id).exists():
             raise ValidationError("El correo ya está registrado.")
@@ -590,24 +629,38 @@ class Guia(models.Model):
     def __str__(self):
         return self.titulo
 
+class TipoObservacion(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nombre
+
+
 class ObservacionIncidente(models.Model):
     servicio = models.ForeignKey(
         Servicio,
         on_delete=models.CASCADE,
         related_name="observaciones",
-        null=True,  # Opcional si no todas las observaciones están asociadas a un servicio
+        null=True,
         blank=True
     )
     autor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     descripcion = models.TextField()
-    tipo_observacion = models.CharField(max_length=100)
+    tipo_observacion = models.ForeignKey(
+        TipoObservacion,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="observaciones"
+    )
     comentarios = models.TextField(blank=True, null=True)
     estado = models.CharField(max_length=50)
     fecha_reportada = models.DateField()
     fecha_fin = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"Observacion {self.id} - {self.tipo_observacion}"
+        return f"Observación {self.id} - {self.tipo_observacion.nombre if self.tipo_observacion else 'Sin tipo'}"
+
 
 # Modelo Enlace
 class Enlace(models.Model):
@@ -871,10 +924,11 @@ class RetoUsuario(models.Model):
 
 class RegistroPuntos(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True)  # Relación explícita
+    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True)
     puntos_obtenidos = models.IntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField()
+    es_conversion_experiencia = models.BooleanField(default=False)  # Nuevo campo
 
     def __str__(self):
         return f"{self.usuario} - {self.puntos_obtenidos} puntos en {self.fecha}"
@@ -911,12 +965,22 @@ class Recompensa(models.Model):
 
 
 class ChatMessage(models.Model):
-    user_message = models.TextField()
-    bot_response = models.TextField()
+    user = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="chat_messages",
+        help_text="Usuario asociado al mensaje."
+    )
+    user_message = models.TextField(help_text="Mensaje enviado por el usuario.")
+    bot_response = models.TextField(help_text="Respuesta generada por el bot en HTML.")
+    raw_response = models.TextField(
+        null=True, blank=True,
+        help_text="Respuesta original generada por el bot en formato Markdown."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user_message[:30]} - {self.bot_response[:30]}"
+        return f"Chat de {self.user.nombre} - {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 class Capacitacion(models.Model):
     titulo = models.CharField(max_length=255)
@@ -925,3 +989,20 @@ class Capacitacion(models.Model):
 
     def __str__(self):
         return self.titulo
+
+    def clean(self):
+        """
+        Valida que el enlace proporcionado sea un enlace válido de YouTube.
+        """
+        if not re.match(r'(https?://)?(www\.)?(youtube\.com|youtu\.be)/(watch\?v=|embed/)?[a-zA-Z0-9_-]{11}', self.link):
+            raise ValidationError('El enlace debe ser un enlace válido de YouTube.')
+
+    def obtener_link_incrustado(self):
+        """
+        Convierte el enlace de YouTube al formato de incrustación (embed).
+        """
+        match = re.search(r'(?:v=|youtu\.be/|embed/)([a-zA-Z0-9_-]{11})', self.link)
+        if match:
+            video_id = match.group(1)
+            return f"https://www.youtube.com/embed/{video_id}"
+        return None

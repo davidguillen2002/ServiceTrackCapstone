@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Incidentes del Servicio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Barra de navegación secundaria -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'tecnico_services_list' %}">Mis Servicios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Incidentes del Servicio</li>
+        </ol>
+    </nav>
+
+    <h1>Incidentes del Servicio #{{ servicio.id }}</h1>
+    <ul class="list-group">
+        {% for incidente in incidentes %}
+            <li class="list-group-item">
+                <p><strong>Descripción:</strong> {{ incidente.descripcion }}</p>
+                <p><strong>Tipo:</strong> {{ incidente.tipo_observacion }}</p>
+                <p><strong>Estado:</strong> {{ incidente.estado }}</p>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-center">No se han reportado incidentes.</li>
+        {% endfor %}
+    </ul>
+
+    <div class="d-flex justify-content-between mt-3">
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Volver a Mis Servicios</a>
+        <a href="{% url 'crear_incidente' servicio.id %}" class="btn btn-warning">Reportar Incidente</a>
+    </div>
+</div>
+{% endblock %}

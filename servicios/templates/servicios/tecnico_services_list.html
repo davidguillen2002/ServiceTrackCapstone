@@ -5,29 +5,108 @@
 {% block content %}
 <div class="container mt-5">
     <h1>Mis Servicios</h1>
-    <p>Selecciona un servicio para ver más opciones.</p>
-    <ul class="list-group">
+    <p>Selecciona un servicio para ver más opciones o crea nuevos registros.</p>
+
+    <!-- Botones para crear cliente y servicio -->
+    <div class="mb-3">
+        <a href="{% url 'crear_cliente' %}" class="btn btn-success">Crear Cliente</a>
+        <a href="{% url 'crear_servicio' %}" class="btn btn-primary">Crear Servicio</a>
+    </div>
+
+    <!-- Listado de servicios -->
+    <ul class="list-group mb-4">
         {% for service in services %}
             <li class="list-group-item">
+                <!-- Información del equipo -->
                 <h5>{{ service.equipo.marca }} {{ service.equipo.modelo }} ({{ service.equipo.anio }})</h5>
+
+                <!-- Fecha de inicio -->
                 <p><strong>Fecha de Inicio:</strong> {{ service.fecha_inicio|date:"d/m/Y" }}</p>
-                <p><strong>Estado:</strong> {{ service.estado }}</p>
-                <p><strong>Entrega Confirmada:</strong>
-                    {% if service.entrega_confirmada %}
-                        Sí
-                    {% else %}
-                        No
+
+                <!-- Estado con etiquetas -->
+                <p><strong>Estado:</strong>
+                    {% if service.estado == "pendiente" %}
+                        <span class="badge bg-secondary">Pendiente</span>
+                    {% elif service.estado == "en_progreso" %}
+                        <span class="badge bg-warning text-dark">En Progreso</span>
+                    {% elif service.estado == "completado" %}
+                        <span class="badge bg-success">Completado</span>
                     {% endif %}
                 </p>
-                <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías</a>
-                <a href="{% url 'detalle_servicio' service.id %}" class="btn btn-outline-info btn-sm">Detalles</a>
-                {% if not service.entrega_confirmada %}
-                    <a href="{% url 'confirmar_entrega' service.id %}" class="btn btn-outline-success btn-sm">Confirmar Entrega</a>
-                {% endif %}
+
+                <!-- Entrega confirmada -->
+                <p><strong>Entrega Confirmada:</strong>
+                    {% if service.entrega_confirmada %}
+                        <span class="text-success">Sí</span>
+                    {% else %}
+                        <span class="text-danger">No</span>
+                    {% endif %}
+                </p>
+
+                <!-- Último incidente registrado -->
+                <p><strong>Último Incidente:</strong>
+                    {% with service.observaciones.last as ultimo_incidente %}
+                        {% if ultimo_incidente %}
+                            {{ ultimo_incidente.descripcion|truncatewords:10 }}
+                        {% else %}
+                            <span class="text-muted">Ninguno registrado.</span>
+                        {% endif %}
+                    {% endwith %}
+                </p>
+
+                <!-- Botones de acción -->
+                <div class="d-flex gap-2">
+                    <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías</a>
+                    <a href="{% url 'detalle_servicio' service.id %}" class="btn btn-outline-info btn-sm">Detalles</a>
+                    <a href="{% url 'listar_incidentes' service.id %}" class="btn btn-warning btn-sm">Incidentes</a>
+                    {% if not service.entrega_confirmada %}
+                        <a href="{% url 'confirmar_entrega' service.id %}" class="btn btn-outline-success btn-sm">
+                            Confirmar Entrega
+                        </a>
+                    {% endif %}
+                    {% if service.estado != "completado" %}
+                        <a href="{% url 'actualizar_estado_servicio' service.id %}" class="btn btn-outline-warning btn-sm">
+                            Actualizar Estado
+                        </a>
+                    {% endif %}
+                </div>
             </li>
         {% empty %}
             <li class="list-group-item text-center">No tienes servicios registrados.</li>
         {% endfor %}
     </ul>
+
+    <!-- Paginación -->
+    <nav aria-label="Navegación de servicios">
+        <ul class="pagination justify-content-center">
+            {% if services.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ services.previous_page_number }}" aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in services.paginator.page_range %}
+                {% if services.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > services.number|add:'-3' and num < services.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if services.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ services.next_page_number }}" aria-label="Siguiente">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock %}

@@ -3,17 +3,28 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Capacitaciones</h1>
+
     {% if user.rol.nombre == "administrador" %}
         <a href="{% url 'capacitacion_create' %}" class="btn btn-success mb-4">Nueva Capacitación</a>
     {% endif %}
+
     <div class="row">
         {% for capacitacion in capacitaciones %}
-            <div class="col-md-4 mb-4">
-                <div class="card">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">{{ capacitacion.titulo }}</h5>
-                        <p class="card-text">{{ capacitacion.descripcion_corta|slice:":100" }}...</p>
-                        <a href="{{ capacitacion.link }}" target="_blank" class="btn btn-primary">Ver Video</a>
+                        <p class="card-text">{{ capacitacion.descripcion_corta|slice:"0:100" }}...</p>
+
+                        <!-- Video Incrustado -->
+                        <div class="embed-responsive embed-responsive-16by9 mb-3">
+                            <iframe
+                                class="embed-responsive-item"
+                                src="{{ capacitacion.embed_link }}"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+
                         {% if user.rol.nombre == "administrador" %}
                             <a href="{% url 'capacitacion_edit' capacitacion.id %}" class="btn btn-warning">Editar</a>
                             <a href="{% url 'capacitacion_delete' capacitacion.id %}" class="btn btn-danger">Eliminar</a>

@@ -212,6 +212,9 @@ def perfil_gamificacion(request):
         usuario.experiencia = experiencia_total
         usuario.save()
 
+    # Convertir experiencia acumulada a puntos y actualizar puntos totales
+    puntos_obtenidos = usuario.convertir_experiencia_a_puntos()
+
     # Verificar y asignar medallas y retos de la temporada actual
     animaciones = verificar_y_asignar_medallas_y_retos(usuario)
 
@@ -274,6 +277,7 @@ def perfil_gamificacion(request):
         "servicios_temporada": servicios_temporada,  # Número de servicios completados en la temporada
         "recomendaciones": recomendaciones,
         "animaciones": animaciones,
+        "puntos_obtenidos": puntos_obtenidos,  # Puntos obtenidos al convertir experiencia
     })
 
 
@@ -389,7 +393,7 @@ def historial_puntos_paginated(request):
 @validar_temporada_activa
 def recompensas_disponibles(request):
     """
-    Muestra las recompensas disponibles, reclamadas y ya redimidas.
+    Muestra las recompensas disponibles, reclamadas y ya redimidas con descripciones completas y visualización mejorada.
     """
     usuario = request.user
     temporada_actual = Temporada.obtener_temporada_actual()
@@ -398,8 +402,22 @@ def recompensas_disponibles(request):
         messages.warning(request, "No hay una temporada activa en este momento.")
         return redirect("home")
 
+    # Verificar cantidad de retos cumplidos por el usuario en la temporada actual
+    retos_cumplidos = RetoUsuario.objects.filter(
+        usuario=usuario,
+        cumplido=True,
+        reto__temporada=temporada_actual
+    ).count()
+
     # Verificar y asignar recompensas basadas en retos cumplidos dentro de la temporada
     verificar_y_asignar_recompensas(usuario, temporada_actual)
+
+    # Obtener recompensas redimidas y disponibles
+    recompensas_redimidas = Recompensa.objects.filter(
+        usuario=usuario,
+        redimido=True,
+        temporada=temporada_actual
+    ).count()
 
     recompensas_disponibles = Recompensa.objects.filter(
         usuario=usuario,
@@ -407,14 +425,17 @@ def recompensas_disponibles(request):
         temporada=temporada_actual
     )
 
-    recompensas_redimidas = Recompensa.objects.filter(
-        usuario=usuario,
-        redimido=True
-    )
+    # Limitar recompensas disponibles según retos cumplidos menos redimidas
+    limite_recompensas = retos_cumplidos - recompensas_redimidas
+    recompensas_permitidas = recompensas_disponibles[:limite_recompensas]
 
     return render(request, 'gamificacion/recompensas_disponibles.html', {
-        'recompensas_disponibles': recompensas_disponibles,
-        'recompensas_redimidas': recompensas_redimidas,
+        'recompensas_disponibles': recompensas_permitidas,
+        'recompensas_redimidas': Recompensa.objects.filter(
+            usuario=usuario,
+            redimido=True,
+            temporada=temporada_actual
+        ),
         'nivel_actual': usuario.nivel,
     })
 
@@ -422,7 +443,7 @@ def recompensas_disponibles(request):
 @login_required
 def redimir_recompensa(request):
     """
-    Permite al usuario redimir una recompensa específica.
+    Permite al usuario redimir una recompensa específica y resta los puntos necesarios.
     """
     if request.method == "POST":
         try:
@@ -433,25 +454,52 @@ def redimir_recompensa(request):
             if recompensa.redimido:
                 return JsonResponse({"success": False, "error": "La recompensa ya ha sido redimida."})
 
+            # Verificar retos cumplidos y redimidos
+            retos_cumplidos = RetoUsuario.objects.filter(
+                usuario=request.user,
+                cumplido=True,
+                reto__temporada=recompensa.temporada
+            ).count()
+
+            recompensas_redimidas = Recompensa.objects.filter(
+                usuario=request.user,
+                redimido=True,
+                temporada=recompensa.temporada
+            ).count()
+
+            if recompensas_redimidas >= retos_cumplidos:
+                return JsonResponse({"success": False, "error": "No puedes redimir más recompensas sin completar más retos."})
+
+            if request.user.puntos < recompensa.puntos_necesarios:
+                return JsonResponse({"success": False, "error": "No tienes suficientes puntos para redimir esta recompensa."})
+
             # Procesar redención
             recompensa.redimido = True
             recompensa.save()
 
+            # Restar los puntos necesarios
+            request.user.puntos -= recompensa.puntos_necesarios
+            request.user.save()
+
             # Registrar la redención en los logs
             RegistroPuntos.objects.create(
                 usuario=request.user,
-                puntos_obtenidos=0,
-                descripcion=f"Recompensa redimida: {recompensa.descripcion}"
+                puntos_obtenidos=-recompensa.puntos_necesarios,
+                descripcion=f"Redimiste la recompensa: {recompensa.descripcion}"
             )
 
-            # Datos para la animación
-            animacion = {
-                "tipo": "cofre",
-                "mensaje": f"¡Felicidades! Has obtenido la recompensa: {recompensa.descripcion} 🎉",
-                "icono": "fas fa-gem",
+            # Datos para la animación y actualización en tiempo real
+            respuesta = {
+                "success": True,
+                "mensaje": {
+                    "tipo": recompensa.tipo,
+                    "descripcion": recompensa.descripcion,
+                    "valor": recompensa.valor,
+                    "icono": "fas fa-check-circle",
+                }
             }
 
-            return JsonResponse({"success": True, "mensaje": animacion})
+            return JsonResponse(respuesta)
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
 

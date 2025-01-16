@@ -2,16 +2,22 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
-from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion
+from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion, ObservacionIncidente
 from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides, get_similar_guides_with_context
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm, CapacitacionForm
+from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm, CapacitacionForm, ClienteForm, IncidenteForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from openai import OpenAI, RateLimitError
 from django.conf import settings
+from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
+import markdown2
+from django.db import transaction
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.hashers import make_password
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
@@ -22,6 +28,221 @@ def is_tecnico(user):
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.rol.nombre == "administrador"
+
+# Crear Cliente (Solo Técnicos)
+@login_required
+@user_passes_test(is_tecnico)
+def crear_cliente(request):
+    if request.method == "POST":
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            cliente = form.save(commit=False)
+            cliente.rol = Usuario.objects.get(nombre="cliente")  # Asigna el rol cliente
+            cliente.password = make_password(form.cleaned_data['password'])  # Hashea la contraseña
+            cliente.tecnico_asignado = request.user  # Asigna el cliente al técnico autenticado
+            cliente.save()
+            messages.success(request, "Cliente creado exitosamente.")
+            return redirect('listar_clientes_tecnico')
+        else:
+            messages.error(request, "Por favor, corrige los errores del formulario.")
+    else:
+        form = ClienteForm()
+    return render(request, "servicios/crear_cliente.html", {"form": form})
+
+# Listar Clientes Asignados (Solo Técnicos)
+@login_required
+@user_passes_test(is_tecnico)
+def listar_clientes_tecnico(request):
+    """
+    Lista de clientes cuyos equipos están asociados al técnico autenticado.
+    """
+    equipos_atendidos = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
+    clientes = Usuario.objects.filter(
+        rol__nombre="cliente",
+        equipo__in=equipos_atendidos  # Clientes que poseen equipos atendidos por el técnico
+    ).distinct().order_by('nombre')
+
+    # Paginación: Mostrar 5 clientes por página
+    paginator = Paginator(clientes, 5)
+    page_number = request.GET.get('page')
+    clientes_paginados = paginator.get_page(page_number)
+
+    return render(request, "servicios/listar_clientes_tecnico.html", {"clientes": clientes_paginados})
+
+@login_required
+@user_passes_test(is_tecnico)
+def detalle_cliente(request, cliente_id):
+    """
+    Muestra los detalles de un cliente específico cuyos equipos están asociados al técnico autenticado.
+    """
+    cliente = get_object_or_404(
+        Usuario,
+        id=cliente_id,
+        rol__nombre="cliente"
+    )
+
+    # Filtrar equipos atendidos por el técnico y pertenecientes al cliente
+    equipos_atendidos = Equipo.objects.filter(
+        cliente=cliente,
+        servicio__tecnico=request.user  # Validar que el técnico autenticado ha atendido estos equipos
+    ).distinct()
+
+    if not equipos_atendidos.exists():
+        messages.error(request, "No tiene acceso a este cliente.")
+        return redirect('listar_clientes_tecnico')
+
+    return render(request, 'servicios/detalle_cliente.html', {
+        'cliente': cliente,
+        'equipos': equipos_atendidos,
+    })
+
+@login_required
+@user_passes_test(is_tecnico)
+def obtener_cliente_por_equipo(request):
+    """
+    Devuelve el nombre del cliente asociado a un equipo seleccionado.
+    """
+    equipo_id = request.GET.get('equipo_id')
+    try:
+        equipo = Equipo.objects.get(id=equipo_id)
+        cliente_nombre = equipo.cliente.nombre
+        return JsonResponse({'cliente': cliente_nombre}, status=200)
+    except Equipo.DoesNotExist:
+        return JsonResponse({'error': 'Equipo no encontrado'}, status=404)
+
+@login_required
+@user_passes_test(is_tecnico)
+def actualizar_estado_servicio(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
+
+    if request.method == "POST":
+        estado_anterior = servicio.estado
+        form = ServicioEstadoForm(request.POST, instance=servicio)
+        if form.is_valid():
+            with transaction.atomic():
+                servicio = form.save()
+
+                # Crear notificación para el cliente
+                Notificacion.crear_notificacion(
+                    usuario=servicio.equipo.cliente,
+                    tipo="actualizacion_servicio",
+                    mensaje=(
+                        f"El estado de su servicio para el equipo {servicio.equipo.marca} "
+                        f"{servicio.equipo.modelo} ha cambiado de '{estado_anterior}' a '{servicio.estado}'."
+                    )
+                )
+
+            messages.success(request, "Estado del servicio actualizado y cliente notificado.")
+            return redirect("detalle_servicio", servicio_id=servicio.id)
+        else:
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
+    else:
+        form = ServicioEstadoForm(instance=servicio)
+
+    return render(request, "servicios/actualizar_estado_servicio.html", {
+        "form": form,
+        "servicio": servicio,
+    })
+
+
+@login_required
+@user_passes_test(is_tecnico)
+def notificar_incidente(request, incidente_id):
+    """
+    Notifica a los clientes sobre incidentes reportados en sus servicios.
+    """
+    incidente = get_object_or_404(ObservacionIncidente, id=incidente_id)
+
+    # Crear la notificación
+    Notificacion.crear_notificacion(
+        usuario=incidente.servicio.equipo.cliente,
+        tipo="nueva_observacion",
+        mensaje=(
+            f"Se ha registrado un nuevo incidente en su servicio para el equipo "
+            f"{incidente.servicio.equipo.marca} {incidente.servicio.equipo.modelo}: {incidente.descripcion}."
+        )
+    )
+
+    messages.success(request, "Incidente notificado exitosamente al cliente.")
+    return redirect("listar_incidentes", servicio_id=incidente.servicio.id)
+
+# Crear Servicio
+@login_required
+@user_passes_test(is_tecnico)
+def crear_servicio(request):
+    """
+    Permite al técnico crear un servicio asociado a uno de los clientes y equipos asignados.
+    """
+    # Obtener los equipos atendidos por el técnico autenticado
+    equipos_atendidos = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
+
+    if request.method == "POST":
+        form = ServicioForm(request.POST, equipos_disponibles=equipos_atendidos)
+        if form.is_valid():
+            servicio = form.save(commit=False)
+            servicio.tecnico = request.user
+            servicio.save()
+            messages.success(request, "Servicio creado exitosamente.")
+            return redirect('tecnico_services_list')
+        else:
+            messages.error(request, "Por favor, corrige los errores del formulario.")
+    else:
+        form = ServicioForm(equipos_disponibles=equipos_atendidos)
+
+    return render(request, "servicios/crear_servicio.html", {
+        "form": form,
+    })
+
+
+# CRUD de Incidentes
+@login_required
+@user_passes_test(is_tecnico)
+def listar_incidentes(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
+    incidentes = ObservacionIncidente.objects.filter(servicio=servicio)
+
+    return render(request, "servicios/listar_incidentes.html", {
+        "servicio": servicio,
+        "incidentes": incidentes
+    })
+
+@login_required
+@user_passes_test(lambda u: u.rol.nombre == "tecnico")
+def crear_incidente(request, servicio_id):
+    servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
+    if servicio.estado != "completado":
+        if request.method == "POST":
+            form = IncidenteForm(request.POST)
+            if form.is_valid():
+                incidente = form.save(commit=False)
+                incidente.servicio = servicio
+                incidente.autor = request.user
+                incidente.save()
+
+                # Notificación para el cliente
+                Notificacion.crear_notificacion(
+                    usuario=servicio.equipo.cliente,
+                    tipo="nueva_observacion",
+                    mensaje=(
+                        f"Se ha registrado un nuevo incidente en su servicio para el equipo "
+                        f"{servicio.equipo.marca} {servicio.equipo.modelo}: {incidente.descripcion}."
+                    )
+                )
+
+                messages.success(request, "Incidente reportado exitosamente y cliente notificado.")
+                return redirect('listar_incidentes', servicio_id=servicio.id)
+            else:
+                messages.error(request, "Por favor, corrige los errores del formulario.")
+        else:
+            form = IncidenteForm()
+    else:
+        messages.error(request, "No se pueden reportar incidentes para servicios completados.")
+        return redirect('tecnico_services_list')
+
+    return render(request, "servicios/crear_incidente.html", {
+        "servicio": servicio,
+        "form": form
+    })
 
 # Confirmar Entrega (El técnico valida el código proporcionado por el cliente)
 @login_required
@@ -36,6 +257,14 @@ def confirmar_entrega(request, servicio_id):
             if servicio.codigo_entrega == codigo:
                 servicio.entrega_confirmada = True
                 servicio.save()
+
+                # Notificación al cliente sobre la confirmación
+                Notificacion.crear_notificacion(
+                    usuario=servicio.equipo.cliente,
+                    tipo="entrega_confirmada",
+                    mensaje=f"El técnico ha confirmado la entrega de su equipo {servicio.equipo.marca} {servicio.equipo.modelo}."
+                )
+
                 messages.success(request, "La entrega ha sido confirmada exitosamente.")
                 return redirect('tecnico_services_list')
             else:
@@ -153,20 +382,29 @@ def historial_servicios(request, equipo_id):
 @login_required
 @user_passes_test(is_tecnico)
 def tecnico_services_list(request):
-    """Vista para mostrar todos los servicios asociados a un técnico."""
-    services = Servicio.objects.filter(tecnico=request.user)
-    return render(request, 'servicios/tecnico_services_list.html', {'services': services})
+    """Vista para mostrar todos los servicios asociados a un técnico con paginación."""
+    services = Servicio.objects.filter(tecnico=request.user).order_by('-fecha_inicio')
+
+    # Paginación: Mostrar 5 servicios por página
+    paginator = Paginator(services, 5)  # Cambia el número para ajustar los elementos por página
+    page_number = request.GET.get('page')
+    paginated_services = paginator.get_page(page_number)
+
+    return render(request, 'servicios/tecnico_services_list.html', {'services': paginated_services})
 
 @login_required
-@user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
+@user_passes_test(lambda u: u.rol.nombre == "tecnico")
 def chat(request):
-    chat_history = ChatMessage.objects.all().order_by('created_at')
+    """Vista del chatbot personalizado para cada técnico."""
+    # Filtrar historial de chat para el usuario autenticado
+    chat_history = ChatMessage.objects.filter(user=request.user).order_by('created_at')
     response_text = None
 
     if request.method == "POST":
         user_message = request.POST.get('message', '')
 
         try:
+            # Generar respuesta del bot
             completion = client.chat.completions.create(
                 model="gpt-4o-mini",
                 store=True,
@@ -174,19 +412,26 @@ def chat(request):
                     {"role": "user", "content": user_message}
                 ]
             )
-            response_text = completion.choices[0].message.content
+            # Respuesta original en Markdown
+            raw_response = completion.choices[0].message.content
+            # Convertir Markdown a HTML
+            response_text = markdown2.markdown(raw_response, extras=["fenced-code-blocks", "tables", "strike", "footnotes"])
 
         except RateLimitError:
             response_text = "Créditos insuficientes, contacte a administración."
 
-        # Guardar en la base de datos solo si la respuesta es válida
+        # Guardar mensajes en el historial con Markdown y HTML
         if response_text != "Créditos insuficientes, contacte a administración.":
-            ChatMessage.objects.create(user_message=user_message, bot_response=response_text)
+            ChatMessage.objects.create(
+                user=request.user,
+                user_message=user_message,
+                bot_response=response_text,
+                raw_response=raw_response
+            )
 
         return JsonResponse({"response": response_text})
 
     return render(request, 'servicios/chat.html', {"chat_history": chat_history})
-
 
 # BASE DE CONOCIMIENTO
 @login_required
@@ -314,6 +559,7 @@ def lista_servicios_cliente(request):
         "servicios": servicios,
     })
 
+# Enviar código al técnico (el cliente proporciona el código)
 @login_required
 def enviar_codigo_tecnico(request, servicio_id):
     """
@@ -340,9 +586,13 @@ def enviar_codigo_tecnico(request, servicio_id):
     })
 
 # Listar capacitaciones (Disponible para técnicos y administradores)
-@login_required
 def capacitacion_index(request):
+    """
+    Vista para mostrar las capacitaciones.
+    """
     capacitaciones = Capacitacion.objects.all()
+    for capacitacion in capacitaciones:
+        capacitacion.embed_link = capacitacion.obtener_link_incrustado()
     return render(request, 'servicios/capacitacion_index.html', {'capacitaciones': capacitaciones})
 
 # Crear capacitación (Solo para administradores)
@@ -405,4 +655,37 @@ def guide_preview(request, guide_id):
         return JsonResponse(data, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+@login_required
+@user_passes_test(is_tecnico)
+def agregar_repuesto(request, servicio_id):
+    """
+    Permite a un técnico agregar repuestos a un servicio que no haya sido completado.
+    """
+    servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
+
+    # Verificar que el servicio no esté completado
+    if servicio.estado == "completado":
+        messages.error(request, "No se pueden agregar repuestos a servicios completados.")
+        return redirect('detalle_servicio', servicio_id=servicio.id)
+
+    # Procesar el formulario
+    if request.method == "POST":
+        form = RepuestoForm(request.POST)
+        if form.is_valid():
+            repuesto = form.save(commit=False)
+            repuesto.servicio = servicio
+            repuesto.save()
+
+            messages.success(request, f"Repuesto '{repuesto.nombre}' agregado exitosamente al servicio.")
+            return redirect('detalle_servicio', servicio_id=servicio.id)
+        else:
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
+    else:
+        form = RepuestoForm()
+
+    return render(request, 'servicios/agregar_repuesto.html', {
+        'servicio': servicio,
+        'form': form,
+    })
 
