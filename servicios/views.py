@@ -171,28 +171,42 @@ def notificar_incidente(request, incidente_id):
 @user_passes_test(is_tecnico)
 def crear_servicio(request):
     """
-    Permite al técnico crear un servicio asociado a uno de los clientes y equipos asignados.
+    Vista para que un técnico registre un nuevo servicio para equipos asignados.
     """
-    # Obtener los equipos atendidos por el técnico autenticado
-    equipos_atendidos = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
+    equipos_disponibles = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
 
     if request.method == "POST":
-        form = ServicioForm(request.POST, equipos_disponibles=equipos_atendidos)
+        form = ServicioForm(request.POST, equipos_disponibles=equipos_disponibles)
         if form.is_valid():
             servicio = form.save(commit=False)
-            servicio.tecnico = request.user
-            servicio.save()
-            messages.success(request, "Servicio creado exitosamente.")
+            servicio.tecnico = request.user  # Asignar el técnico autenticado
+
+            # Validación para generar el código de entrega y notificación solo si el estado es "completado"
+            if servicio.estado.lower() == "completado":
+                servicio.generar_codigo_entrega()  # Generar código único para el servicio
+
+                # Notificar al cliente
+                Notificacion.crear_notificacion(
+                    usuario=servicio.equipo.cliente,
+                    tipo="codigo_entrega",
+                    mensaje=f"Se ha creado un nuevo servicio para el equipo {servicio.equipo.marca}. "
+                            f"Su código de entrega es: {servicio.codigo_entrega}."
+                )
+                messages.success(request, "El servicio completado ha sido creado y el cliente ha sido notificado.")
+            else:
+                servicio.codigo_entrega = None  # No generar código de entrega si no está completado
+                estado_actual = servicio.get_estado_display()
+                messages.warning(request,
+                                 f"El servicio ha sido creado en estado '{estado_actual}', por lo que no se generó un código de entrega.")
+
+            servicio.save()  # Guardar el servicio en la base de datos
             return redirect('tecnico_services_list')
         else:
             messages.error(request, "Por favor, corrige los errores del formulario.")
     else:
-        form = ServicioForm(equipos_disponibles=equipos_atendidos)
+        form = ServicioForm(equipos_disponibles=equipos_disponibles)
 
-    return render(request, "servicios/crear_servicio.html", {
-        "form": form,
-    })
-
+    return render(request, "servicios/crear_servicio.html", {"form": form})
 
 # CRUD de Incidentes
 @login_required
@@ -278,30 +292,45 @@ def confirmar_entrega(request, servicio_id):
 @login_required
 @user_passes_test(is_admin)
 def registrar_servicio(request):
+    """
+    Vista para que un administrador registre un nuevo servicio.
+    """
+    equipos_disponibles = Equipo.objects.filter(cliente__isnull=False)  # Solo equipos con cliente asociado
+
     if request.method == "POST":
-        servicio_form = ServicioForm(request.POST)
+        servicio_form = ServicioForm(request.POST, equipos_disponibles=equipos_disponibles)
         repuesto_form = RepuestoForm(request.POST)
         if servicio_form.is_valid() and repuesto_form.is_valid():
             servicio = servicio_form.save(commit=False)
-            servicio.generar_codigo_entrega()  # Genera un código único
-            servicio.save()
 
-            # Enviar notificación al cliente
-            Notificacion.crear_notificacion(
-                usuario=servicio.equipo.cliente,
-                tipo="codigo_entrega",
-                mensaje=f"Su código de entrega para el servicio del equipo {servicio.equipo.marca} {servicio.equipo.modelo} es: {servicio.codigo_entrega}."
-            )
+            # Validación para generar el código de entrega y notificar solo si el estado es "completado"
+            if servicio.estado.lower() == "completado":
+                servicio.generar_codigo_entrega()  # Generar código único para el servicio
 
-            messages.success(request, "Servicio registrado y código enviado al cliente.")
-            return redirect("lista_servicios")
+                # Notificar al cliente
+                Notificacion.crear_notificacion(
+                    usuario=servicio.equipo.cliente,
+                    tipo="codigo_entrega",
+                    mensaje=f"Se ha registrado un servicio para su equipo {servicio.equipo.marca} {servicio.equipo.modelo}. "
+                            f"Su código de entrega es: {servicio.codigo_entrega}."
+                )
+                messages.success(request, "El servicio completado ha sido registrado y el cliente notificado.")
+            else:
+                servicio.codigo_entrega = None  # No generar código de entrega si no está completado
+                estado_actual = servicio.get_estado_display()
+                messages.warning(request, f"El servicio ha sido registrado en estado '{estado_actual}', por lo que no se generó un código de entrega.")
+
+            servicio.save()  # Guardar el servicio en la base de datos
+            return redirect('lista_servicios')
+        else:
+            messages.error(request, "Por favor, corrige los errores del formulario.")
     else:
-        servicio_form = ServicioForm()
+        servicio_form = ServicioForm(equipos_disponibles=equipos_disponibles)
         repuesto_form = RepuestoForm()
 
     return render(request, "servicios/registrar_servicio.html", {
         "servicio_form": servicio_form,
-        "repuesto_form": repuesto_form
+        "repuesto_form": repuesto_form,
     })
 
 @login_required
@@ -449,21 +478,27 @@ def base_conocimiento(request):
     if tipo_servicio_filtro:
         guias = guias.filter(tipo_servicio__icontains=tipo_servicio_filtro)
 
+    # Paginación: 10 guías por página
+    paginator = Paginator(guias, 10)
+    page_number = request.GET.get('page')
+    guias_paginadas = paginator.get_page(page_number)
+
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        html = render_to_string('servicios/guia_list.html', {'guias': guias})
+        html = render_to_string('servicios/guia_list.html', {'guias': guias_paginadas})
         return JsonResponse({'html': html})
 
     categorias = Categoria.objects.all()
     tipos_servicio = Guia.objects.values_list('tipo_servicio', flat=True).distinct()
 
     return render(request, 'servicios/base_conocimiento.html', {
-        'guias': guias,
+        'guias': guias_paginadas,
         'categorias': categorias,
         'tipos_servicio': tipos_servicio,
         'query': query,
         'categoria_filtro': categoria_filtro,
         'tipo_servicio_filtro': tipo_servicio_filtro
     })
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -548,22 +583,30 @@ def actualizar_estado_equipo_tecnico(request, equipo_id):
 @login_required
 def lista_servicios_cliente(request):
     """
-    Muestra los servicios relacionados con los equipos del cliente autenticado.
+    Muestra los servicios relacionados con los equipos del cliente autenticado con paginación.
     """
     if request.user.rol.nombre != "cliente":
         return redirect("home")  # Redirige si no es cliente
 
+    # Filtra los servicios relacionados con el cliente
     servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
 
+    # Configura la paginación (5 servicios por página)
+    paginator = Paginator(servicios, 5)
+    page_number = request.GET.get('page')  # Obtiene el número de página desde la URL
+    servicios_paginados = paginator.get_page(page_number)  # Obtiene los servicios correspondientes a la página
+
+    # Renderiza el template con los servicios paginados
     return render(request, "servicios/lista_servicios_cliente.html", {
-        "servicios": servicios,
+        "servicios": servicios_paginados,  # Pasa los servicios paginados al template
     })
+
 
 # Enviar código al técnico (el cliente proporciona el código)
 @login_required
 def enviar_codigo_tecnico(request, servicio_id):
     """
-    Vista para que el cliente envíe el código de entrega al técnico.
+    Vista para que el cliente confirme el código de entrega al técnico.
     """
     servicio = get_object_or_404(Servicio, id=servicio_id, equipo__cliente=request.user)
 
@@ -574,12 +617,16 @@ def enviar_codigo_tecnico(request, servicio_id):
             Notificacion.crear_notificacion(
                 usuario=servicio.tecnico,
                 tipo="codigo_entrega",
-                mensaje=f"El cliente ha confirmado el código de entrega para el servicio del equipo {servicio.equipo.marca} {servicio.equipo.modelo}: {codigo_ingresado}."
+                mensaje=(
+                    f"El cliente ha confirmado el código de entrega para el servicio del equipo "
+                    f"{servicio.equipo.marca} {servicio.equipo.modelo}.\n"
+                    f"**Código de Entrega:** {servicio.codigo_entrega}"
+                )
             )
-            messages.success(request, "Código enviado exitosamente al técnico.")
+            messages.success(request, "El código ha sido confirmado exitosamente y enviado al técnico.")
             return redirect('lista_servicios_cliente')
         else:
-            messages.error(request, "El código ingresado es incorrecto.")
+            messages.error(request, "El código ingresado no es válido. Verifica nuevamente.")
 
     return render(request, 'servicios/enviar_codigo_tecnico.html', {
         'servicio': servicio
@@ -689,3 +736,25 @@ def agregar_repuesto(request, servicio_id):
         'form': form,
     })
 
+@login_required
+@user_passes_test(lambda u: u.rol.nombre in ["administrador", "tecnico"])
+def api_equipo_cliente(request):
+    """
+    API para obtener el cliente asociado a un equipo seleccionado.
+    """
+    equipo_id = request.GET.get('equipo_id')
+    if not equipo_id:
+        return JsonResponse({'error': 'No se proporcionó un ID de equipo.'}, status=400)
+
+    try:
+        equipo = Equipo.objects.get(id=equipo_id)
+        if not equipo.cliente:
+            return JsonResponse({'error': 'El equipo no tiene un cliente asociado.'}, status=404)
+
+        cliente = equipo.cliente
+        if not cliente.nombre:
+            return JsonResponse({'error': 'El cliente asociado no tiene un nombre válido.'}, status=500)
+
+        return JsonResponse({'cliente': cliente.nombre}, status=200)
+    except Equipo.DoesNotExist:
+        return JsonResponse({'error': 'Equipo no encontrado.'}, status=404)

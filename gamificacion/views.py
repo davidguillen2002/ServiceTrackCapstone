@@ -1,8 +1,8 @@
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Sum, Avg, F, Count
+from django.db.models import Sum, Avg, F, Count, OuterRef, Subquery
 from django import forms
 from django.contrib import messages
 import json
@@ -21,7 +21,7 @@ from .utils import (
     asignar_retos_dinamicos,
     otorgar_experiencia,
     generar_recomendaciones_con_ia,
-    verificar_y_asignar_recompensas,
+    asignar_recompensas_a_tecnico,
 )
 from .notifications import notificar_tecnico, notificar_tecnico_con_animacion
 
@@ -32,86 +32,101 @@ def es_administrador(usuario):
 @user_passes_test(es_administrador)
 def administrar_gamificacion(request):
     """
-    Vista principal para administrar la gamificación.
+    Vista principal para administrar la gamificación con funcionalidad CRUD, otorgar puntos y paginación.
     """
-    usuarios = Usuario.objects.all()
-    temporadas = Temporada.objects.all()
-    retos = Reto.objects.all()
-    recompensas = Recompensa.objects.all()
-    medallas = Medalla.objects.all()
+    # Paginación de datos
+    def paginate_queryset(queryset, page_param, items_per_page=5):
+        page = request.GET.get(page_param, 1)  # Cada lista tiene un parámetro único para la paginación
+        paginator = Paginator(queryset, items_per_page)
+        try:
+            paginated_data = paginator.page(page)
+        except PageNotAnInteger:
+            paginated_data = paginator.page(1)
+        except EmptyPage:
+            paginated_data = paginator.page(paginator.num_pages)
+        return paginated_data, paginator
 
-    if request.method == "POST":
-        # Proceso de CRUD dinámico
+    # Paginación individual para cada sección
+    temporadas, temporadas_paginator = paginate_queryset(
+        Temporada.objects.all().order_by('-fecha_inicio'), 'temporadas_page'
+    )
+    retos, retos_paginator = paginate_queryset(
+        Reto.objects.all().order_by('-id'), 'retos_page'
+    )
+    recompensas, recompensas_paginator = paginate_queryset(
+        Recompensa.objects.all().order_by('-id'), 'recompensas_page'
+    )
+    medallas, medallas_paginator = paginate_queryset(
+        Medalla.objects.all().order_by('-id'), 'medallas_page'
+    )
+
+    # Procesar formulario de otorgar puntos
+    if request.method == "POST" and request.POST.get("action") == "otorgar_puntos":
+        otorgar_puntos_form = OtorgarPuntosForm(request.POST)
+        if otorgar_puntos_form.is_valid():
+            tecnico = otorgar_puntos_form.cleaned_data["usuario"]
+            puntos = otorgar_puntos_form.cleaned_data["puntos"]
+            descripcion = otorgar_puntos_form.cleaned_data["descripcion"]
+
+            tecnico.puntos += puntos
+            tecnico.save()
+
+            RegistroPuntos.objects.create(usuario=tecnico, puntos_obtenidos=puntos, descripcion=descripcion)
+            messages.success(request, f"{puntos} puntos otorgados con éxito a {tecnico.nombre}.")
+            return redirect("administrar_gamificacion")
+        else:
+            messages.error(request, "Error al otorgar puntos. Revisa los datos ingresados.")
+    else:
+        otorgar_puntos_form = OtorgarPuntosForm()
+
+    # Procesar acciones CRUD dinámicas
+    if request.method == "POST" and request.POST.get("action") != "otorgar_puntos":
         action = request.POST.get("action")
         if action == "crear_temporada":
             form = TemporadaForm(request.POST)
             if form.is_valid():
                 form.save()
                 messages.success(request, "Temporada creada con éxito.")
-        elif action == "editar_temporada":
-            temporada_id = request.POST.get("temporada_id")
-            temporada = get_object_or_404(Temporada, id=temporada_id)
-            form = TemporadaForm(request.POST, instance=temporada)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Temporada actualizada con éxito.")
+            else:
+                messages.error(request, "Error al crear la temporada.")
         elif action == "eliminar_temporada":
-            temporada_id = request.POST.get("temporada_id")
-            Temporada.objects.filter(id=temporada_id).delete()
+            Temporada.objects.filter(id=request.POST.get("temporada_id")).delete()
             messages.success(request, "Temporada eliminada con éxito.")
         elif action == "crear_reto":
             form = RetoForm(request.POST)
             if form.is_valid():
                 form.save()
                 messages.success(request, "Reto creado con éxito.")
-        elif action == "editar_reto":
-            reto_id = request.POST.get("reto_id")
-            reto = get_object_or_404(Reto, id=reto_id)
-            form = RetoForm(request.POST, instance=reto)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Reto actualizado con éxito.")
+            else:
+                messages.error(request, "Error al crear el reto.")
         elif action == "eliminar_reto":
-            reto_id = request.POST.get("reto_id")
-            Reto.objects.filter(id=reto_id).delete()
+            Reto.objects.filter(id=request.POST.get("reto_id")).delete()
             messages.success(request, "Reto eliminado con éxito.")
         elif action == "crear_recompensa":
             form = RecompensaForm(request.POST)
             if form.is_valid():
                 form.save()
                 messages.success(request, "Recompensa creada con éxito.")
-        elif action == "editar_recompensa":
-            recompensa_id = request.POST.get("recompensa_id")
-            recompensa = get_object_or_404(Recompensa, id=recompensa_id)
-            form = RecompensaForm(request.POST, instance=recompensa)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Recompensa actualizada con éxito.")
+            else:
+                messages.error(request, "Error al crear la recompensa.")
         elif action == "eliminar_recompensa":
-            recompensa_id = request.POST.get("recompensa_id")
-            Recompensa.objects.filter(id=recompensa_id).delete()
+            Recompensa.objects.filter(id=request.POST.get("recompensa_id")).delete()
             messages.success(request, "Recompensa eliminada con éxito.")
         elif action == "crear_medalla":
             form = MedallaForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
                 messages.success(request, "Medalla creada con éxito.")
-        elif action == "editar_medalla":
-            medalla_id = request.POST.get("medalla_id")
-            medalla = get_object_or_404(Medalla, id=medalla_id)
-            form = MedallaForm(request.POST, request.FILES, instance=medalla)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Medalla actualizada con éxito.")
+            else:
+                messages.error(request, "Error al crear la medalla.")
         elif action == "eliminar_medalla":
-            medalla_id = request.POST.get("medalla_id")
-            Medalla.objects.filter(id=medalla_id).delete()
+            Medalla.objects.filter(id=request.POST.get("medalla_id")).delete()
             messages.success(request, "Medalla eliminada con éxito.")
-
+        else:
+            messages.error(request, "Acción no reconocida.")
         return redirect("administrar_gamificacion")
 
     return render(request, "gamificacion/admin_gamificacion.html", {
-        "usuarios": usuarios,
         "temporadas": temporadas,
         "retos": retos,
         "recompensas": recompensas,
@@ -120,6 +135,11 @@ def administrar_gamificacion(request):
         "reto_form": RetoForm(),
         "recompensa_form": RecompensaForm(),
         "medalla_form": MedallaForm(),
+        "otorgar_puntos_form": otorgar_puntos_form,
+        "temporadas_paginator": temporadas_paginator,
+        "retos_paginator": retos_paginator,
+        "recompensas_paginator": recompensas_paginator,
+        "medallas_paginator": medallas_paginator,
     })
 
 
@@ -389,11 +409,12 @@ def historial_puntos_paginated(request):
 
     return render(request, 'gamificacion/historial_puntos_paginated.html', {'page_obj': page_obj})
 
+# Vista para recompensas disponibles
 @login_required
 @validar_temporada_activa
 def recompensas_disponibles(request):
     """
-    Muestra las recompensas disponibles, reclamadas y ya redimidas con descripciones completas y visualización mejorada.
+    Vista para mostrar las recompensas disponibles y redimidas del usuario actual.
     """
     usuario = request.user
     temporada_actual = Temporada.obtener_temporada_actual()
@@ -402,109 +423,98 @@ def recompensas_disponibles(request):
         messages.warning(request, "No hay una temporada activa en este momento.")
         return redirect("home")
 
-    # Verificar cantidad de retos cumplidos por el usuario en la temporada actual
-    retos_cumplidos = RetoUsuario.objects.filter(
-        usuario=usuario,
-        cumplido=True,
-        reto__temporada=temporada_actual
-    ).count()
+    # Asignar recompensas globales y asociarlas a retos cumplidos
+    asignar_recompensas_a_tecnico(usuario, temporada_actual)
 
-    # Verificar y asignar recompensas basadas en retos cumplidos dentro de la temporada
-    verificar_y_asignar_recompensas(usuario, temporada_actual)
-
-    # Obtener recompensas redimidas y disponibles
-    recompensas_redimidas = Recompensa.objects.filter(
-        usuario=usuario,
-        redimido=True,
-        temporada=temporada_actual
-    ).count()
-
-    recompensas_disponibles = Recompensa.objects.filter(
-        usuario=usuario,
-        redimido=False,
-        temporada=temporada_actual
+    # Obtener recompensas disponibles clasificadas por nivel
+    recompensas_disponibles = (
+        Recompensa.objects.filter(
+            temporada=temporada_actual,
+            reto__retos_asignados__usuario=usuario,
+            reto__retos_asignados__cumplido=True,
+            puntos_necesarios__lte=usuario.puntos  # Usuario debe tener puntos suficientes
+        )
+        .exclude(usuarios_redimidos=usuario)  # Excluir recompensas ya redimidas
+        .order_by('reto__nivel', 'puntos_necesarios')  # Ordenar por nivel y puntos necesarios
     )
 
-    # Limitar recompensas disponibles según retos cumplidos menos redimidas
-    limite_recompensas = retos_cumplidos - recompensas_redimidas
-    recompensas_permitidas = recompensas_disponibles[:limite_recompensas]
+    # Clasificar recompensas por nivel
+    recompensas_clasificadas = {}
+    for recompensa in recompensas_disponibles:
+        nivel = recompensa.reto.nivel if recompensa.reto else 0
+        if nivel not in recompensas_clasificadas:
+            recompensas_clasificadas[nivel] = []
+        recompensas_clasificadas[nivel].append(recompensa)
+
+    # Obtener recompensas redimidas por el usuario
+    recompensas_redimidas = (
+        Recompensa.objects.filter(
+            temporada=temporada_actual,
+            usuarios_redimidos=usuario
+        )
+        .distinct()
+        .order_by('tipo', 'puntos_necesarios')
+    )
 
     return render(request, 'gamificacion/recompensas_disponibles.html', {
-        'recompensas_disponibles': recompensas_permitidas,
-        'recompensas_redimidas': Recompensa.objects.filter(
-            usuario=usuario,
-            redimido=True,
-            temporada=temporada_actual
-        ),
+        'recompensas_disponibles': recompensas_clasificadas,
+        'recompensas_redimidas': recompensas_redimidas,
         'nivel_actual': usuario.nivel,
     })
 
-@csrf_exempt
+
+
+@csrf_exempt  # Para manejar solicitudes AJAX sin problemas con CSRF
 @login_required
 def redimir_recompensa(request):
     """
-    Permite al usuario redimir una recompensa específica y resta los puntos necesarios.
+    Permite redimir una recompensa específica si se cumplen las condiciones.
     """
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            recompensa_id = data.get("recompensa_id")
-            recompensa = get_object_or_404(Recompensa, id=recompensa_id, usuario=request.user)
+            body = json.loads(request.body)
+            recompensa_id = body.get("recompensa_id")
+            usuario = request.user
 
-            if recompensa.redimido:
-                return JsonResponse({"success": False, "error": "La recompensa ya ha sido redimida."})
-
-            # Verificar retos cumplidos y redimidos
-            retos_cumplidos = RetoUsuario.objects.filter(
-                usuario=request.user,
-                cumplido=True,
-                reto__temporada=recompensa.temporada
-            ).count()
-
-            recompensas_redimidas = Recompensa.objects.filter(
-                usuario=request.user,
-                redimido=True,
-                temporada=recompensa.temporada
-            ).count()
-
-            if recompensas_redimidas >= retos_cumplidos:
-                return JsonResponse({"success": False, "error": "No puedes redimir más recompensas sin completar más retos."})
-
-            if request.user.puntos < recompensa.puntos_necesarios:
-                return JsonResponse({"success": False, "error": "No tienes suficientes puntos para redimir esta recompensa."})
-
-            # Procesar redención
-            recompensa.redimido = True
-            recompensa.save()
-
-            # Restar los puntos necesarios
-            request.user.puntos -= recompensa.puntos_necesarios
-            request.user.save()
-
-            # Registrar la redención en los logs
-            RegistroPuntos.objects.create(
-                usuario=request.user,
-                puntos_obtenidos=-recompensa.puntos_necesarios,
-                descripcion=f"Redimiste la recompensa: {recompensa.descripcion}"
+            # Validar si la recompensa existe
+            recompensa = Recompensa.objects.get(
+                id=recompensa_id,
+                temporada=Temporada.obtener_temporada_actual()
             )
 
-            # Datos para la animación y actualización en tiempo real
-            respuesta = {
+            # Validar si ya ha sido redimida
+            if recompensa.usuarios_redimidos.filter(id=usuario.id).exists():
+                return JsonResponse({"success": False, "error": "La recompensa ya ha sido redimida."})
+
+            # Validar puntos suficientes
+            if usuario.puntos < recompensa.puntos_necesarios:
+                return JsonResponse({"success": False, "error": "No tienes suficientes puntos para redimir esta recompensa."})
+
+            # Redimir la recompensa
+            recompensa.usuarios_redimidos.add(usuario)
+            usuario.puntos -= recompensa.puntos_necesarios
+            usuario.save()
+
+            # Respuesta JSON con información de la recompensa
+            return JsonResponse({
                 "success": True,
                 "mensaje": {
                     "tipo": recompensa.tipo,
                     "descripcion": recompensa.descripcion,
-                    "valor": recompensa.valor,
-                    "icono": "fas fa-check-circle",
+                    "id": recompensa.id
                 }
-            }
+            })
 
-            return JsonResponse(respuesta)
+        except Recompensa.DoesNotExist:
+            return JsonResponse({"success": False, "error": "La recompensa no existe."})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Solicitud mal formada."})
+
         except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
+            return JsonResponse({"success": False, "error": f"Error inesperado: {str(e)}"})
 
-    return JsonResponse({"success": False, "error": "Método no permitido."})
-
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
 
 # CRUD para Observaciones de Incidentes
 @login_required

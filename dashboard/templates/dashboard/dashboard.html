@@ -10,23 +10,40 @@
     <!-- Filtros -->
     <form method="get" class="row mb-4">
         <div class="col-md-3">
-            <select name="mes" class="form-select">
+            <label for="anio" class="form-label">Año</label>
+            <select name="anio" id="anio" class="form-select">
+                <option value="">Seleccionar Año</option>
+                {% for anio in anios %}
+                    <option value="{{ anio.year }}" {% if anio_filtrado == anio.year|stringformat:"d" %}selected{% endif %}>
+                        {{ anio.year }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="mes" class="form-label">Mes</label>
+            <select name="mes" id="mes" class="form-select">
                 <option value="">Seleccionar Mes</option>
                 {% for mes in meses %}
-                    <option value="{{ mes }}" {% if mes_filtrado == mes|stringformat:"d" %}selected{% endif %}>Mes {{ mes }}</option>
+                    <option value="{{ mes.0 }}" {% if mes_filtrado == mes.0|stringformat:"d" %}selected{% endif %}>
+                        {{ mes.1 }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-3">
-            <select name="tecnico" class="form-select">
+            <label for="tecnico" class="form-label">Técnico</label>
+            <select name="tecnico" id="tecnico" class="form-select">
                 <option value="">Seleccionar Técnico</option>
                 {% for tecnico in tecnicos_kpis %}
-                    <option value="{{ tecnico.id }}" {% if tecnico_filtrado == tecnico.id|stringformat:"d" %}selected{% endif %}>{{ tecnico.nombre }}</option>
+                    <option value="{{ tecnico.id }}" {% if tecnico_filtrado == tecnico.id|stringformat:"d" %}selected{% endif %}>
+                        {{ tecnico.nombre }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
-        <div class="col-md-3">
-            <button class="btn btn-primary">Aplicar Filtros</button>
+        <div class="col-md-3 align-self-end">
+            <button class="btn btn-primary w-100">Aplicar Filtros</button>
         </div>
     </form>
 
@@ -106,24 +123,6 @@
         <p class="text-center">No hay datos de rendimiento disponibles.</p>
     {% endif %}
 
-    <!-- Retos dinámicos
-    <h2 class="mt-5 text-center">Retos a conseguir</h2>
-    <div class="row justify-content-center">
-        {% if retos %}
-            {% for reto in retos %}
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center shadow-sm p-3">
-                        <h5 class="fw-bold">{{ reto.nombre }}</h5>
-                        <p>{{ reto.descripcion }}</p>
-                        <p><strong>Recompensa:</strong> {{ reto.puntos_otorgados }} puntos</p>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-center">No hay retos disponibles en este momento.</p>
-        {% endif %}
-    </div>-->
-
     <!-- Progreso general de técnicos -->
     <h2 class="mt-5">Progreso General de Técnicos</h2>
     {% if tecnicos_proceso %}
@@ -152,10 +151,8 @@
     {% endif %}
 </div>
 
-<!-- Gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Servicios por técnico
     const technicianPerformanceData = {{ servicios_por_tecnico|safe }};
     if (technicianPerformanceData.length > 0) {
         const technicianNames = technicianPerformanceData.map(item => item.tecnico__nombre);
@@ -181,7 +178,6 @@
         });
     }
 
-    // Proporción de estados de servicios
     const serviceStatesData = {{ estados_servicios|safe }};
     if (serviceStatesData.length > 0) {
         const stateLabels = serviceStatesData.map(item => item.estado);

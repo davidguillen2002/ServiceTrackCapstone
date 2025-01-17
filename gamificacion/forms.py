@@ -62,12 +62,13 @@ class RetoForm(forms.ModelForm):
 class MedallaForm(forms.ModelForm):
     class Meta:
         model = Medalla
-        fields = ['nombre', 'descripcion', 'icono', 'puntos_necesarios']
+        fields = ['nombre', 'descripcion', 'icono', 'puntos_necesarios', 'nivel_requerido']
         labels = {
             'nombre': 'Nombre de la medalla',
             'descripcion': 'Descripción',
             'icono': 'Ícono de la medalla',
             'puntos_necesarios': 'Puntos necesarios para desbloquear',
+            'nivel_requerido': 'Nivel mínimo requerido',
         }
 
     def clean_puntos_necesarios(self):
@@ -75,49 +76,87 @@ class MedallaForm(forms.ModelForm):
         if puntos <= 0:
             raise forms.ValidationError("Los puntos necesarios deben ser mayores que cero.")
         return puntos
+
 
 class TemporadaForm(forms.ModelForm):
     class Meta:
         model = Temporada
         fields = ['nombre', 'fecha_inicio', 'fecha_fin', 'activa']
 
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get("fecha_inicio")
+        fecha_fin = cleaned_data.get("fecha_fin")
+
+        if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
+            raise forms.ValidationError("La fecha de inicio no puede ser posterior a la fecha de fin.")
+
+        return cleaned_data
+
+
 class RecompensaForm(forms.ModelForm):
     class Meta:
         model = Recompensa
         fields = [
-            'tipo', 'puntos_necesarios', 'descripcion', 'valor', 'reto', 'usuario', 'redimido'
+            'tipo', 'descripcion', 'valor', 'puntos_necesarios', 'temporada', 'reto'
         ]
         labels = {
             'tipo': 'Tipo de recompensa',
-            'puntos_necesarios': 'Puntos necesarios para redimir',
             'descripcion': 'Descripción de la recompensa',
             'valor': 'Valor de la recompensa (monetario u otro)',
-            'reto': 'Reto asociado',
-            'usuario': 'Usuario (opcional)',
-            'redimido': 'Estado de redención',
+            'puntos_necesarios': 'Puntos necesarios para redimir',
+            'temporada': 'Temporada asociada a la recompensa',
+            'reto': 'Reto asociado a la recompensa (opcional)',
         }
         widgets = {
-            'descripcion': forms.Textarea(attrs={'rows': 3}),
+            'descripcion': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Describe la recompensa en detalle.'}),
         }
 
     def clean_puntos_necesarios(self):
+        """
+        Valida que los puntos necesarios sean mayores que cero.
+        """
         puntos = self.cleaned_data.get("puntos_necesarios")
         if puntos <= 0:
             raise forms.ValidationError("Los puntos necesarios deben ser mayores que cero.")
         return puntos
 
     def clean_valor(self):
+        """
+        Valida que el valor de la recompensa sea positivo y razonable.
+        """
         valor = self.cleaned_data.get("valor")
         if valor < 0:
             raise forms.ValidationError("El valor de la recompensa no puede ser negativo.")
+        if valor > 10000:  # Límite arbitrario; ajusta según tus necesidades
+            raise forms.ValidationError("El valor de la recompensa parece ser demasiado alto.")
         return valor
 
     def clean(self):
+        """
+        Validaciones generales del formulario.
+        """
         cleaned_data = super().clean()
         tipo = cleaned_data.get("tipo")
         descripcion = cleaned_data.get("descripcion")
+        temporada = cleaned_data.get("temporada")
+        puntos_necesarios = cleaned_data.get("puntos_necesarios")
+        reto = cleaned_data.get("reto")
 
-        if not tipo or not descripcion:
-            raise forms.ValidationError("El tipo y la descripción de la recompensa son obligatorios.")
+        if not tipo or not descripcion or not temporada:
+            raise forms.ValidationError("El tipo, la descripción y la temporada son obligatorios.")
+
+        # Validación específica: si se proporciona un reto, debe coincidir con la temporada de la recompensa.
+        if reto and reto.temporada != temporada:
+            raise forms.ValidationError("El reto asociado debe pertenecer a la misma temporada que la recompensa.")
+
+        # Validación adicional: verificar unicidad del reto si está presente.
+        if reto:
+            recompensa_existente = Recompensa.objects.filter(reto=reto).exclude(id=self.instance.id).first()
+            if recompensa_existente:
+                raise forms.ValidationError(
+                    f"El reto '{reto.nombre}' ya está asociado a otra recompensa: '{recompensa_existente.descripcion}'."
+                )
 
         return cleaned_data
+

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'reportes',
     'notificaciones',
     "channels",
+    'widget_tweaks',
 ]
 
 

@@ -9,7 +9,6 @@
 
     <div class="row justify-content-center mb-4">
         <div class="col-md-6 text-center">
-            <!-- Texto destacado para el nivel actual -->
             <p class="nivel-actual-text">
                 ¡Estás en el <strong>nivel {{ nivel_actual }}</strong>! <br>
                 <span>Abre el cofre para descubrir tus recompensas.</span>
@@ -21,54 +20,52 @@
         </div>
     </div>
 
-    <!-- Botón para regresar al perfil -->
     <div class="text-center mb-4 animate__animated animate__zoomIn">
         <a href="{% url 'perfil_gamificacion' %}" class="btn btn-info animate__animated animate__tada">Volver al Perfil</a>
     </div>
 
-    <div id="recompensas-container" class="d-none">
-        <!-- Recompensas disponibles -->
-        <div class="col-md-8 mx-auto mt-4">
-            <h4 class="text-center text-primary">🌟 Tus Recompensas Disponibles</h4>
-            <div id="recompensas-disponibles">
-                {% if recompensas_disponibles %}
-                    {% for recompensa in recompensas_disponibles %}
-                    <div class="card mb-3 animate__animated animate__fadeIn">
-                        <div class="row g-0">
-                            <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
-                                <img src="{% static 'img/' %}{{ recompensa.tipo }}.png" alt="{{ recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
-                                    <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
-                                    <p class="card-text"><strong>Puntos necesarios:</strong> {{ recompensa.puntos_necesarios }}</p>
-                                    {% if forloop.counter <= retos_cumplidos %}
-                                        <button class="btn btn-success mt-2 reclamar-btn" data-id="{{ recompensa.id }}">
-                                            Redimir <i class="fas fa-check-circle"></i>
-                                        </button>
-                                    {% else %}
-                                        <button class="btn btn-secondary mt-2" disabled>
-                                            Completa más retos para redimir
-                                        </button>
-                                    {% endif %}
+<div id="recompensas-container" class="d-none">
+    <!-- Recompensas disponibles -->
+    <div class="col-md-8 mx-auto mt-4">
+        <h4 class="text-center text-primary">🌟 Tus Recompensas Disponibles</h4>
+        <div id="recompensas-disponibles">
+            {% if recompensas_disponibles %}
+                {% for nivel, recompensas in recompensas_disponibles.items %}
+                    <div class="nivel-recompensas">
+                        <h5 class="text-secondary">Recompensas del Nivel {{ nivel }}</h5>
+                        {% for recompensa in recompensas %}
+                            <div class="card mb-3 animate__animated animate__fadeIn">
+                                <div class="row g-0">
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
+                                        <img src="{% static 'img/' %}{{ recompensa.tipo }}.png" alt="{{ recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
+                                            <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
+                                            <p class="card-text"><strong>Puntos necesarios:</strong> {{ recompensa.puntos_necesarios }}</p>
+                                            <button class="btn btn-success mt-2 reclamar-btn" data-id="{{ recompensa.id }}">
+                                                Redimir <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted text-center">No hay recompensas disponibles para redimir en este momento.</p>
-                {% endif %}
-            </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted text-center">No hay recompensas disponibles para redimir en este momento.</p>
+            {% endif %}
         </div>
+    </div>
 
-        <!-- Recompensas redimidas -->
-        <div class="col-md-8 mx-auto mt-4">
-            <h4 class="text-center text-success">✅ Recompensas Redimidas</h4>
-            <div id="recompensas-redimidas">
-                {% if recompensas_redimidas %}
-                    {% for recompensa in recompensas_redimidas %}
+    <!-- Recompensas redimidas -->
+    <div class="col-md-8 mx-auto mt-4">
+        <h4 class="text-center text-info">✔️ Recompensas Redimidas</h4>
+        <div id="recompensas-redimidas">
+            {% if recompensas_redimidas %}
+                {% for recompensa in recompensas_redimidas %}
                     <div class="card mb-3 animate__animated animate__fadeIn">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
@@ -78,21 +75,21 @@
                                 <div class="card-body">
                                     <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
                                     <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
-                                    <span class="badge bg-info">Redimida</span>
+                                    <span class="badge bg-success">Redimida</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted text-center">No has redimido recompensas aún.</p>
-                {% endif %}
-            </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted text-center">No hay recompensas redimidas todavía.</p>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Animación gráfica -->
+
+
 <div id="animacion-cofre" class="animacion-cofre d-none">
     <div class="animacion-content animate__animated animate__zoomIn">
         <i class="fas fa-gem" style="font-size: 4rem; color: gold;"></i>
@@ -106,23 +103,24 @@
         const abrirCofreBtn = document.getElementById("abrir-cofre-btn");
         const recompensasContainer = document.getElementById("recompensas-container");
         const cofreImg = document.getElementById("cofre-img");
-        const animacionCofre = document.getElementById("animacion-cofre");
-        const mensajeAnimacion = document.getElementById("mensaje-animacion");
-        const cerrarAnimacionBtn = document.getElementById("cerrar-animacion");
-        const recompensasDisponiblesDiv = document.getElementById("recompensas-disponibles");
-        const recompensasRedimidasDiv = document.getElementById("recompensas-redimidas");
 
+        // Evento para abrir el cofre
         abrirCofreBtn.addEventListener("click", function () {
-            cofreImg.src = "{% static 'img/cofre-abierto.png' %}";
-            cofreImg.classList.add("animate__animated", "animate__bounce");
-            setTimeout(() => {
-                recompensasContainer.classList.remove("d-none");
-                recompensasContainer.classList.add("animate__animated", "animate__fadeIn");
-            }, 1000);
-            abrirCofreBtn.textContent = "Cofre Abierto";
-            abrirCofreBtn.disabled = true;
+            if (!abrirCofreBtn.disabled) {
+                cofreImg.src = "{% static 'img/cofre-abierto.png' %}";
+                cofreImg.classList.add("animate__animated", "animate__bounce");
+
+                setTimeout(() => {
+                    recompensasContainer.classList.remove("d-none");
+                    recompensasContainer.classList.add("animate__animated", "animate__fadeIn");
+                }, 1000);
+
+                abrirCofreBtn.textContent = "Cofre Abierto";
+                abrirCofreBtn.disabled = true;
+            }
         });
 
+        // Evento para redimir recompensas
         const reclamarBtns = document.querySelectorAll(".reclamar-btn");
         reclamarBtns.forEach(btn => {
             btn.addEventListener("click", function () {
@@ -138,49 +136,42 @@
                     },
                     body: JSON.stringify({ recompensa_id: recompensaId }),
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        mensajeAnimacion.textContent = data.mensaje.descripcion;
-                        animacionCofre.classList.remove("d-none");
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const recompensaCard = btn.closest(".card");
+                            recompensaCard.remove();
 
-                        // Actualizar la recompensa redimida
-                        const recompensaCard = btn.closest(".card");
-                        recompensasDisponiblesDiv.removeChild(recompensaCard);
-
-                        recompensasRedimidasDiv.insertAdjacentHTML('beforeend', `
-                            <div class="card mb-3 animate__animated animate__fadeIn">
-                                <div class="row g-0">
-                                    <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
-                                        <img src="{% static 'img/' %}${data.mensaje.tipo}-redimido.png" alt="${data.mensaje.tipo}" class="img-fluid" style="max-height: 100px;">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-uppercase"><strong>${data.mensaje.tipo}</strong></h5>
-                                            <p class="card-text"><strong>Descripción:</strong> ${data.mensaje.descripcion}</p>
-                                            <p class="card-text"><strong>Valor estimado:</strong> ${data.mensaje.valor}</p>
-                                            <span class="badge bg-info">Redimida</span>
+                            // Mover la recompensa a la lista de redimidas
+                            const recompensasRedimidasDiv = document.getElementById("recompensas-redimidas");
+                            recompensasRedimidasDiv.insertAdjacentHTML("beforeend", `
+                                <div class="card mb-3 animate__animated animate__fadeIn">
+                                    <div class="row g-0">
+                                        <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
+                                            <img src="{% static 'img/' %}${data.mensaje.tipo}-redimido.png" alt="${data.mensaje.tipo}" class="img-fluid" style="max-height: 100px;">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-uppercase"><strong>${data.mensaje.tipo}</strong></h5>
+                                                <p class="card-text"><strong>Descripción:</strong> ${data.mensaje.descripcion}</p>
+                                                <span class="badge bg-success">Redimida</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        `);
-
-                        cerrarAnimacionBtn.addEventListener("click", () => {
-                            animacionCofre.classList.add("d-none");
-                        });
-                    } else {
-                        alert("Error: " + data.error);
+                            `);
+                        } else {
+                            alert("Error: " + data.error);
+                            btn.disabled = false;
+                            btn.textContent = "Redimir";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Ocurrió un error inesperado.");
                         btn.disabled = false;
                         btn.textContent = "Redimir";
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("Ocurrió un error inesperado.");
-                    btn.disabled = false;
-                    btn.textContent = "Redimir";
-                });
+                    });
             });
         });
     });
@@ -230,21 +221,21 @@
         }
     }
     .nivel-actual-text {
-        font-size: 2rem; /* Tamaño grande del texto */
+        font-size: 2rem;
         font-weight: bold;
-        color: #ff9800; /* Color llamativo */
-        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3); /* Sombra para destacar */
+        color: #ff9800;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
         line-height: 1.5;
     }
 
     .nivel-actual-text strong {
-        font-size: 2.5rem; /* Tamaño aún mayor para el nivel */
-        color: #4caf50; /* Diferente color para destacar más */
+        font-size: 2.5rem;
+        color: #4caf50;
     }
 
     .nivel-actual-text span {
         display: block;
-        font-size: 1.8rem; /* Texto adicional también llamativo */
+        font-size: 1.8rem;
         margin-top: 0.5rem;
     }
 </style>

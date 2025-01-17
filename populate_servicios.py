@@ -1,4 +1,3 @@
-# Crear servicios masivos, repuestos y observaciones con datos detallados
 import os
 import random
 from faker import Faker
@@ -142,7 +141,7 @@ for _ in range(5000):  # Crear 5000 servicios
             observacion = ObservacionIncidente(
                 servicio=servicio,
                 autor=tecnico,
-                descripcion=fake.sentence(),
+                descripcion=fake.paragraph(nb_sentences=3),
                 tipo_observacion=tipo_observacion,
                 estado="En progreso",
                 fecha_reportada=fake.date_between(start_date=fecha_inicio, end_date=fecha_fin or datetime.now()),

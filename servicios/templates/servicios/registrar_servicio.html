@@ -1,65 +1,116 @@
 {% extends "base.html" %}
 
-{% block title %}Registrar Servicio{% endblock %}
+{% load widget_tweaks %}
+
+{% block title %}Registrar Nuevo Servicio{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center mb-4">Registrar Nuevo Servicio</h1>
 
-    <form method="post">
+    <form method="post" class="shadow-lg p-4 bg-white rounded">
         {% csrf_token %}
+
         <div class="row">
+            <!-- Datos del Servicio -->
             <div class="col-md-6">
-                <h4>Datos del Servicio</h4>
+                <h4 class="text-primary border-bottom pb-2">Datos del Servicio</h4>
+
                 <div class="mb-3">
-                    <label for="equipo" class="form-label">Equipo</label>
-                    {{ servicio_form.equipo }}
+                    <label for="equipo" class="form-label fw-bold">Equipo</label>
+                    {{ servicio_form.equipo|add_class:"form-select" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="tecnico" class="form-label">Técnico</label>
-                    {{ servicio_form.tecnico }}
+                    <label for="cliente" class="form-label fw-bold">Cliente</label>
+                    <input type="text" id="cliente-name" class="form-control" placeholder="Selecciona un equipo" readonly>
                 </div>
+
                 <div class="mb-3">
-                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-                    {{ servicio_form.fecha_inicio }}
+                    <label for="tecnico" class="form-label fw-bold">Técnico</label>
+                    {{ servicio_form.tecnico|add_class:"form-select" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="estado" class="form-label">Estado</label>
-                    {{ servicio_form.estado }}
+                    <label for="fecha_inicio" class="form-label fw-bold">Fecha de Inicio</label>
+                    {{ servicio_form.fecha_inicio|add_class:"form-control" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="costo" class="form-label">Costo</label>
-                    {{ servicio_form.costo }}
+                    <label for="estado" class="form-label fw-bold">Estado</label>
+                    {{ servicio_form.estado|add_class:"form-select" }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="costo" class="form-label fw-bold">Costo</label>
+                    {{ servicio_form.costo|add_class:"form-control" }}
                 </div>
             </div>
+
+            <!-- Repuestos -->
             <div class="col-md-6">
-                <h4>Repuestos</h4>
+                <h4 class="text-primary border-bottom pb-2">Repuestos</h4>
+
                 <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    {{ repuesto_form.nombre }}
+                    <label for="nombre" class="form-label fw-bold">Nombre</label>
+                    {{ repuesto_form.nombre|add_class:"form-control" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción</label>
-                    {{ repuesto_form.descripcion }}
+                    <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                    {{ repuesto_form.descripcion|add_class:"form-control" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="costo" class="form-label">Costo</label>
-                    {{ repuesto_form.costo }}
+                    <label for="costo" class="form-label fw-bold">Costo</label>
+                    {{ repuesto_form.costo|add_class:"form-control" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="cantidad" class="form-label">Cantidad</label>
-                    {{ repuesto_form.cantidad }}
+                    <label for="cantidad" class="form-label fw-bold">Cantidad</label>
+                    {{ repuesto_form.cantidad|add_class:"form-control" }}
                 </div>
+
                 <div class="mb-3">
-                    <label for="proveedor" class="form-label">Proveedor</label>
-                    {{ repuesto_form.proveedor }}
+                    <label for="proveedor" class="form-label fw-bold">Proveedor</label>
+                    {{ repuesto_form.proveedor|add_class:"form-select" }}
                 </div>
             </div>
         </div>
+
+        <!-- Botones de acción -->
         <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Registrar Servicio</button>
-            <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary btn-lg px-4">Registrar Servicio</button>
+            <a href="{% url 'lista_servicios' %}" class="btn btn-secondary btn-lg px-4">Cancelar</a>
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const equipoSelect = document.getElementById('id_equipo');
+        const clienteName = document.getElementById('cliente-name');
+
+        equipoSelect.addEventListener('change', function () {
+            const equipoId = this.value;
+            if (equipoId) {
+                // Cambia la ruta para incluir el prefijo "servicios/"
+                fetch(`/servicios/api/equipo_cliente/?equipo_id=${equipoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.cliente) {
+                            clienteName.value = data.cliente; // Muestra el nombre del cliente
+                        } else {
+                            clienteName.value = 'No encontrado'; // Si no hay cliente
+                        }
+                    })
+                    .catch(() => {
+                        clienteName.value = 'Error al cargar el cliente'; // Error de conexión
+                    });
+            } else {
+                clienteName.value = ''; // Limpia el campo si no hay selección
+            }
+        });
+    });
+</script>
 {% endblock %}

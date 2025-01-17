@@ -2,20 +2,31 @@
 {% block title %}Administración de Gamificación{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center">🎮 Administración de Gamificación</h1>
+    <h1 class="text-center text-primary mb-4">🎮 Administración de Gamificación</h1>
+
+    <!-- Otorgar Puntos -->
+    <h2 class="mt-5 text-secondary">✨ Otorgar Puntos</h2>
+    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
+        {% csrf_token %}
+        {{ otorgar_puntos_form.as_p }}
+        <input type="hidden" name="action" value="otorgar_puntos">
+        <button class="btn btn-success btn-lg w-100">Otorgar Puntos</button>
+    </form>
 
     <!-- Temporadas -->
-    <h2 class="mt-4">📅 Temporadas</h2>
-    <form method="post">
+    <h2 class="mt-5 text-secondary">📅 Temporadas</h2>
+    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ temporada_form.as_p }}
         <input type="hidden" name="action" value="crear_temporada">
-        <button class="btn btn-primary">Crear Temporada</button>
+        <button class="btn btn-success btn-lg w-100">Crear Temporada</button>
     </form>
-    <ul class="list-group mt-3">
+    <ul class="list-group mb-5">
         {% for temporada in temporadas %}
-        <li class="list-group-item">
-            <strong>{{ temporada.nombre }}</strong> ({{ temporada.fecha_inicio }} - {{ temporada.fecha_fin }})
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <strong>{{ temporada.nombre }}</strong> ({{ temporada.fecha_inicio }} - {{ temporada.fecha_fin }})
+            </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="eliminar_temporada">
@@ -23,21 +34,60 @@
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
         </li>
+        {% empty %}
+        <li class="list-group-item text-center">No hay temporadas registradas.</li>
         {% endfor %}
     </ul>
+    <div class="d-flex justify-content-center">
+        {% if temporadas.has_other_pages %}
+        <nav>
+            <ul class="pagination">
+                {% if temporadas.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?temporadas_page={{ temporadas.previous_page_number }}">Anterior</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for page_num in temporadas.paginator.page_range %}
+                {% if temporadas.number == page_num %}
+                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?temporadas_page={{ page_num }}">{{ page_num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if temporadas.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?temporadas_page={{ temporadas.next_page_number }}">Siguiente</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
 
     <!-- Retos -->
-    <h2 class="mt-4">📜 Retos</h2>
-    <form method="post">
+    <h2 class="mt-5 text-secondary">📜 Retos</h2>
+    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ reto_form.as_p }}
         <input type="hidden" name="action" value="crear_reto">
-        <button class="btn btn-primary">Crear Reto</button>
+        <button class="btn btn-success btn-lg w-100">Crear Reto</button>
     </form>
-    <ul class="list-group mt-3">
+    <ul class="list-group mb-5">
         {% for reto in retos %}
-        <li class="list-group-item">
-            <strong>{{ reto.nombre }}</strong> (Nivel: {{ reto.nivel }})
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <strong>{{ reto.nombre }}</strong> (Nivel: {{ reto.nivel }})
+            </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="eliminar_reto">
@@ -45,21 +95,60 @@
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
         </li>
+        {% empty %}
+        <li class="list-group-item text-center">No hay retos registrados.</li>
         {% endfor %}
     </ul>
+    <div class="d-flex justify-content-center">
+        {% if retos.has_other_pages %}
+        <nav>
+            <ul class="pagination">
+                {% if retos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?retos_page={{ retos.previous_page_number }}">Anterior</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for page_num in retos.paginator.page_range %}
+                {% if retos.number == page_num %}
+                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?retos_page={{ page_num }}">{{ page_num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if retos.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?retos_page={{ retos.next_page_number }}">Siguiente</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
 
     <!-- Recompensas -->
-    <h2 class="mt-4">🎁 Recompensas</h2>
-    <form method="post">
+    <h2 class="mt-5 text-secondary">🎁 Recompensas</h2>
+    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ recompensa_form.as_p }}
         <input type="hidden" name="action" value="crear_recompensa">
-        <button class="btn btn-primary">Crear Recompensa</button>
+        <button class="btn btn-success btn-lg w-100">Crear Recompensa</button>
     </form>
-    <ul class="list-group mt-3">
+    <ul class="list-group mb-5">
         {% for recompensa in recompensas %}
-        <li class="list-group-item">
-            <strong>{{ recompensa.descripcion }}</strong> ({{ recompensa.tipo }})
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <strong>{{ recompensa.descripcion }}</strong> ({{ recompensa.tipo }})
+            </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="eliminar_recompensa">
@@ -67,21 +156,60 @@
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
         </li>
+        {% empty %}
+        <li class="list-group-item text-center">No hay recompensas registradas.</li>
         {% endfor %}
     </ul>
+    <div class="d-flex justify-content-center">
+        {% if recompensas.has_other_pages %}
+        <nav>
+            <ul class="pagination">
+                {% if recompensas.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?recompensas_page={{ recompensas.previous_page_number }}">Anterior</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for page_num in recompensas.paginator.page_range %}
+                {% if recompensas.number == page_num %}
+                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?recompensas_page={{ page_num }}">{{ page_num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if recompensas.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?recompensas_page={{ recompensas.next_page_number }}">Siguiente</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
 
     <!-- Medallas -->
-    <h2 class="mt-4">🏅 Medallas</h2>
-    <form method="post" enctype="multipart/form-data">
+    <h2 class="mt-5 text-secondary">🏅 Medallas</h2>
+    <form method="post" enctype="multipart/form-data" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ medalla_form.as_p }}
         <input type="hidden" name="action" value="crear_medalla">
-        <button class="btn btn-primary">Crear Medalla</button>
+        <button class="btn btn-success btn-lg w-100">Crear Medalla</button>
     </form>
-    <ul class="list-group mt-3">
+    <ul class="list-group">
         {% for medalla in medallas %}
-        <li class="list-group-item">
-            <strong>{{ medalla.nombre }}</strong> (Nivel: {{ medalla.nivel_requerido }})
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <strong>{{ medalla.nombre }}</strong> (Nivel: {{ medalla.nivel_requerido }})
+            </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="eliminar_medalla">
@@ -89,7 +217,44 @@
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
         </li>
+        {% empty %}
+        <li class="list-group-item text-center">No hay medallas registradas.</li>
         {% endfor %}
     </ul>
+    <div class="d-flex justify-content-center">
+        {% if medallas.has_other_pages %}
+        <nav>
+            <ul class="pagination">
+                {% if medallas.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?medallas_page={{ medallas.previous_page_number }}">Anterior</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for page_num in medallas.paginator.page_range %}
+                {% if medallas.number == page_num %}
+                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?medallas_page={{ page_num }}">{{ page_num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if medallas.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?medallas_page={{ medallas.next_page_number }}">Siguiente</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

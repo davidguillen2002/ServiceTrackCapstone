@@ -4,41 +4,121 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Mis Servicios</h1>
-    {% if servicios %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Equipo</th>
-                <th>Técnico</th>
-                <th>Estado</th>
-                <th>Fecha de Inicio</th>
-                <th>Entrega Confirmada</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for servicio in servicios %}
-            <tr>
-                <td>{{ servicio.equipo }}</td>
-                <td>{{ servicio.tecnico }}</td>
-                <td>{{ servicio.estado }}</td>
-                <td>{{ servicio.fecha_inicio }}</td>
-                <td>{{ servicio.entrega_confirmada|yesno:"Sí,No" }}</td>
-                <td>
-                    {% if not servicio.entrega_confirmada %}
-                    <a href="{% url 'enviar_codigo_tecnico' servicio.id %}" class="btn btn-sm btn-success">
-                        Enviar Código
-                    </a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h1 class="text-center mb-4">Mis Servicios</h1>
 
+    {% if servicios %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Equipo</th>
+                    <th>Técnico</th>
+                    <th>Estado</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Entrega Confirmada</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.equipo }}</td>
+                    <td>{{ servicio.tecnico }}</td>
+                    <td>
+                        {% if servicio.estado == "completado" %}
+                            <span class="badge bg-success">Completado</span>
+                        {% elif servicio.estado == "pendiente" %}
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        {% elif servicio.estado == "en_progreso" %}
+                            <span class="badge bg-info text-dark">En Progreso</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if servicio.entrega_confirmada %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not servicio.entrega_confirmada %}
+                        <a href="{% url 'enviar_codigo_tecnico' servicio.id %}" class="btn btn-sm btn-outline-success">
+                            Enviar Código
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No tienes servicios registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if servicios.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ servicios.previous_page_number }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for num in servicios.paginator.page_range %}
+                    <li class="page-item {% if servicios.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if servicios.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ servicios.next_page_number }}" aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
     {% else %}
-        <p>No tienes servicios registrados.</p>
+        <p class="text-center mt-5">No tienes servicios registrados.</p>
     {% endif %}
 </div>
+
+<style>
+    .table {
+        font-size: 0.95rem;
+        background-color: #fff;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .pagination .page-link {
+        color: #007bff;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+    }
+</style>
 {% endblock %}

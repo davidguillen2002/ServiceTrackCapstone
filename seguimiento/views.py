@@ -14,17 +14,23 @@ def is_cliente(user):
     return user.rol.nombre == "cliente"
 
 # Vistas para Clientes
-
 @login_required
 @user_passes_test(is_cliente)
 def lista_equipos_cliente(request):
-    # Mostrar solo los equipos del cliente logueado
-    equipos = Equipo.objects.filter(cliente=request.user)
-    servicios = Servicio.objects.filter(equipo__cliente=request.user)
+    """
+    Vista para mostrar el seguimiento de las reparaciones del cliente con paginación.
+    """
+    servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
+
+    # Paginación: 5 servicios por página
+    paginator = Paginator(servicios, 5)
+    page_number = request.GET.get('page', 1)
+    servicios_paginados = paginator.get_page(page_number)
+
     return render(request, 'seguimiento/lista_equipos_cliente.html', {
-        'equipos': equipos,
-        'servicios': servicios,
+        'servicios': servicios_paginados,
     })
+
 
 
 @login_required
@@ -59,14 +65,19 @@ def detalle_equipo_cliente(request, equipo_id):
 @user_passes_test(is_cliente)
 def dejar_resena(request, servicio_id):
     servicio = get_object_or_404(Servicio, id=servicio_id, equipo__cliente=request.user)
+    rango_estrellas = range(1, 6)
 
     if request.method == 'POST':
         form = ResenaForm(request.POST, instance=servicio)
         if form.is_valid():
             form.save()
-            # Crear notificación para el administrador sobre la nueva reseña
-            mensaje = f"El cliente {request.user.nombre} ha dejado una nueva observación en el servicio {servicio.id}."
-            Notificacion.crear_notificacion(usuario=Usuario.objects.get(rol__nombre="administrador"), tipo="nueva_observacion", mensaje=mensaje)
+            # Crear notificación al administrador
+            mensaje = f"El cliente {request.user.nombre} ha dejado una reseña para el servicio {servicio.id}."
+            Notificacion.crear_notificacion(
+                usuario=Usuario.objects.get(rol__nombre="administrador"),
+                tipo="nueva_observacion",
+                mensaje=mensaje
+            )
             return redirect('lista_equipos_cliente')
     else:
         form = ResenaForm(instance=servicio)
@@ -74,10 +85,10 @@ def dejar_resena(request, servicio_id):
     return render(request, 'seguimiento/dejar_resena.html', {
         'form': form,
         'servicio': servicio,
+        'rango_estrellas': rango_estrellas,
     })
 
 # Vistas para Técnicos
-
 @login_required
 @user_passes_test(is_tecnico)
 def lista_equipos_tecnico(request):

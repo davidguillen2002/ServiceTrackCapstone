@@ -569,7 +569,9 @@ class Servicio(models.Model):
         ],
         default='pendiente'
     )
-    calificacion = models.IntegerField(null=True, blank=True)
+    calificacion = models.DecimalField(
+        max_digits=3, decimal_places=1, null=True, blank=True, help_text="Calificación de 1 a 5, admite decimales"
+    )
     comentario_cliente = models.TextField(null=True, blank=True)
     diagnostico_inicial = models.TextField(null=True, blank=True)
     costo = models.DecimalField(max_digits=10, decimal_places=2)
@@ -868,7 +870,7 @@ class RetoUsuario(models.Model):
 
     def verificar_cumplimiento(self):
         """
-        Verifica si el reto está completo y actualiza su estado.
+        Verifica si el reto está completo, actualiza su estado y otorga la recompensa asociada.
         """
         if self.progreso >= 100 and not self.cumplido:
             self.cumplido = True
@@ -886,11 +888,16 @@ class RetoUsuario(models.Model):
                 descripcion=f"Reto completado: {self.reto.nombre}"
             )
 
+            # Otorgar la recompensa asociada al reto
+            if hasattr(self.reto, 'recompensa'):
+                recompensa = self.reto.recompensa
+                recompensa.verificar_y_otorgar(self.usuario)
+
             # Notificar al usuario
             from gamificacion.notifications import notificar_tecnico
             notificar_tecnico(
                 usuario=self.usuario,
-                mensaje=f"¡Has completado el reto '{self.reto.nombre}'! 🏆",
+                mensaje=f"¡Has completado el reto '{self.reto.nombre}' y recibido tu recompensa! 🎉",
                 tipo="success"
             )
 
@@ -943,26 +950,68 @@ class HistorialReporte(models.Model):
     def __str__(self):
         return f"{self.tipo_reporte} generado por {self.generado_por} el {self.fecha_generacion}"
 
-# Modelo Recompensa
 class Recompensa(models.Model):
-    usuario = models.ForeignKey(
-        Usuario,
+    temporada = models.ForeignKey(
+        'Temporada',
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="recompensas"
+        related_name="recompensas",
+        help_text="Temporada a la que pertenece esta recompensa."
     )
-    reto = models.ForeignKey(Reto, on_delete=models.CASCADE, related_name="recompensas_asignadas")
-    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE, related_name="recompensas")
-    tipo = models.CharField(max_length=50)
-    puntos_necesarios = models.IntegerField()
-    descripcion = models.TextField()
-    valor = models.DecimalField(max_digits=10, decimal_places=2)
-    redimido = models.BooleanField(default=False)
+    descripcion = models.TextField(
+        help_text="Descripción detallada de la recompensa."
+    )
+    valor = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Valor monetario o simbólico asociado a la recompensa."
+    )
+    puntos_necesarios = models.IntegerField(
+        help_text="Cantidad de puntos requeridos para redimir esta recompensa."
+    )
+    tipo = models.CharField(
+        max_length=50,
+        help_text="Tipo de recompensa: bono, herramienta o trofeo."
+    )
+    reto = models.OneToOneField(
+        'Reto',
+        on_delete=models.SET_NULL,
+        related_name="recompensa",
+        null=True,  # Permitir valores nulos
+        blank=True,  # Opcional en formularios
+        help_text="Reto asociado directamente a esta recompensa (opcional)."
+    )
+    usuarios_redimidos = models.ManyToManyField(
+        'Usuario',
+        related_name="recompensas_redimidas",
+        blank=True,
+        help_text="Usuarios que han redimido esta recompensa."
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['reto'],
+                name='unique_recompensa_por_reto'
+            )
+        ]
+        ordering = ['temporada', 'tipo']
+        verbose_name = "Recompensa"
+        verbose_name_plural = "Recompensas"
 
     def __str__(self):
-        return f"{self.tipo} - {self.descripcion} ({'Redimido' if self.redimido else 'Disponible'})"
+        return f"{self.tipo}: {self.descripcion} - Temporada: {self.temporada.nombre}"
 
+    def verificar_y_otorgar(self, usuario):
+        """
+        Verifica si el usuario cumple con el reto asociado y otorga la recompensa si es aplicable.
+        """
+        if self.reto:
+            reto_usuario = RetoUsuario.objects.filter(usuario=usuario, reto=self.reto).first()
+            if reto_usuario and reto_usuario.cumplido:
+                if not self.usuarios_redimidos.filter(id=usuario.id).exists():
+                    self.usuarios_redimidos.add(usuario)
+                    return True
+        return False
 
 class ChatMessage(models.Model):
     user = models.ForeignKey(

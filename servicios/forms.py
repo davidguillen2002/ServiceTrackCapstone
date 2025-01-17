@@ -1,6 +1,9 @@
 from django import forms
 from ServiceTrack.models import Servicio, Repuesto, Capacitacion, ObservacionIncidente, Usuario, TipoObservacion
 
+from django import forms
+from ServiceTrack.models import Servicio, Equipo, Usuario
+
 class ServicioForm(forms.ModelForm):
     cliente = forms.CharField(
         required=False,
@@ -10,38 +13,32 @@ class ServicioForm(forms.ModelForm):
 
     class Meta:
         model = Servicio
-        fields = ['cliente', 'equipo', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
+        fields = ['cliente', 'equipo', 'tecnico', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
         widgets = {
             'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
-            'diagnostico_inicial': forms.Textarea(
-                attrs={'class': 'form-control', 'placeholder': 'Describa el diagnóstico inicial...'}
-            ),
-            'costo': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el costo en USD'}),
+            'diagnostico_inicial': forms.Textarea(attrs={'class': 'form-control'}),
+            'costo': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         equipos_disponibles = kwargs.pop('equipos_disponibles', None)
         super().__init__(*args, **kwargs)
 
-        # Limitar los equipos disponibles en el formulario
-        if equipos_disponibles:
+        if equipos_disponibles is not None:
             self.fields['equipo'].queryset = equipos_disponibles
-            self.fields['equipo'].widget.attrs.update({'class': 'form-control'})
 
     def clean(self):
         """
-        Sobrescribe el método clean para incluir la validación y asignación del cliente asociado al equipo.
+        Valida que el equipo seleccionado tenga un cliente asociado.
         """
         cleaned_data = super().clean()
         equipo = cleaned_data.get('equipo')
 
-        if equipo:
-            # Validar que el equipo tiene un cliente asociado
-            if equipo.cliente:
-                cleaned_data['cliente'] = equipo.cliente.nombre
-            else:
-                self.add_error('equipo', 'El equipo seleccionado no tiene un cliente asociado.')
+        if equipo and not equipo.cliente:
+            self.add_error('equipo', 'El equipo seleccionado no tiene un cliente asociado.')
+        else:
+            cleaned_data['cliente'] = equipo.cliente.nombre
 
         return cleaned_data
 

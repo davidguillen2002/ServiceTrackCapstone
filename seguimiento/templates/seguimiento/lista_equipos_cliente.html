@@ -3,50 +3,113 @@
 {% block title %}Seguimiento de Reparaciones - Cliente{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Seguimiento de Reparaciones</h1>
-    <p class="text-center">Consulta el estado de las reparaciones técnicas en curso y completadas.</p>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Seguimiento de Reparaciones</h1>
+    <p class="text-center mb-4">Consulta el estado de las reparaciones técnicas en curso y completadas.</p>
 
-    <table class="table table-bordered table-striped text-center mt-4">
-        <thead class="table-dark">
-            <tr>
-                <th>Equipo</th>
-                <th>Fecha de Inicio</th>
-                <th>Fecha Estimada de Finalización</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for servicio in servicios %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</td>
-                    <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
-                    <td>{{ servicio.fecha_fin|date:"d/m/Y" }}</td>
-                    <td>
-                        {% if servicio.estado == 'completado' %}
-                            <span class="badge bg-success">Completado</span>
-                        {% elif servicio.estado == 'pendiente' %}
-                            <span class="badge bg-warning text-dark">Pendiente</span>
-                        {% elif servicio.estado == 'en_progreso' %}
-                            <span class="badge bg-info text-dark">En Progreso</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center gap-2">
-                            <a href="{% url 'detalle_equipo_cliente' servicio.equipo.id %}" class="btn btn-outline-primary btn-sm">Ver Detalle</a>
+                    <th>Equipo</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha Estimada de Finalización</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</td>
+                        <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
+                        <td>{{ servicio.fecha_fin|date:"d/m/Y" }}</td>
+                        <td>
                             {% if servicio.estado == 'completado' %}
-                                <a href="{% url 'dejar_resena' servicio.id %}" class="btn btn-outline-success btn-sm">Dejar Reseña</a>
+                                <span class="badge bg-success">Completado</span>
+                            {% elif servicio.estado == 'pendiente' %}
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% elif servicio.estado == 'en_progreso' %}
+                                <span class="badge bg-info text-dark">En Progreso</span>
                             {% endif %}
-                        </div>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">No tienes reparaciones en curso.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'detalle_equipo_cliente' servicio.equipo.id %}" class="btn btn-outline-primary btn-sm">Ver Detalle</a>
+                                {% if servicio.estado == 'completado' %}
+                                    <a href="{% url 'dejar_resena' servicio.id %}" class="btn btn-outline-success btn-sm">Dejar Reseña</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No tienes reparaciones en curso.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if servicios.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ servicios.previous_page_number }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for num in servicios.paginator.page_range %}
+                    <li class="page-item {% if servicios.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if servicios.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ servicios.next_page_number }}" aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
 </div>
+
+<style>
+    .table {
+        background-color: #fff;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .pagination .page-link {
+        color: #007bff;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+    }
+</style>
 {% endblock %}

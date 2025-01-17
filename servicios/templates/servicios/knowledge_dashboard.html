@@ -4,65 +4,89 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Panel de Conocimiento</h1>
+    <h1 class="text-center text-primary mb-4">Panel de Conocimiento</h1>
 
+    <!-- Botón de Navegación a Base de Conocimientos -->
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{% url 'base_conocimiento' %}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-book"></i> Ir a la Base de Conocimientos
+        </a>
+    </div>
+
+    <!-- Tarjetas estadísticas -->
     <div class="row mb-5">
-        <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-lg border-0 bg-primary text-white">
+                <div class="card-body text-center">
                     <h5 class="card-title">Total de Servicios Realizados</h5>
-                    <p class="card-text">{{ total_servicios }}</p>
+                    <p class="display-4 fw-bold">{{ total_servicios|default:"-" }}</p>
+                    <i class="fas fa-tools fa-3x"></i>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-lg border-0" style="background-color: #28a745; color: white;">
+                <div class="card-body text-center">
                     <h5 class="card-title">Calificación Promedio</h5>
-                    <p class="card-text">{{ calificacion_promedio|floatformat:1 }}</p>
+                    <p class="display-4 fw-bold">{{ calificacion_promedio|floatformat:1|default:"-" }}</p>
+                    <i class="fas fa-star fa-3x"></i>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-lg border-0" style="background-color: #ffc107; color: #333;">
+                <div class="card-body text-center">
                     <h5 class="card-title">Técnicos Activos</h5>
-                    <ul class="list-group list-group-flush">
-                        {% for tecnico in tecnicos %}
-                            <li class="list-group-item">{{ tecnico.nombre }}</li>
-                        {% endfor %}
-                    </ul>
+                    <p class="display-4 fw-bold">{{ tecnicos|length|default:"-" }}</p>
+                    <i class="fas fa-users fa-3x"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <h2>Guías Más Consultadas</h2>
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Categoría</th>
-                <th>Puntuación</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for guia in guias_mas_consultadas %}
+    <!-- Tabla de Guías Más Consultadas -->
+    <h2 class="text-center text-secondary mb-4">Guías Más Consultadas</h2>
+    <div class="table-responsive mb-5">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ guia.titulo }}</td>
-                    <td>{{ guia.categoria.nombre }}</td>
-                    <td>{{ guia.puntuacion }}</td>
+                    <th scope="col">Título</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Puntuación</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% if guias_mas_consultadas %}
+                    {% for guia in guias_mas_consultadas %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'guia_detalle' guia.id %}" class="text-decoration-none text-dark">
+                                    {{ guia.titulo }}
+                                </a>
+                            </td>
+                            <td>{{ guia.categoria.nombre }}</td>
+                            <td>{{ guia.puntuacion }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center">No hay datos disponibles</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
 
-    <h2>Servicios por Estado</h2>
-    <canvas id="servicesChart" width="400" height="200"></canvas>
+    <!-- Gráfico de Servicios por Estado -->
+    <h2 class="text-center text-secondary mb-4">Servicios por Estado</h2>
+    <div class="card shadow p-4 mb-5">
+        <canvas id="servicesChart" width="400" height="200"></canvas>
+    </div>
 </div>
 
+<!-- Script para el gráfico -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -70,18 +94,22 @@
         const labels = {{ labels|safe }};
         const data = {{ data|safe }};
         const backgroundColors = [
-            'rgba(75, 192, 192, 0.6)', // Color para el estado 1
-            'rgba(255, 159, 64, 0.6)', // Color para el estado 2
-            'rgba(153, 102, 255, 0.6)', // Color para el estado 3
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)'
         ];
         const borderColors = [
-            'rgba(75, 192, 192, 1)', // Borde para el estado 1
-            'rgba(255, 159, 64, 1)', // Borde para el estado 2
-            'rgba(153, 102, 255, 1)', // Borde para el estado 3
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)'
         ];
 
         new Chart(ctx, {
-            type: 'bar',
+            type: 'pie',
             data: {
                 labels: labels,
                 datasets: [{
@@ -100,22 +128,7 @@
                     },
                     title: {
                         display: true,
-                        text: 'Servicios por Estado'
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Estado'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Cantidad'
-                        }
+                        text: 'Distribución de Servicios por Estado'
                     }
                 }
             }

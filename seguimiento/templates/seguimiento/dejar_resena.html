@@ -3,25 +3,186 @@
 {% block title %}Dejar Reseña{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Dejar Reseña para el Servicio</h1>
-
-    <div class="card">
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <!-- Encabezado con fondo negro -->
+        <div class="card-header text-center py-4 rounded-top" style="background-color: #000;">
+            <h2 class="fw-bold mb-0 text-uppercase text-white">
+                Dejar Reseña para el Servicio
+            </h2>
+        </div>
         <div class="card-body">
-            <h5 class="card-title">Equipo: {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</h5>
-            <p><strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d/m/Y" }}</p>
-            <p><strong>Fecha Estimada de Finalización:</strong> {{ servicio.fecha_fin|date:"d/m/Y" }}</p>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="fw-bold"><i class="fa fa-laptop me-2"></i>Equipo:</h5>
+                    <p class="fs-5 text-secondary">{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d/m/Y" }}</p>
+                    <p><strong>Fecha Estimada de Finalización:</strong> {{ servicio.fecha_fin|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <!-- Calificación -->
+                <div class="form-group mb-4">
+                    <label for="calificacion" class="form-label fs-5 fw-bold">Calificación:</label>
+                    <div id="star-rating" class="star-container">
+                        {% for i in rango_estrellas %}
+                        <i class="fa fa-star {% if i <= servicio.calificacion|default:0 %}checked{% endif %}" data-value="{{ i }}"></i>
+                        {% endfor %}
+                    </div>
+                    <input
+                        type="number"
+                        name="calificacion"
+                        id="calificacion"
+                        value="{{ servicio.calificacion|default:0 }}"
+                        hidden>
+                </div>
+
+                <!-- Comentario -->
+                <div class="form-group mb-4">
+                    <label for="comentario_cliente" class="form-label fs-5 fw-bold">Comentario:</label>
+                    {{ form.comentario_cliente }}
+                </div>
+
+                <!-- Botones -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-5 shadow-lg">Guardar Reseña</button>
+                    <a href="{% url 'lista_equipos_cliente' %}" class="btn btn-secondary btn-lg px-5 ms-3 shadow-lg">Cancelar</a>
+                </div>
+            </form>
         </div>
     </div>
-
-    <form method="post" class="mt-4">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">Guardar Reseña</button>
-            <a href="{% url 'lista_equipos_cliente' %}" class="btn btn-secondary">Cancelar</a>
-        </div>
-    </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll("#star-rating .fa-star");
+        const input = document.getElementById("calificacion");
+
+        const updateStars = (value) => {
+            stars.forEach(star => {
+                star.classList.remove("checked");
+                if (parseInt(star.getAttribute("data-value")) <= value) {
+                    star.classList.add("checked");
+                }
+            });
+            input.value = value; // Sincronizar el valor del input con las estrellas seleccionadas
+        };
+
+        // Inicializa las estrellas con la calificación actual
+        const currentValue = parseInt(input.value) || 0;
+        updateStars(currentValue);
+
+        // Permite al usuario seleccionar una calificación al hacer clic en las estrellas
+        stars.forEach(star => {
+            star.addEventListener("click", () => {
+                const value = parseInt(star.getAttribute("data-value"));
+                updateStars(value);
+            });
+
+            star.addEventListener("mouseover", () => {
+                const value = parseInt(star.getAttribute("data-value"));
+                stars.forEach(s => s.classList.remove("hover"));
+                stars.forEach((s, index) => {
+                    if (index < value) {
+                        s.classList.add("hover");
+                    }
+                });
+            });
+
+            star.addEventListener("mouseout", () => {
+                stars.forEach(s => s.classList.remove("hover"));
+                updateStars(parseInt(input.value) || 0); // Restaurar la selección actual
+            });
+        });
+    });
+</script>
+
+<style>
+    .container {
+        max-width: 900px;
+    }
+
+    /* Fondo negro para el título */
+    .card-header {
+        border-radius: 15px 15px 0 0;
+        background-color: #000;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        padding: 2.5rem;
+        background-color: #fefefe;
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #444;
+    }
+
+    .star-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 10px;
+    }
+
+    #star-rating .fa-star {
+        font-size: 3rem;
+        color: #ccc;
+        cursor: pointer;
+        transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    #star-rating .fa-star.checked {
+        color: #ffcc00;
+    }
+
+    #star-rating .fa-star.hover {
+        color: #ffd700;
+    }
+
+    #star-rating .fa-star:hover {
+        transform: scale(1.1);
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        letter-spacing: 0.05rem;
+    }
+
+    .btn-lg {
+        border-radius: 30px;
+        font-size: 1.2rem;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    h5 {
+        margin-bottom: 0.5rem;
+    }
+</style>
 {% endblock %}

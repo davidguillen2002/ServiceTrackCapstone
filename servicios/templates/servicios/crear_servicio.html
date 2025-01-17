@@ -79,28 +79,20 @@
             const equipoId = equipoField.value; // Obtener el ID del equipo seleccionado
 
             if (equipoId) {
-                // Actualiza la URL para que coincida con tu ruta correcta
                 fetch(`/servicios/ajax/obtener-cliente/?equipo_id=${equipoId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error en la solicitud al servidor');
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         if (data.cliente) {
                             clienteField.value = data.cliente; // Mostrar el cliente en el campo de texto
                         } else {
-                            clienteField.value = ''; // Vaciar el campo si no se encuentra cliente
-                            alert(data.error || 'Error al obtener el cliente.');
+                            clienteField.value = 'Cliente no encontrado'; // Vaciar si no se encuentra cliente
                         }
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Ocurrió un error al obtener el cliente.');
+                    .catch(() => {
+                        clienteField.value = 'Error al obtener cliente';
                     });
             } else {
-                clienteField.value = ''; // Vaciar el campo si no se selecciona equipo
+                clienteField.value = ''; // Vaciar si no se selecciona equipo
             }
         });
     });

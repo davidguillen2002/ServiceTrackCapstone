@@ -1,5 +1,4 @@
 import json
-
 import pandas as pd
 from django.db.models import Count, Min, Sum
 from ServiceTrack.models import Usuario, Servicio, Reto, RetoUsuario, RegistroPuntos, Medalla, ObservacionIncidente, \
@@ -8,7 +7,8 @@ from django.utils.timezone import now
 from .notifications import notificar_tecnico, notificar_tecnico_con_animacion
 import joblib
 import os
-
+from django.db import models
+from django.core.exceptions import ValidationError
 import json
 import pandas as pd
 from django.db.models import Sum, Avg
@@ -18,7 +18,7 @@ from ServiceTrack.models import (
 from django.utils.timezone import now
 import joblib
 import os
-
+from django.db import transaction
 
 def generar_recomendaciones_con_ia(tecnico):
     """
@@ -448,92 +448,140 @@ def finalizar_temporada():
         Temporada.crear_temporadas_anuales()
         print("Se crearon nuevas temporadas para el siguiente año.")
 
-def verificar_y_asignar_recompensas(usuario, temporada_actual):
-    """
-    Asigna recompensas específicas al usuario basadas en su nivel, temporada actual y retos cumplidos,
-    asegurando que no haya duplicados en recompensas o notificaciones.
-    """
-    tipos_recompensa = ["bono", "herramienta", "trofeo"]
-    nivel_actual = usuario.nivel
-    notificaciones_enviadas = set()
 
-    # Obtener todas las recompensas existentes para evitar duplicados
-    recompensas_existentes = Recompensa.objects.filter(
-        usuario=usuario,
-        temporada=temporada_actual
-    ).values_list("reto_id", "tipo")
-    recompensas_existentes_set = set(recompensas_existentes)
+# Función para sincronizar recompensas globales
+def sincronizar_recompensas_globales(temporada_actual):
+    """
+    Sincroniza las recompensas globales por nivel para la temporada actual.
+    """
+    descripcion_recompensas = {
+        1: [
+            {"tipo": "Bono", "descripcion": "Bono de $100", "valor": 100, "puntos": 20},
+            {"tipo": "Herramienta", "descripcion": "Kit básico de herramientas", "valor": 150, "puntos": 20},
+            {"tipo": "Trofeo", "descripcion": "Trofeo: Técnico en Entrenamiento", "valor": 200, "puntos": 20},
+        ],
+        2: [
+            {"tipo": "Bono", "descripcion": "Bono de $150", "valor": 150, "puntos": 40},
+            {"tipo": "Herramienta", "descripcion": "Multímetro digital avanzado", "valor": 200, "puntos": 40},
+            {"tipo": "Trofeo", "descripcion": "Trofeo: Técnico en Progreso", "valor": 300, "puntos": 40},
+        ],
+        3: [
+            {"tipo": "Bono", "descripcion": "Bono de $200", "valor": 200, "puntos": 60},
+            {"tipo": "Herramienta", "descripcion": "Juego profesional de herramientas", "valor": 300, "puntos": 60},
+            {"tipo": "Trofeo", "descripcion": "Trofeo: Técnico Experto", "valor": 400, "puntos": 60},
+        ],
+        4: [
+            {"tipo": "Bono", "descripcion": "Bono de $300", "valor": 300, "puntos": 80},
+            {"tipo": "Herramienta", "descripcion": "Estación de soldadura avanzada", "valor": 400, "puntos": 80},
+            {"tipo": "Trofeo", "descripcion": "Trofeo: Técnico Avanzado", "valor": 600, "puntos": 80},
+        ],
+        5: [
+            {"tipo": "Bono", "descripcion": "Bono de $500", "valor": 500, "puntos": 100},
+            {"tipo": "Herramienta", "descripcion": "Maletín premium especializado", "valor": 600, "puntos": 100},
+            {"tipo": "Trofeo", "descripcion": "Trofeo: Maestro Técnico", "valor": 800, "puntos": 100},
+        ],
+    }
 
-    # Iterar por todos los niveles desde 1 hasta el nivel actual
-    for nivel in range(1, nivel_actual + 1):
-        # Retos cumplidos por el usuario en el nivel actual dentro de la temporada
+    print("[INFO] Sincronizando recompensas globales para la temporada actual.")
+
+    for nivel, recompensas in descripcion_recompensas.items():
+        for recompensa_data in recompensas:
+            recompensa, created = Recompensa.objects.get_or_create(
+                temporada=temporada_actual,
+                tipo=recompensa_data["tipo"],
+                descripcion=recompensa_data["descripcion"],
+                defaults={
+                    "valor": recompensa_data["valor"],
+                    "puntos_necesarios": recompensa_data["puntos"],
+                    "reto": None,
+                },
+            )
+            if created:
+                print(f"[SUCCESS] Recompensa creada: '{recompensa.descripcion}' (Nivel: {nivel}).")
+            else:
+                recompensa.valor = recompensa_data["valor"]
+                recompensa.puntos_necesarios = recompensa_data["puntos"]
+                recompensa.save()
+                print(f"[INFO] Recompensa actualizada: '{recompensa.descripcion}' (Nivel: {nivel}).")
+
+    print("[SUCCESS] Sincronización completada.")
+
+
+# Función para asignar recompensas a técnicos, incluyendo niveles previos
+def asignar_recompensas_a_tecnico(usuario, temporada_actual):
+    """
+    Asigna recompensas globales al usuario si cumple los requisitos de retos,
+    incluyendo las de niveles previos no asignadas.
+    """
+    sincronizar_recompensas_globales(temporada_actual)
+
+    # Obtener todos los niveles hasta el nivel actual del usuario
+    niveles_revisar = range(1, usuario.nivel + 1)
+
+    for nivel in niveles_revisar:
+        # Obtener los retos cumplidos por el usuario en este nivel
         retos_cumplidos = RetoUsuario.objects.filter(
             usuario=usuario,
             cumplido=True,
+            reto__nivel=nivel,
             reto__temporada=temporada_actual,
-            reto__nivel=nivel
         )
 
-        # Generar recompensas faltantes según retos cumplidos
-        for reto_asociado in retos_cumplidos:
-            recompensa_notificada = False  # Control para evitar notificar múltiples veces por el mismo reto
-            for tipo in tipos_recompensa:
-                recompensa_clave = (reto_asociado.reto.id, tipo)
+        for reto_usuario in retos_cumplidos:
+            # Verificar si el reto ya tiene una recompensa asociada
+            if not hasattr(reto_usuario.reto, 'recompensa'):
+                # Buscar recompensas globales no asociadas a un reto y que coincidan con este nivel
+                recompensa_disponible = Recompensa.objects.filter(
+                    temporada=temporada_actual,
+                    puntos_necesarios__lte=reto_usuario.reto.puntos_otorgados,
+                    reto__isnull=True,  # No asociada a otro reto
+                    tipo__in=["Trofeo", "Herramienta", "Bono"]  # Priorizar tipos comunes
+                ).order_by('puntos_necesarios').first()
 
-                if recompensa_clave not in recompensas_existentes_set:
-                    # Descripciones personalizadas por nivel y tipo de recompensa
-                    descripcion_base = {
-                        "bono": {
-                            1: "Bono de $100 para tus primeros logros en retos iniciales. ¡Excelente comienzo!",
-                            2: "Bono de $150 por cumplir consistentemente tus metas. ¡Sigue destacando!",
-                            3: "Bono de $200 por superar retos técnicos avanzados con excelencia.",
-                            4: "Bono de $300 por liderar tareas complejas y mantener altos estándares.",
-                            5: "Bono de $500 como reconocimiento por alcanzar la maestría técnica. ¡Eres un referente!"
-                        },
-                        "herramienta": {
-                            1: "Kit básico de herramientas técnicas ideal para principiantes.",
-                            2: "Multímetro digital avanzado para diagnósticos precisos.",
-                            3: "Juego profesional de destornilladores y pinzas para equipos complejos.",
-                            4: "Estación de soldadura de precisión para reparaciones avanzadas.",
-                            5: "Maletín premium con herramientas especializadas para expertos."
-                        },
-                        "trofeo": {
-                            1: "Trofeo: Técnico en Entrenamiento por completar tus primeros retos.",
-                            2: "Trofeo: Técnico en Progreso como reconocimiento a tu dedicación.",
-                            3: "Trofeo: Técnico Experto por destacarte en retos avanzados.",
-                            4: "Trofeo: Técnico Avanzado por liderar proyectos técnicos complejos.",
-                            5: "Trofeo: Maestro Técnico como símbolo de excelencia y experiencia."
-                        }
-                    }
-
-                    # Valores ajustados por nivel y tipo
-                    valor_base = {
-                        "bono": {1: 100, 2: 150, 3: 200, 4: 300, 5: 500},
-                        "herramienta": {1: 150, 2: 200, 3: 300, 4: 400, 5: 600},
-                        "trofeo": {1: 200, 2: 300, 3: 400, 4: 600, 5: 800},
-                    }
-
-                    # Crear y asignar recompensa
-                    nueva_recompensa = Recompensa.objects.create(
-                        usuario=usuario,
-                        reto=reto_asociado.reto,
-                        temporada=temporada_actual,
-                        tipo=tipo,
-                        puntos_necesarios=20 * nivel,  # Ajustar según nivel
-                        descripcion=descripcion_base[tipo][nivel],
-                        valor=valor_base[tipo][nivel]
-                    )
-
-                    # Enviar una única notificación por recompensa asignada para un reto
-                    if not recompensa_notificada:
-                        notificar_tecnico(
-                            usuario=usuario,
-                            mensaje=f"¡Has ganado una nueva recompensa por el reto '{reto_asociado.reto.nombre}': {nueva_recompensa.descripcion}! 🎉",
-                            tipo="success"
-                        )
-                        recompensa_notificada = True
+                if recompensa_disponible:
+                    recompensa_disponible.reto = reto_usuario.reto
+                    recompensa_disponible.save()
+                    print(f"[SUCCESS] Recompensa '{recompensa_disponible.descripcion}' asociada al reto '{reto_usuario.reto.nombre}' para {usuario.username}.")
 
 
+# Función para eliminar recompensas duplicadas
+def eliminar_duplicados_globales(temporada_actual):
+    """
+    Elimina duplicados globales en recompensas para una temporada específica.
+    """
+    print("[INFO] Iniciando eliminación de recompensas duplicadas globales.")
 
+    # Obtener todas las recompensas de la temporada actual
+    recompensas = Recompensa.objects.filter(temporada=temporada_actual)
 
+    # Identificar duplicados por tipo y descripción
+    duplicados = (
+        recompensas.values("tipo", "descripcion")
+        .annotate(count=Count("id"))
+        .filter(count__gt=1)
+    )
 
+    if not duplicados:
+        print("[INFO] No se encontraron recompensas duplicadas.")
+        return
+
+    for duplicado in duplicados:
+        tipo = duplicado["tipo"]
+        descripcion = duplicado["descripcion"]
+
+        # Buscar recompensas duplicadas y ordenar por ID para conservar la primera
+        recompensas_a_eliminar = (
+            Recompensa.objects.filter(
+                temporada=temporada_actual, tipo=tipo, descripcion=descripcion
+            )
+            .order_by("id")[1:]  # Mantener solo la recompensa con el menor ID
+        )
+
+        # Eliminar recompensas duplicadas
+        ids_eliminados = [recompensa.id for recompensa in recompensas_a_eliminar]
+        recompensas_a_eliminar.delete()
+
+        print(
+            f"[SUCCESS] Recompensas duplicadas eliminadas para tipo '{tipo}' y descripción '{descripcion}'. IDs eliminados: {ids_eliminados}.")
+
+    print("[SUCCESS] Eliminación de recompensas duplicadas completada.")

@@ -17,14 +17,17 @@ from django.db.models.functions import TruncYear
 
 @login_required
 def dashboard_view(request):
-    # Filtros para los servicios (por mes o técnico)
-    mes_filtrado = request.GET.get('mes', None)
-    tecnico_filtrado = request.GET.get('tecnico', None)
+    anio_filtrado = request.GET.get('anio')
+    mes_filtrado = request.GET.get('mes')
+    tecnico_filtrado = request.GET.get('tecnico')
 
     servicios = Servicio.objects.all()
-    if mes_filtrado:
+
+    if anio_filtrado and anio_filtrado.isdigit():
+        servicios = servicios.filter(fecha_inicio__year=int(anio_filtrado))
+    if mes_filtrado and mes_filtrado.isdigit():
         servicios = servicios.filter(fecha_inicio__month=int(mes_filtrado))
-    if tecnico_filtrado:
+    if tecnico_filtrado and tecnico_filtrado.isdigit():
         servicios = servicios.filter(tecnico__id=int(tecnico_filtrado))
 
     # Servicios completados por técnico
@@ -43,7 +46,8 @@ def dashboard_view(request):
     # KPIs generales
     tecnicos_kpis = Usuario.objects.filter(rol__nombre='tecnico').annotate(
         total_servicios_completados=Coalesce(
-            Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='completado')), 0),
+            Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='completado')), 0
+        ),
         puntuacion_clientes=Avg('tecnico_servicios__calificacion'),
         tiempo_resolucion=ExpressionWrapper(
             Avg(F('tecnico_servicios__fecha_fin') - F('tecnico_servicios__fecha_inicio')),
@@ -54,46 +58,47 @@ def dashboard_view(request):
     # Rendimiento de técnicos
     tecnicos_rendimiento = Usuario.objects.filter(rol__nombre='tecnico').annotate(
         servicios_realizados=Coalesce(Count('tecnico_servicios'), 0),
-        servicios_completados_anotados=Coalesce(
-            Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='completado')), 0),
+        servicios_completados_count=Coalesce(
+            Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='completado')), 0
+        ),
         rendimiento=Case(
-            When(servicios_realizados=0, then=Value(0.0)),
+            When(servicios_realizados=0, then=Value(0)),
             default=ExpressionWrapper(
-                (F('servicios_completados_anotados') * 100.0) / F('servicios_realizados'),
+                (F('servicios_completados_count') * 100.0) / F('servicios_realizados'),
                 output_field=FloatField()
             ),
-            output_field=FloatField(),  # Especificamos el tipo de salida como FloatField
+            output_field=FloatField()
         ),
         total_puntos=Coalesce(Sum('puntos'), 0),
-        logros=Coalesce(Count('medallas'), 0),
+        logros=Coalesce(Count('medallas'), 0)
     )
 
     # Progreso general de técnicos
     tecnicos_proceso = Usuario.objects.filter(rol__nombre='tecnico').annotate(
-        progreso_servicios=Coalesce(Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='en_progreso')), 0),
+        progreso_servicios=Coalesce(
+            Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='en_progreso')), 0
+        ),
         puntos_totales=Coalesce(Sum('puntos'), 0),
-        ultimo_logro=F('medallas__nombre'),
+        ultimo_logro=F('medallas__nombre')
     )
 
-    # Retos dinámicos
-    retos = Reto.objects.all()
+    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
+    meses_disponibles = [(i, datetime(2000, i, 1).strftime('%B')) for i in range(1, 13)]
 
-    # Contexto
     context = {
         'servicios': servicios,
-        'servicios_por_tecnico': list(servicios_por_tecnico),  # Lista para graficar
-        'estados_servicios': list(estados_servicios),          # Lista para graficar
+        'servicios_por_tecnico': list(servicios_por_tecnico),
+        'estados_servicios': list(estados_servicios),
         'tecnicos_kpis': tecnicos_kpis,
         'tecnicos_rendimiento': tecnicos_rendimiento,
         'tecnicos_proceso': tecnicos_proceso,
-        'retos': retos,
+        'anios': anios_disponibles,
+        'meses': meses_disponibles,
+        'anio_filtrado': anio_filtrado,
         'mes_filtrado': mes_filtrado,
         'tecnico_filtrado': tecnico_filtrado,
-        'meses': range(1, 13),
     }
     return render(request, 'dashboard/dashboard.html', context)
-
-from django.core.paginator import Paginator
 
 @login_required
 def tecnico_dashboard_view(request):
