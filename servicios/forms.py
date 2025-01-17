@@ -126,3 +126,11 @@ class RepuestoForm(forms.ModelForm):
             'proveedor': forms.TextInput(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+class EquipoForm(forms.ModelForm):
+    class Meta:
+        model = Equipo
+        fields = ['cliente', 'marca', 'modelo', 'anio', 'tipo_equipo', 'observaciones']
+        widgets = {
+            'observaciones': forms.Textarea(attrs={'rows': 3}),
+        }

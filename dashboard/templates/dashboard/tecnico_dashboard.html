@@ -20,8 +20,10 @@
         <div class="col-md-3">
             <select name="mes" class="form-select">
                 <option value="">Seleccionar Mes</option>
-                {% for mes in meses %}
-                    <option value="{{ mes }}" {% if mes_filtrado == mes|stringformat:"d" %}selected{% endif %}>Mes {{ mes }}</option>
+                {% for mes_num, mes_nombre in meses %}
+                    <option value="{{ mes_num }}" {% if mes_filtrado == mes_num|stringformat:"d" %}selected{% endif %}>
+                        {{ mes_nombre }}
+                    </option>
                 {% endfor %}
             </select>
         </div>

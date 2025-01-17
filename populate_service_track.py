@@ -688,19 +688,3 @@ puntos_registrados = RegistroPuntos.objects.filter(usuario__rol=roles['tecnico']
 print(f"Medallas asignadas en Temporada 1: {medallas_asignadas_total}")
 print(f"Puntos registrados en Temporada 1: {puntos_registrados}")
 print("Evaluación de retos y progreso completada exitosamente.")
-# Verificar recompensas creadas
-print("\nResumen de recompensas creadas:")
-for nivel in range(1, 6):
-    recompensas_nivel = Recompensa.objects.filter(
-        reto_usuario__reto__nivel=nivel,
-        reto_usuario__reto__temporada=temporada_1
-    ).count()
-    print(f"Nivel {nivel}: {recompensas_nivel} recompensas creadas.")
-# Resumen de recompensas asignadas por técnico
-print("\nResumen de recompensas asignadas por técnico:")
-for tecnico in tecnicos:
-    recompensas_tecnico = Recompensa.objects.filter(
-        reto_usuario__usuario=tecnico
-    ).count()
-    print(f"Técnico {tecnico.nombre}: {recompensas_tecnico} recompensas asignadas.")
-

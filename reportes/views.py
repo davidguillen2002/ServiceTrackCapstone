@@ -8,7 +8,7 @@ from datetime import datetime
 import pandas as pd
 import io
 from django.core.paginator import Paginator
-from django.db.models import Avg, Count, Sum, F, ExpressionWrapper, DurationField
+from django.db.models import Avg, Count, Sum, F, ExpressionWrapper, DurationField, FloatField, Q
 
 # Helper para verificar roles
 def is_admin(user):
@@ -97,11 +97,17 @@ def historial_reportes(request):
 @user_passes_test(is_admin)
 def analizar_incidentes(request):
     """
-    Vista para analizar los incidentes registrados con gráficos.
+    Vista para analizar los incidentes registrados con métricas clave y gráficos.
     """
+    # Calcular incidentes por diagnóstico
     incidentes = Servicio.objects.filter(estado='pendiente').values('diagnostico_inicial').annotate(
         total=Count('id')
     ).order_by('-total')
+
+    # Calcular métricas clave
+    total_incidentes = sum([incidente['total'] for incidente in incidentes])  # Sumar manualmente los valores de 'total'
+    diagnostico_mas_comun = incidentes[0]['diagnostico_inicial'] if incidentes else "N/A"
+    incidentes_criticos = len([incidente for incidente in incidentes if incidente['total'] >= 10])  # Incidentes críticos >= 10
 
     # Preparar datos para gráficas
     diagnosticos = [incidente['diagnostico_inicial'] for incidente in incidentes]
@@ -110,9 +116,13 @@ def analizar_incidentes(request):
     context = {
         'incidentes': incidentes,
         'diagnosticos': diagnosticos,
-        'totales': totales
+        'totales': totales,
+        'total_incidentes': total_incidentes,
+        'diagnostico_mas_comun': diagnostico_mas_comun,
+        'incidentes_criticos': incidentes_criticos,
     }
     return render(request, 'reportes/analisis_incidentes.html', context)
+
 
 def generar_alertas_incidentes():
     """
@@ -145,14 +155,40 @@ def notificaciones_kpis(request):
 @user_passes_test(is_admin)
 def analizar_repuestos(request):
     """
-    Vista para analizar el rendimiento de repuestos.
+    Vista mejorada para analizar el rendimiento de repuestos con métricas avanzadas y gráficas.
     """
+    # Agregar un filtro que considere servicios fallidos
     repuestos = Repuesto.objects.values('nombre').annotate(
         total_uso=Count('id'),
-        tasa_fallas=Count('servicio__id', filter=F('servicio__estado') == 'fallido') * 100 / Count('servicio__id')
+        total_fallas=Count(
+            'servicio__id',
+            filter=Q(servicio__estado='fallido')
+        ),
+        tasa_fallas=ExpressionWrapper(
+            F('total_fallas') * 100.0 / F('total_uso'),
+            output_field=FloatField()
+        ),
+        costo_promedio=Avg('costo')
     ).order_by('-total_uso')
 
-    return render(request, 'reportes/analisis_repuestos.html', {'repuestos': repuestos})
+    total_repuestos = sum(repuesto['total_uso'] for repuesto in repuestos)
+    repuesto_mas_usado = max(repuestos, key=lambda x: x['total_uso'], default=None)
+    repuesto_mas_fallas = max(repuestos, key=lambda x: x['tasa_fallas'], default=None)
+
+    # Preparar datos para gráficas
+    nombres_repuestos = [repuesto['nombre'] for repuesto in repuestos]
+    usos_repuestos = [repuesto['total_uso'] for repuesto in repuestos]
+
+    context = {
+        'repuestos': repuestos,
+        'total_repuestos': total_repuestos,
+        'repuesto_mas_usado': repuesto_mas_usado or {'nombre': 'N/A', 'total_uso': 0},
+        'repuesto_mas_fallas': repuesto_mas_fallas or {'nombre': 'N/A', 'tasa_fallas': 0},
+        'nombres_repuestos': nombres_repuestos,
+        'usos_repuestos': usos_repuestos,
+    }
+    return render(request, 'reportes/analisis_repuestos.html', context)
+
 
 @login_required
 @user_passes_test(lambda u: u.rol.nombre == "tecnico")

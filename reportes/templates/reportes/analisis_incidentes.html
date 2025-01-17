@@ -1,59 +1,137 @@
 {% extends "base.html" %}
-{% block title %}Análisis de Incidentes{% endblock %}
+
+{% block title %}Análisis Detallado de Incidentes{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center">Análisis de Incidentes</h1>
+    <h1 class="text-center fw-bold">Análisis Detallado de Incidentes</h1>
+    <p class="text-center text-muted">Explora las causas principales y las tendencias de incidentes reportados.</p>
+
+    <!-- Resumen de Incidentes -->
+    <section class="mb-5">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="fw-bold">Total de Incidentes</h5>
+                    <h3 class="text-primary">{{ total_incidentes }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="fw-bold">Diagnóstico Más Común</h5>
+                    <h3 class="text-success">{{ diagnostico_mas_comun }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="fw-bold">Incidentes Críticos</h5>
+                    <h3 class="text-danger">{{ incidentes_criticos }}</h3>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Tabla de incidentes -->
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Diagnóstico Inicial</th>
-                <th>Recuento</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for incidente in incidentes %}
-            <tr>
-                <td>{{ incidente.diagnostico_inicial }}</td>
-                <td>{{ incidente.total }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <section class="mb-5">
+        <h2 class="text-center">Recuento por Diagnóstico</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-center mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Diagnóstico Inicial</th>
+                        <th>Recuento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incidente in incidentes %}
+                        <tr>
+                            <td>{{ incidente.diagnostico_inicial }}</td>
+                            <td>{{ incidente.total }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-    <!-- Gráfica -->
-    <h2 class="text-center mt-5">Gráfica de Incidentes</h2>
-    <canvas id="incidentChart" width="400" height="200"></canvas>
+    <!-- Gráfica de Incidentes -->
+    <section class="mb-5">
+        <h2 class="text-center">Distribución de Incidentes</h2>
+        <div class="d-flex justify-content-center">
+            <canvas id="incidentChart" style="max-height: 400px;"></canvas>
+        </div>
+    </section>
 
-    <a href="{% url 'panel_reportes' %}" class="btn btn-secondary mt-3">Regresar al Panel de Reportes</a>
+    <!-- Botón de regreso -->
+    <div class="text-center mt-5">
+        <a href="{% url 'panel_reportes' %}" class="btn btn-secondary">Regresar al Panel de Reportes</a>
+    </div>
 </div>
 
 <!-- Scripts para la gráfica -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('incidentChart').getContext('2d');
-    const incidentChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ diagnosticos|safe }},
-            datasets: [{
-                label: 'Recuento de Incidentes',
-                data: {{ totales|safe }},
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('incidentChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ diagnosticos|safe }},
+                datasets: [{
+                    label: 'Recuento de Incidentes',
+                    data: {{ totales|safe }},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return `Incidentes: ${tooltipItem.raw}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Diagnósticos'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Recuento'
+                        }
+                    }
                 }
             }
-        }
+        });
     });
 </script>
 {% endblock %}

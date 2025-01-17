@@ -7,7 +7,7 @@ from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides, get_similar_guides_with_context
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm, CapacitacionForm, ClienteForm, IncidenteForm
+from .forms import ServicioForm, RepuestoForm, ConfirmarEntregaForm, CapacitacionForm, ClienteForm, IncidenteForm, EquipoForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from openai import OpenAI, RateLimitError
@@ -336,35 +336,48 @@ def registrar_servicio(request):
 @login_required
 @user_passes_test(is_admin)
 def lista_servicios(request):
-    # Recibir parámetros de búsqueda y filtros
+    """
+    Vista para listar servicios con búsqueda y filtros, con soporte para paginación y solicitudes AJAX.
+    """
     query = request.GET.get('q', '')
     estado_filtro = request.GET.get('estado', '')
 
-    # Filtrar los servicios basados en los parámetros de búsqueda
+    # Filtrar los servicios basados en los parámetros de búsqueda y filtros
     servicios = Servicio.objects.all()
     if query:
-        servicios = servicios.filter(Q(equipo__modelo__icontains=query) | Q(tecnico__nombre__icontains=query))
+        servicios = servicios.filter(
+            Q(equipo__marca__icontains=query) |
+            Q(equipo__modelo__icontains=query) |
+            Q(tecnico__nombre__icontains=query) |
+            Q(equipo__cliente__nombre__icontains=query)
+        )
     if estado_filtro:
-        servicios = servicios.filter(estado=estado_filtro)
+        servicios = servicios.filter(estado__iexact=estado_filtro)  # Comparación exacta, insensible a mayúsculas
 
-    # Obtener los estados únicos para el filtro
-    estados = Servicio.objects.values_list('estado', flat=True).distinct().order_by('estado')
+    # Obtener los estados únicos sin modificar los valores reales
+    estados = Servicio.objects.values_list('estado', flat=True).distinct()
 
-    # Paginación: Mostrar 5 servicios por página
+    # Crear un mapeo para mostrar un formato amigable
+    estados_mapeados = {estado: estado.replace('_', ' ').capitalize() for estado in estados}
+
+    # Configurar la paginación
     paginator = Paginator(servicios, 5)
     page_number = request.GET.get('page', 1)
     servicios_paginados = paginator.get_page(page_number)
 
-    # Si es una solicitud AJAX, devolver solo el contenido filtrado
+    # Manejar solicitudes AJAX para actualizar la lista de servicios
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('servicios/servicio_list.html', {'servicios': servicios_paginados})
         return JsonResponse({'html': html})
 
-    # En caso de una solicitud normal, renderizar la página completa
+    # Renderizar la página completa para solicitudes normales
     return render(request, "servicios/lista_servicios.html", {
         "servicios": servicios_paginados,
-        "estados": estados,
+        "estados": estados_mapeados,  # Pasar el mapeo de estados a la plantilla
     })
+
+
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -758,3 +771,66 @@ def api_equipo_cliente(request):
         return JsonResponse({'cliente': cliente.nombre}, status=200)
     except Equipo.DoesNotExist:
         return JsonResponse({'error': 'Equipo no encontrado.'}, status=404)
+
+# Listar equipos (Administradores pueden ver todo, técnicos ven equipos relacionados con ellos)
+@login_required
+@user_passes_test(lambda u: u.rol.nombre in ["administrador", "tecnico"])
+def lista_equipos(request):
+    if request.user.rol.nombre == "administrador":
+        equipos = Equipo.objects.all().order_by('marca')
+    else:  # Si es técnico, solo ve equipos de sus servicios
+        equipos = Equipo.objects.filter(servicio__tecnico=request.user).distinct().order_by('marca')
+
+    # Implementar paginación
+    paginator = Paginator(equipos, 5)  # Mostrar 5 equipos por página
+    page_number = request.GET.get('page')
+    equipos_paginados = paginator.get_page(page_number)
+
+    return render(request, "servicios/lista_equipos.html", {"equipos": equipos_paginados})
+
+
+# Crear equipo (Solo administradores)
+@login_required
+@user_passes_test(is_admin)
+def crear_equipo(request):
+    if request.method == "POST":
+        form = EquipoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Equipo registrado exitosamente.")
+            return redirect("lista_equipos")
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
+    else:
+        form = EquipoForm()
+    return render(request, "servicios/crear_equipo.html", {"form": form})
+
+
+# Editar equipo (Solo administradores)
+@login_required
+@user_passes_test(is_admin)
+def editar_equipo(request, equipo_id):
+    equipo = get_object_or_404(Equipo, id=equipo_id)
+    if request.method == "POST":
+        form = EquipoForm(request.POST, instance=equipo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Equipo actualizado exitosamente.")
+            return redirect("lista_equipos")
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
+    else:
+        form = EquipoForm(instance=equipo)
+    return render(request, "servicios/editar_equipo.html", {"form": form})
+
+
+# Eliminar equipo (Solo administradores)
+@login_required
+@user_passes_test(is_admin)
+def eliminar_equipo(request, equipo_id):
+    equipo = get_object_or_404(Equipo, id=equipo_id)
+    if request.method == "POST":
+        equipo.delete()
+        messages.success(request, "Equipo eliminado exitosamente.")
+        return redirect("lista_equipos")
+    return render(request, "servicios/eliminar_equipo.html", {"equipo": equipo})

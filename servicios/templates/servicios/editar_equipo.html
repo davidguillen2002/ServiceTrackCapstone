@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %} <!-- Cargar el filtro necesario -->
+
+{% block title %}Editar Equipo{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Editar Equipo</h1>
+    <form id="equipoEditForm" method="POST" novalidate class="needs-validation">
+        {% csrf_token %}
+        <div class="row g-3">
+            <!-- Iterar sobre los campos del formulario -->
+            {% for field in form %}
+            <div class="col-md-6">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label|default:"Campo" }}</label>
+                {{ field|add_class:"form-control" }}
+                <div class="invalid-feedback">
+                    {% for error in field.errors %}{{ error }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                </div>
+                <div class="valid-feedback">Campo válido.</div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-5">
+            <a href="{% url 'lista_equipos' %}" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary px-4">Actualizar</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Validación del formulario
+    document.getElementById('equipoEditForm').addEventListener('submit', function (event) {
+        let isValid = true;
+        const fields = document.querySelectorAll('.form-control');
+
+        fields.forEach(field => {
+            if (field.value.trim() === '') {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+        });
+
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+
+    // Validación en tiempo real
+    document.querySelectorAll('.form-control').forEach(field => {
+        field.addEventListener('input', function () {
+            if (field.value.trim() === '') {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+        });
+    });
+</script>
+{% endblock %}

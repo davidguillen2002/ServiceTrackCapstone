@@ -48,6 +48,20 @@ diagnosticos_iniciales = [
     "El cargador del equipo está defectuoso.",
 ]
 
+# Ponderación de diagnósticos para una selección más realista
+diagnosticos_ponderados = [
+    (diagnosticos_iniciales[0], 30),  # Ejemplo: encendido, 30% de probabilidad
+    (diagnosticos_iniciales[1], 15),
+    (diagnosticos_iniciales[2], 20),
+    (diagnosticos_iniciales[3], 10),
+    (diagnosticos_iniciales[4], 10),
+    (diagnosticos_iniciales[5], 5),
+    (diagnosticos_iniciales[6], 5),
+    (diagnosticos_iniciales[7], 3),
+    (diagnosticos_iniciales[8], 1),
+    (diagnosticos_iniciales[9], 1),
+]
+
 # Repuestos reales basados en diagnósticos
 repuestos_por_diagnostico = {
     "Problemas con el encendido del equipo.": ["Fuente de poder", "Placa base"],
@@ -99,12 +113,16 @@ for _ in range(5000):  # Crear 5000 servicios
 
         # Generar fechas aleatorias dentro del rango
         fecha_inicio = fake.date_between_dates(date_start=fecha_inicio_servicio, date_end=fecha_fin_servicio)
-        fecha_fin = fecha_inicio + timedelta(days=random.randint(1, 15)) if random.random() > 0.2 else None
+        fecha_fin = fecha_inicio + timedelta(days=random.randint(1, 15)) if random.random() > 0.3 else None
         estado = random.choice(["pendiente", "en_progreso", "completado"])
         calificacion = random.uniform(1, 5) if estado == "completado" else None
 
-        # Seleccionar diagnóstico inicial y repuestos relacionados
-        diagnostico = random.choice(diagnosticos_iniciales)
+        # Seleccionar diagnóstico inicial basado en ponderaciones
+        diagnostico = random.choices(
+            [d[0] for d in diagnosticos_ponderados],
+            weights=[d[1] for d in diagnosticos_ponderados],
+            k=1
+        )[0]
         repuestos_diagnostico = repuestos_por_diagnostico.get(diagnostico, [])
 
         # Crear servicio

@@ -11,9 +11,13 @@ from django.db.models import Avg, Count, F, Sum, Value, FloatField, Case, When, 
 from django.db.models.functions import TruncMonth, Coalesce
 from django.core.paginator import Paginator
 from datetime import datetime
-from calendar import monthrange
+from django.utils.translation import gettext as _
+from calendar import monthrange, month_name
 from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import TruncYear
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.exceptions import ValidationError
+import math
 
 @login_required
 def dashboard_view(request):
@@ -83,7 +87,12 @@ def dashboard_view(request):
     )
 
     anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
-    meses_disponibles = [(i, datetime(2000, i, 1).strftime('%B')) for i in range(1, 13)]
+    # Generar lista de meses con nombres en español
+    meses_disponibles = [
+        ("1", _("Enero")), ("2", _("Febrero")), ("3", _("Marzo")), ("4", _("Abril")),
+        ("5", _("Mayo")), ("6", _("Junio")), ("7", _("Julio")), ("8", _("Agosto")),
+        ("9", _("Septiembre")), ("10", _("Octubre")), ("11", _("Noviembre")), ("12", _("Diciembre"))
+    ]
 
     context = {
         'servicios': servicios,
@@ -149,6 +158,13 @@ def tecnico_dashboard_view(request):
     # Obtener años disponibles para el filtro
     anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
 
+    # Generar lista de meses con nombres en español
+    meses_disponibles = [
+        ("1", _("Enero")), ("2", _("Febrero")), ("3", _("Marzo")), ("4", _("Abril")),
+        ("5", _("Mayo")), ("6", _("Junio")), ("7", _("Julio")), ("8", _("Agosto")),
+        ("9", _("Septiembre")), ("10", _("Octubre")), ("11", _("Noviembre")), ("12", _("Diciembre"))
+    ]
+
     # Paginación de servicios
     paginator = Paginator(servicios, 5)  # 5 servicios por página
     servicios_paginados = paginator.get_page(page_number)
@@ -160,7 +176,7 @@ def tecnico_dashboard_view(request):
         'servicios_en_progreso': servicios_en_progreso,
         'anios': anios_disponibles,
         'anio_filtrado': anio_filtrado,
-        'meses': range(1, 13),
+        'meses': meses_disponibles,
         'mes_filtrado': mes_filtrado,
         'servicios_por_dia': servicios_por_dia_formateado,
         'tiempos_resolucion_data': tiempos_resolucion_data,
@@ -215,11 +231,38 @@ def cliente_dashboard_view(request):
     }
     return render(request, 'dashboard/cliente_dashboard.html', context)
 
+# Algoritmo para validar cédula
+def verificar_cedula(cedula):
+    if len(cedula) != 10:
+        raise ValidationError("La cédula debe contener exactamente 10 dígitos.")
+    try:
+        multiplicador = [2, 1, 2, 1, 2, 1, 2, 1, 2]
+        ced_array = [int(k) for k in list(cedula[:9])]
+        ultimo_digito = int(cedula[9])
+        resultado = []
+
+        for i, j in zip(ced_array, multiplicador):
+            prod = i * j
+            resultado.append(prod if prod < 10 else prod - 9)
+
+        suma = sum(resultado)
+        verificador = (10 - (suma % 10)) if suma % 10 != 0 else 0
+
+        if verificador != ultimo_digito:
+            raise ValidationError("La cédula ingresada no es válida.")
+    except ValueError:
+        raise ValidationError("La cédula debe contener únicamente números.")
+
+# Formulario personalizado con validación de cédula
 class UsuarioForm(forms.ModelForm):
-    """Formulario personalizado para usuarios."""
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '********'}),
         label="Contraseña"
+    )
+    cedula = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567890'}),
+        label="Cédula",
+        max_length=10
     )
 
     class Meta:
@@ -228,11 +271,15 @@ class UsuarioForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Juan Pérez'}),
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'jperez'}),
-            'cedula': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567890'}),
             'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'juan.perez@example.com'}),
-            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '555-1234'}),
+            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '5551234567'}),
             'rol': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def clean_cedula(self):
+        cedula = self.cleaned_data.get('cedula')
+        verificar_cedula(cedula)  # Llama al algoritmo de validación
+        return cedula
 
 class UsuarioCreateForm(UsuarioForm):
     """Formulario para crear un usuario con campo de contraseña."""
@@ -274,11 +321,28 @@ class UsuarioUpdateView(SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('usuario-list')
     success_message = "Usuario actualizado correctamente."
 
-class UsuarioListView(ListView):
-    """Vista para listar todos los usuarios."""
-    model = Usuario
-    template_name = 'usuarios/usuario_list.html'
-    context_object_name = 'usuarios'
+@login_required
+def usuario_list_view(request):
+    usuarios = Usuario.objects.all().order_by('nombre')  # Ordenar usuarios por nombre
+
+    # Configurar el paginador
+    page = request.GET.get('page', 1)  # Obtener el número de página de los parámetros GET
+    paginator = Paginator(usuarios, 5)  # Mostrar 5 usuarios por página
+
+    try:
+        usuarios_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        # Si el número de página no es un entero, mostrar la primera página
+        usuarios_paginados = paginator.page(1)
+    except EmptyPage:
+        # Si el número de página está fuera de rango, mostrar la última página
+        usuarios_paginados = paginator.page(paginator.num_pages)
+
+    context = {
+        'usuarios': usuarios_paginados,  # Pasa los usuarios paginados al template
+    }
+
+    return render(request, 'usuarios/usuario_list.html', context)
 
 class UsuarioDeleteView(SuccessMessageMixin, DeleteView):
     """Vista para eliminar un usuario."""

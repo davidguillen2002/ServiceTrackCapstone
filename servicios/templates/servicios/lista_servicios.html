@@ -7,6 +7,13 @@
     <h1>Gestión de Servicios</h1>
     <p>Consulta y gestiona los servicios técnicos asignados.</p>
 
+    <!-- Navegación adicional -->
+    {% if user.rol.nombre == "administrador" %}
+    <div class="text-end mb-3">
+        <a href="{% url 'lista_equipos' %}" class="btn btn-primary">Gestionar Equipos</a>
+    </div>
+    {% endif %}
+
     <!-- Botón para registrar un nuevo servicio -->
     <div class="text-end mb-3">
         <a href="{% url 'registrar_servicio' %}" class="btn btn-success">Registrar Nuevo Servicio</a>
@@ -22,9 +29,9 @@
                 <div class="col-md-4">
                     <select name="estado" class="form-select" id="estado-select">
                         <option value="">Filtrar por Estado</option>
-                        {% for estado in estados %}
+                        {% for estado, estado_amigable in estados.items %}
                             <option value="{{ estado }}" {% if estado == request.GET.estado %}selected{% endif %}>
-                                {{ estado }}
+                                {{ estado_amigable }}
                             </option>
                         {% endfor %}
                     </select>

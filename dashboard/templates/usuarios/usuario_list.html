@@ -6,7 +6,9 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold">Usuarios Registrados</h1>
-        <a href="{% url 'usuario-create' %}" class="btn btn-success">Agregar Usuario</a>
+        <a href="{% url 'usuario-create' %}" class="btn btn-success">
+            <i class="bi bi-person-plus"></i> Agregar Usuario
+        </a>
     </div>
 
     <div class="card shadow-sm">
@@ -36,9 +38,10 @@
                             <a href="{% url 'usuario-update' usuario.pk %}" class="btn btn-warning btn-sm me-2">
                                 <i class="bi bi-pencil-square"></i> Editar
                             </a>
-                            <a href="{% url 'usuario-delete' usuario.pk %}" class="btn btn-danger btn-sm">
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" 
+                                    data-usuario-id="{{ usuario.pk }}" data-usuario-nombre="{{ usuario.nombre }}">
                                 <i class="bi bi-trash"></i> Eliminar
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     {% empty %}
@@ -48,7 +51,91 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Paginación -->
+            {% if usuarios.paginator.num_pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Página anterior -->
+                    {% if usuarios.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ usuarios.previous_page_number }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Números de página -->
+                    {% for num in usuarios.paginator.page_range %}
+                    {% if usuarios.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > usuarios.number|add:"-3" and num < usuarios.number|add:"3" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- Página siguiente -->
+                    {% if usuarios.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ usuarios.next_page_number }}" aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar al usuario <strong id="usuarioNombre"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuración del modal de confirmación
+    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    const usuarioNombre = document.getElementById('usuarioNombre');
+    const deleteForm = document.getElementById('deleteForm');
+
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const usuarioId = button.getAttribute('data-usuario-id');
+        const usuarioNombreValue = button.getAttribute('data-usuario-nombre');
+
+        usuarioNombre.textContent = usuarioNombreValue;
+        deleteForm.action = `/usuarios/${usuarioId}/delete/`; // Cambia la acción del formulario
+    });
+</script>
 {% endblock %}

@@ -41,6 +41,13 @@ urlpatterns = [
     path('servicio/<int:servicio_id>/incidentes/', views.listar_incidentes, name='listar_incidentes'),
     path('servicio/<int:servicio_id>/incidente/crear/', views.crear_incidente, name='crear_incidente'),
 
+    # CRUD de Equipos
+    path('equipos/', views.lista_equipos, name='lista_equipos'),
+    path('equipos/crear/', views.crear_equipo, name='crear_equipo'),
+    path('equipos/<int:equipo_id>/editar/', views.editar_equipo, name='editar_equipo'),
+    path('equipos/<int:equipo_id>/eliminar/', views.eliminar_equipo, name='eliminar_equipo'),
+
+    # Otras rutas
     path('ajax/obtener-cliente/', views.obtener_cliente_por_equipo, name='obtener_cliente_por_equipo'),
     path('servicio/<int:servicio_id>/actualizar_estado/', views.actualizar_estado_servicio, name='actualizar_estado_servicio'),
     path('incidente/<int:incidente_id>/notificar/', views.notificar_incidente, name='notificar_incidente'),

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Equipos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Lista de Equipos</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        {% if user.rol.nombre == "administrador" %}
+        <a href="{% url 'crear_equipo' %}" class="btn btn-primary">Registrar Nuevo Equipo</a>
+        {% endif %}
+        <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Gestionar Servicios</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Año</th>
+                <th>Tipo</th>
+                {% if user.rol.nombre == "administrador" %}
+                <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipo in equipos %}
+            <tr>
+                <td>{{ equipo.cliente.nombre }}</td>
+                <td>{{ equipo.marca }}</td>
+                <td>{{ equipo.modelo }}</td>
+                <td>{{ equipo.anio }}</td>
+                <td>{{ equipo.tipo_equipo }}</td>
+                {% if user.rol.nombre == "administrador" %}
+                <td>
+                    <a href="{% url 'editar_equipo' equipo.id %}" class="btn btn-warning btn-sm">Editar</a>
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal"
+                            data-equipo-id="{{ equipo.id }}" data-equipo-name="{{ equipo.marca }} {{ equipo.modelo }}">
+                        Eliminar
+                    </button>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if user.rol.nombre == 'administrador' %}6{% else %}5{% endif %}">
+                    No hay equipos registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    {% if equipos.has_other_pages %}
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            {% if equipos.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ equipos.previous_page_number }}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+            {% endif %}
+
+            {% for num in equipos.paginator.page_range %}
+            {% if equipos.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > equipos.number|add:"-3" and num < equipos.number|add:"3" %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if equipos.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ equipos.next_page_number }}" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar el equipo <strong id="equipoName"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuración del modal de confirmación
+    const confirmModal = document.getElementById('confirmModal');
+    const equipoName = document.getElementById('equipoName');
+    const deleteForm = document.getElementById('deleteForm');
+
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const equipoId = button.getAttribute('data-equipo-id');
+        const equipoFullName = button.getAttribute('data-equipo-name');
+
+        equipoName.textContent = equipoFullName;
+        deleteForm.action = `/servicios/equipos/${equipoId}/eliminar/`; // Actualiza la acción del formulario
+    });
+</script>
+{% endblock %}

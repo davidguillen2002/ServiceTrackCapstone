@@ -1,27 +1,105 @@
 {% extends "base.html" %}
-{% block title %}Análisis de Repuestos{% endblock %}
+
+{% block title %}Análisis Detallado de Repuestos{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center">Análisis de Repuestos</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Repuesto</th>
-                <th>Total de Uso</th>
-                <th>Tasa de Fallas (%)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for repuesto in repuestos %}
-            <tr>
-                <td>{{ repuesto.nombre }}</td>
-                <td>{{ repuesto.total_uso }}</td>
-                <td>{{ repuesto.tasa_fallas|floatformat:2 }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{% url 'panel_reportes' %}" class="btn btn-secondary mt-3">Regresar al Panel de Reportes</a>
+    <h1 class="text-center fw-bold">Análisis Detallado de Repuestos</h1>
+    <p class="text-center text-muted">Examina el rendimiento y uso de los repuestos con métricas clave.</p>
+
+    <!-- Resumen de Repuestos -->
+    <section class="mb-5">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="fw-bold">Total de Repuestos Usados</h5>
+                    <h3 class="text-primary">{{ total_repuestos }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="fw-bold">Repuesto Más Usado</h5>
+                    <h3 class="text-success">{{ repuesto_mas_usado.nombre }}</h3>
+                    <p>Usos: {{ repuesto_mas_usado.total_uso }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="fw-bold">Repuesto con Mayor Tasa de Fallas</h5>
+                    <h3 class="text-danger">{{ repuesto_mas_fallas.nombre }}</h3>
+                    <p>Fallas: {{ repuesto_mas_fallas.tasa_fallas|floatformat:2 }}%</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabla de Repuestos -->
+    <section class="mb-5">
+        <h2 class="text-center">Rendimiento de Repuestos</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-center mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Repuesto</th>
+                        <th>Total de Uso</th>
+                        <th>Tasa de Fallas (%)</th>
+                        <th>Costo Promedio ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repuesto in repuestos %}
+                        <tr>
+                            <td>{{ repuesto.nombre }}</td>
+                            <td>{{ repuesto.total_uso }}</td>
+                            <td>{{ repuesto.tasa_fallas|floatformat:2 }}</td>
+                            <td>{{ repuesto.costo_promedio|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Gráfica de Repuestos -->
+    <section class="mb-5">
+        <h2 class="text-center">Distribución de Uso de Repuestos</h2>
+        <div class="d-flex justify-content-center">
+            <canvas id="repuestoChart" style="max-height: 400px;"></canvas>
+        </div>
+    </section>
+
+    <!-- Botón de regreso -->
+    <div class="text-center mt-5">
+        <a href="{% url 'panel_reportes' %}" class="btn btn-secondary">Regresar al Panel de Reportes</a>
+    </div>
 </div>
+
+<!-- Scripts para la gráfica -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('repuestoChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: {{ nombres_repuestos|safe }},
+                datasets: [{
+                    label: 'Usos de Repuestos',
+                    data: {{ usos_repuestos|safe }},
+                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 206, 86, 1)', 'rgba(54, 162, 235, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            }
+        });
+    });
+</script>
 {% endblock %}
