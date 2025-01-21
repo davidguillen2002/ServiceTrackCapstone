@@ -435,7 +435,7 @@ def tecnico_services_list(request):
     return render(request, 'servicios/tecnico_services_list.html', {'services': paginated_services})
 
 @login_required
-@user_passes_test(lambda u: u.rol.nombre == "tecnico")
+@user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])
 def chat(request):
     """Vista del chatbot personalizado para cada técnico."""
     # Filtrar historial de chat para el usuario autenticado
@@ -482,7 +482,9 @@ def base_conocimiento(request):
     query = request.GET.get('q', '')
     categoria_filtro = request.GET.get('categoria', '')
     tipo_servicio_filtro = request.GET.get('tipo_servicio', '')
+    marca_filtro = request.GET.get('marca', '')
 
+    # Filtrar las guías
     guias = Guia.objects.all()
     if query:
         guias = guias.filter(Q(titulo__icontains=query) | Q(descripcion__icontains=query))
@@ -490,27 +492,32 @@ def base_conocimiento(request):
         guias = guias.filter(categoria__nombre=categoria_filtro)
     if tipo_servicio_filtro:
         guias = guias.filter(tipo_servicio__icontains=tipo_servicio_filtro)
+    if marca_filtro:
+        guias = guias.filter(equipo_marca__icontains=marca_filtro)
 
-    # Paginación: 10 guías por página
+    # Configurar la paginación
     paginator = Paginator(guias, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page', 1)
     guias_paginadas = paginator.get_page(page_number)
 
+    # Responder con el HTML parcial si es una solicitud AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('servicios/guia_list.html', {'guias': guias_paginadas})
         return JsonResponse({'html': html})
 
-    categorias = Categoria.objects.all()
-    tipos_servicio = Guia.objects.values_list('tipo_servicio', flat=True).distinct()
-
+    # Enviar todos los filtros al contexto
     return render(request, 'servicios/base_conocimiento.html', {
         'guias': guias_paginadas,
-        'categorias': categorias,
-        'tipos_servicio': tipos_servicio,
+        'categorias': Categoria.objects.all(),
+        'tipos_servicio': Guia.objects.values_list('tipo_servicio', flat=True).distinct(),
+        'marcas': Guia.objects.values_list('equipo_marca', flat=True).distinct(),
         'query': query,
         'categoria_filtro': categoria_filtro,
-        'tipo_servicio_filtro': tipo_servicio_filtro
+        'tipo_servicio_filtro': tipo_servicio_filtro,
+        'marca_filtro': marca_filtro,
+        'current_page': int(page_number),  # Página actual
     })
+
 
 
 @login_required

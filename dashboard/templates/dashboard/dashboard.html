@@ -25,7 +25,7 @@
             <select name="mes" id="mes" class="form-select">
                 <option value="">Seleccionar Mes</option>
                 {% for mes in meses %}
-                    <option value="{{ mes.0 }}" {% if mes_filtrado == mes.0|stringformat:"d" %}selected{% endif %}>
+                    <option value="{{ mes.0 }}" {% if mes_filtrado == mes.0 %}selected{% endif %}>
                         {{ mes.1 }}
                     </option>
                 {% endfor %}
@@ -42,7 +42,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="col-md-3 align-self-end">
+        <div class="col-md-3 offset-md-5">
             <button class="btn btn-primary w-100">Aplicar Filtros</button>
         </div>
     </form>
@@ -152,6 +152,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script>
     const technicianPerformanceData = {{ servicios_por_tecnico|safe }};
     if (technicianPerformanceData.length > 0) {
@@ -182,6 +183,7 @@
     if (serviceStatesData.length > 0) {
         const stateLabels = serviceStatesData.map(item => item.estado);
         const stateTotals = serviceStatesData.map(item => item.total);
+        const total = stateTotals.reduce((acc, value) => acc + value, 0); // Suma total para calcular porcentajes
 
         new Chart(document.getElementById('serviceStatesChart'), {
             type: 'pie',
@@ -198,8 +200,24 @@
                 }]
             },
             options: {
-                responsive: true
-            }
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        formatter: (value, context) => {
+                            const percentage = ((value / total) * 100).toFixed(2); // Calcula porcentaje
+                            return `${percentage}%`; // Devuelve porcentaje como texto
+                        },
+                        color: '#fff', // Color del texto en blanco
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        align: 'center', // Centra el texto dentro del segmento
+                        anchor: 'center' // Ancla el texto en el centro del segmento
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // Activa el plugin
         });
     }
 </script>

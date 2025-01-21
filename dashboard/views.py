@@ -25,8 +25,11 @@ def dashboard_view(request):
     mes_filtrado = request.GET.get('mes')
     tecnico_filtrado = request.GET.get('tecnico')
 
-    servicios = Servicio.objects.all()
+    # Obtener todos los años disponibles antes de aplicar los filtros
+    anios_disponibles = Servicio.objects.dates('fecha_inicio', 'year', order='DESC')
 
+    # Filtrar servicios
+    servicios = Servicio.objects.all()
     if anio_filtrado and anio_filtrado.isdigit():
         servicios = servicios.filter(fecha_inicio__year=int(anio_filtrado))
     if mes_filtrado and mes_filtrado.isdigit():
@@ -86,7 +89,6 @@ def dashboard_view(request):
         ultimo_logro=F('medallas__nombre')
     )
 
-    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
     # Generar lista de meses con nombres en español
     meses_disponibles = [
         ("1", _("Enero")), ("2", _("Febrero")), ("3", _("Marzo")), ("4", _("Abril")),
@@ -108,6 +110,7 @@ def dashboard_view(request):
         'tecnico_filtrado': tecnico_filtrado,
     }
     return render(request, 'dashboard/dashboard.html', context)
+
 
 @login_required
 def tecnico_dashboard_view(request):

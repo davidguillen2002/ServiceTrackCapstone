@@ -15,15 +15,21 @@
     <h2>Enlaces Útiles:</h2>
     <div>
         {% if guia.manual %}
-            <a href="{{ guia.manual }}" class="btn btn-primary"><i class="fas fa-book"></i> Ver Manual</a>
+            <a href="{{ guia.manual }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-book"></i> Ver Manual
+            </a>
         {% endif %}
         {% if guia.video %}
-            <a href="{{ guia.video }}" class="btn btn-secondary"><i class="fas fa-video"></i> Ver Video</a>
+            <a href="{{ guia.video }}" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-video"></i> Ver Video
+            </a>
         {% endif %}
     </div>
 
     <div class="back-button mt-3">
-        <a href="{% url 'base_conocimiento' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
+        <a href="{% url 'base_conocimiento' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a la Lista
+        </a>
     </div>
 </div>
 {% endblock %}

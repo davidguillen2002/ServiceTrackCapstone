@@ -20,25 +20,49 @@
         <form id="search-form">
             <div class="mb-4">
                 <label for="search-input" class="form-label fw-bold">Buscar Guías o Soluciones</label>
-                <input type="text" name="q" id="search-input" class="form-control form-control-lg" placeholder="Buscar guías o soluciones...">
+                <div class="input-group">
+                    <input type="text" name="q" id="search-input" class="form-control form-control-lg" placeholder="Buscar guías o soluciones...">
+                    <button class="btn btn-outline-secondary clear-filter-btn" type="button" data-filter-id="search-input">Limpiar</button>
+                </div>
             </div>
+
+            <div class="mb-4">
+                <label for="marca-select" class="form-label fw-bold">Filtrar por Marca</label>
+                <div class="input-group">
+                    <select name="marca" id="marca-select" class="form-select form-select-lg">
+                        <option value="">Selecciona una marca</option>
+                        {% for marca in marcas %}
+                            <option value="{{ marca }}">{{ marca }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-outline-secondary clear-filter-btn" type="button" data-filter-id="marca-select">Limpiar</button>
+                </div>
+            </div>
+
             <div class="mb-4">
                 <label for="categoria-select" class="form-label fw-bold">Filtrar por Categoría</label>
-                <select name="categoria" id="categoria-select" class="form-select form-select-lg">
-                    <option value="">Selecciona una categoría</option>
-                    {% for categoria in categorias %}
-                        <option value="{{ categoria.nombre }}">{{ categoria.nombre }}</option>
-                    {% endfor %}
-                </select>
+                <div class="input-group">
+                    <select name="categoria" id="categoria-select" class="form-select form-select-lg">
+                        <option value="">Selecciona una categoría</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.nombre }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-outline-secondary clear-filter-btn" type="button" data-filter-id="categoria-select">Limpiar</button>
+                </div>
             </div>
-            <div>
+
+            <div class="mb-4">
                 <label for="tipo-servicio-select" class="form-label fw-bold">Filtrar por Tipo de Servicio</label>
-                <select name="tipo_servicio" id="tipo-servicio-select" class="form-select form-select-lg">
-                    <option value="">Selecciona un tipo de servicio</option>
-                    {% for tipo in tipos_servicio %}
-                        <option value="{{ tipo }}">{{ tipo }}</option>
-                    {% endfor %}
-                </select>
+                <div class="input-group">
+                    <select name="tipo_servicio" id="tipo-servicio-select" class="form-select form-select-lg">
+                        <option value="">Selecciona un tipo de servicio</option>
+                        {% for tipo in tipos_servicio %}
+                            <option value="{{ tipo }}">{{ tipo }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-outline-secondary clear-filter-btn" type="button" data-filter-id="tipo-servicio-select">Limpiar</button>
+                </div>
             </div>
         </form>
     </div>
@@ -51,30 +75,27 @@
     <!-- Paginación -->
     <nav aria-label="Paginación" class="mt-5">
         <ul class="pagination justify-content-center">
-            <!-- Botón de página inicial -->
             {% if guias.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1&q={{ query }}&categoria={{ categoria_filtro }}&tipo_servicio={{ tipo_servicio_filtro }}" aria-label="Primera">
+                    <a class="page-link" href="?page=1&q={{ query }}&categoria={{ categoria_filtro }}&tipo_servicio={{ tipo_servicio_filtro }}&marca={{ marca_filtro }}" aria-label="Primera">
                         &laquo; Primera
                     </a>
                 </li>
             {% endif %}
 
-            <!-- Páginas anteriores -->
             {% for page_num in guias.paginator.page_range %}
                 {% if page_num >= guias.number|add:-2 and page_num <= guias.number|add:2 %}
                     <li class="page-item {% if guias.number == page_num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ page_num }}&q={{ query }}&categoria={{ categoria_filtro }}&tipo_servicio={{ tipo_servicio_filtro }}">
+                        <a class="page-link" href="?page={{ page_num }}&q={{ query }}&categoria={{ categoria_filtro }}&tipo_servicio={{ tipo_servicio_filtro }}&marca={{ marca_filtro }}">
                             {{ page_num }}
                         </a>
                     </li>
                 {% endif %}
             {% endfor %}
 
-            <!-- Botón de página final -->
             {% if guias.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ guias.paginator.num_pages }}&q={{ query }}&categoria={{ categoria_filtro }}&tipo_servicio={{ tipo_servicio_filtro }}" aria-label="Última">
+                    <a class="page-link" href="?page={{ guias.paginator.num_pages }}&q={{ query }}&categoria={{ categoria_filtro }}&tipo_servicio={{ tipo_servicio_filtro }}&marca={{ marca_filtro }}" aria-label="Última">
                         Última &raquo;
                     </a>
                 </li>
@@ -131,22 +152,142 @@
 <script>
     function searchGuides(event) {
         event.preventDefault();
+
+        // Capturar los valores actuales de los filtros
         const query = $('#search-input').val();
         const categoria = $('#categoria-select').val();
         const tipoServicio = $('#tipo-servicio-select').val();
+        const marca = $('#marca-select').val();
 
+        // Realizar solicitud AJAX
         $.ajax({
             url: '{% url "base_conocimiento" %}',
-            data: { q: query, categoria: categoria, tipo_servicio: tipoServicio },
+            data: {
+                q: query,
+                categoria: categoria,
+                tipo_servicio: tipoServicio,
+                marca: marca,
+                page: 1 // Reiniciar siempre a la primera página al filtrar
+            },
             dataType: 'json',
             success: function (data) {
+                // Actualizar la lista de guías
                 $('#guide-list').html(data.html);
+
+                // Actualizar los enlaces de paginación
+                updatePaginationLinks(query, categoria, tipoServicio, marca);
+            },
+            error: function () {
+                alert('Error al filtrar las guías. Intente nuevamente.');
             }
         });
     }
 
+    function updatePaginationLinks(query, categoria, tipoServicio, marca, currentPage) {
+        $('.pagination a').each(function () {
+            const baseUrl = $(this).attr('href').split('?')[0]; // Mantener solo la base de la URL
+            const page = new URLSearchParams($(this).attr('href').split('?')[1]).get('page'); // Extraer el número de página
+
+            // Actualizar el enlace con los parámetros de búsqueda y filtros
+            $(this).attr('href', `${baseUrl}?page=${page}&q=${query}&categoria=${categoria}&tipo_servicio=${tipoServicio}&marca=${marca}`);
+
+            // Resaltar la página activa
+            if (page == currentPage) {
+                $(this).closest('li').addClass('active');
+            } else {
+                $(this).closest('li').removeClass('active');
+            }
+        });
+    }
+
+    // Función para manejar cambios en los filtros y enviar solicitud AJAX
+    function updateResults() {
+        // Obtener los valores actuales de los filtros
+        const query = $('#search-input').val();
+        const categoria = $('#categoria-select').val();
+        const tipoServicio = $('#tipo-servicio-select').val();
+        const marca = $('#marca-select').val();
+
+        // Realizar solicitud AJAX para actualizar los resultados
+        $.ajax({
+            url: '{% url "base_conocimiento" %}', // URL de tu vista Django
+            data: {
+                q: query,
+                categoria: categoria,
+                tipo_servicio: tipoServicio,
+                marca: marca,
+                page: 1 // Reiniciar siempre a la primera página
+            },
+            dataType: 'json',
+            success: function (data) {
+                // Actualizar la lista de guías
+                $('#guide-list').html(data.html);
+            },
+            error: function () {
+                alert('Error al actualizar los resultados. Intente nuevamente.');
+            }
+        });
+    }
+
+    // Función para limpiar un filtro específico y actualizar resultados
+    function clearFilter(filterId) {
+        $(`#${filterId}`).val(''); // Limpiar el valor del filtro específico
+        updateResults(); // Actualizar los resultados basados en los filtros restantes
+    }
+
+    // Asignar eventos a los selectores
+    $('#search-input').on('keyup', updateResults); // Actualizar resultados cuando se escriba en el campo de búsqueda
+    $('#categoria-select').on('change', updateResults); // Actualizar resultados cuando cambie la categoría
+    $('#tipo-servicio-select').on('change', updateResults); // Actualizar resultados cuando cambie el tipo de servicio
+    $('#marca-select').on('change', updateResults); // Actualizar resultados cuando cambie la marca
+
+    // Asignar eventos a los botones de limpieza
+    $(document).on('click', '.clear-filter-btn', function () {
+        const filterId = $(this).data('filter-id'); // Obtener el ID del filtro asociado
+        clearFilter(filterId); // Limpiar el filtro específico
+    });
+
+    // Asignar eventos a los filtros
     $('#search-input').on('keyup', searchGuides);
     $('#categoria-select').on('change', searchGuides);
     $('#tipo-servicio-select').on('change', searchGuides);
+    $('#marca-select').on('change', searchGuides);
+
+    // Manejar clic en enlaces de paginación para solicitudes AJAX
+    $(document).on('click', '.pagination a', function (event) {
+        event.preventDefault();
+
+        // Obtener la página a la que se quiere navegar
+        const page = new URLSearchParams($(this).attr('href').split('?')[1]).get('page');
+
+        // Capturar los valores actuales de los filtros
+        const query = $('#search-input').val();
+        const categoria = $('#categoria-select').val();
+        const tipoServicio = $('#tipo-servicio-select').val();
+        const marca = $('#marca-select').val();
+
+        // Realizar solicitud AJAX para la nueva página
+        $.ajax({
+            url: '{% url "base_conocimiento" %}',
+            data: {
+                q: query,
+                categoria: categoria,
+                tipo_servicio: tipoServicio,
+                marca: marca,
+                page: page
+            },
+            dataType: 'json',
+            success: function (data) {
+                // Actualizar la lista de guías
+                $('#guide-list').html(data.html);
+
+                // Actualizar los enlaces de paginación
+                updatePaginationLinks(query, categoria, tipoServicio, marca, page);
+            },
+            error: function () {
+                alert('Error al cargar la página. Intente nuevamente.');
+            }
+        });
+    });
 </script>
 {% endblock %}
