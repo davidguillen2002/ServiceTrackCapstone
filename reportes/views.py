@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.files.base import ContentFile
 from reportlab.pdfgen import canvas
@@ -9,6 +9,7 @@ import pandas as pd
 import io
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Sum, F, ExpressionWrapper, DurationField, FloatField, Q
+from django.template.loader import render_to_string
 
 # Helper para verificar roles
 def is_admin(user):
@@ -155,10 +156,12 @@ def notificaciones_kpis(request):
 @user_passes_test(is_admin)
 def analizar_repuestos(request):
     """
-    Vista mejorada para analizar el rendimiento de repuestos con métricas avanzadas y gráficas.
+    Vista para analizar el rendimiento de repuestos con un filtro dinámico.
     """
-    # Agregar un filtro que considere servicios fallidos
-    repuestos = Repuesto.objects.values('nombre').annotate(
+    query = request.GET.get('q', '')  # Obtener el parámetro de búsqueda desde el request
+    repuestos = Repuesto.objects.filter(
+        Q(nombre__icontains=query)  # Filtrar repuestos por nombre que contenga el texto ingresado
+    ).values('nombre').annotate(
         total_uso=Count('id'),
         total_fallas=Count(
             'servicio__id',
@@ -186,8 +189,10 @@ def analizar_repuestos(request):
         'repuesto_mas_fallas': repuesto_mas_fallas or {'nombre': 'N/A', 'tasa_fallas': 0},
         'nombres_repuestos': nombres_repuestos,
         'usos_repuestos': usos_repuestos,
+        'query': query  # Pasar el valor del filtro actual al contexto
     }
     return render(request, 'reportes/analisis_repuestos.html', context)
+
 
 
 @login_required
@@ -276,3 +281,24 @@ def generar_reporte_excel_tecnico(request):
         file_content = buffer.getvalue()
 
     return HttpResponse(file_content, content_type='application/vnd.ms-excel')
+
+from django.db.models import Count, Avg, Q, F, ExpressionWrapper, FloatField
+
+@login_required
+@user_passes_test(is_admin)
+def filtrar_repuestos(request):
+    query = request.GET.get('q', '')  # Obtener el texto de búsqueda
+    repuestos = Repuesto.objects.filter(
+        nombre__icontains=query  # Filtrar por nombre
+    ).values('nombre').annotate(  # Agrupar por 'nombre'
+        total_uso=Sum('cantidad'),  # Sumar la cantidad total de repuestos
+        tasa_fallas=ExpressionWrapper(
+            Count('servicio__id', filter=Q(servicio__estado='fallido')) * 100.0 / Count('id'),
+            output_field=FloatField()
+        ),
+        costo_promedio=Avg('costo')  # Calcular el costo promedio
+    ).order_by('-total_uso')  # Ordenar por el total de uso
+
+    return JsonResponse({
+        'tabla': render_to_string('partials/tabla_repuestos.html', {'repuestos': repuestos}),
+    })

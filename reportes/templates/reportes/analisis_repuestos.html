@@ -36,6 +36,17 @@
     <!-- Tabla de Repuestos -->
     <section class="mb-5">
         <h2 class="text-center">Rendimiento de Repuestos</h2>
+
+        <!-- Formulario de Filtro -->
+        <form class="d-flex justify-content-center mb-4">
+            <input
+                type="text"
+                id="search-input"
+                class="form-control w-50"
+                placeholder="Buscar repuesto...">
+        </form>
+
+        <!-- Tabla de Repuestos -->
         <div class="table-responsive">
             <table class="table table-hover text-center mt-3">
                 <thead class="table-dark">
@@ -46,13 +57,17 @@
                         <th>Costo Promedio ($)</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="table-body">
                     {% for repuesto in repuestos %}
                         <tr>
                             <td>{{ repuesto.nombre }}</td>
                             <td>{{ repuesto.total_uso }}</td>
                             <td>{{ repuesto.tasa_fallas|floatformat:2 }}</td>
                             <td>{{ repuesto.costo_promedio|floatformat:2 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No se encontraron resultados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -99,6 +114,31 @@
                     },
                 },
             }
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("search-input");
+        const tableBody = document.getElementById("table-body");
+
+        input.addEventListener("input", function () {
+            const query = input.value;
+
+            // Generar la URL dinámica con Django
+            const url = "{% url 'filtrar_repuestos' %}?q=" + encodeURIComponent(query);
+
+            // Enviar la consulta al servidor
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+            .then(response => response.json()) // Asegúrate de parsear la respuesta como JSON
+            .then(data => {
+                // Extraer y renderizar solo el contenido de la clave 'tabla'
+                tableBody.innerHTML = data.tabla;
+            })
+            .catch(error => console.error("Error:", error));
         });
     });
 </script>

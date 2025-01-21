@@ -1,0 +1,12 @@
+{% for repuesto in repuestos %}
+<tr>
+    <td>{{ repuesto.nombre }}</td>
+    <td>{{ repuesto.total_uso }}</td>
+    <td>{{ repuesto.tasa_fallas|floatformat:2 }}</td>
+    <td>{{ repuesto.costo_promedio|floatformat:2 }}</td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4">No se encontraron resultados.</td>
+</tr>
+{% endfor %}
