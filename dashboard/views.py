@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from ServiceTrack.models import Usuario, Servicio, Reto, Equipo
+from ServiceTrack.models import Usuario, Servicio, Reto, Equipo, Rol
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.hashers import make_password
 from django import forms
@@ -326,23 +326,36 @@ class UsuarioUpdateView(SuccessMessageMixin, UpdateView):
 
 @login_required
 def usuario_list_view(request):
-    usuarios = Usuario.objects.all().order_by('nombre')  # Ordenar usuarios por nombre
+    # Obtener filtros de la solicitud GET
+    nombre_filtro = request.GET.get('nombre', '').strip()
+    rol_filtro = request.GET.get('rol', '').strip()
+
+    # Consultar todos los usuarios
+    usuarios = Usuario.objects.all().order_by('nombre')
+
+    # Aplicar filtros
+    if nombre_filtro:
+        usuarios = usuarios.filter(nombre__icontains=nombre_filtro)
+    if rol_filtro.isdigit():
+        usuarios = usuarios.filter(rol__id=int(rol_filtro))
 
     # Configurar el paginador
-    page = request.GET.get('page', 1)  # Obtener el número de página de los parámetros GET
+    page = request.GET.get('page', 1)
     paginator = Paginator(usuarios, 5)  # Mostrar 5 usuarios por página
 
     try:
         usuarios_paginados = paginator.page(page)
     except PageNotAnInteger:
-        # Si el número de página no es un entero, mostrar la primera página
         usuarios_paginados = paginator.page(1)
     except EmptyPage:
-        # Si el número de página está fuera de rango, mostrar la última página
         usuarios_paginados = paginator.page(paginator.num_pages)
 
+    # Pasar todos los roles al contexto para el filtro de rol
+    roles = Rol.objects.all()
+
     context = {
-        'usuarios': usuarios_paginados,  # Pasa los usuarios paginados al template
+        'usuarios': usuarios_paginados,
+        'roles': roles,  # Para el filtro de roles en el template
     }
 
     return render(request, 'usuarios/usuario_list.html', context)

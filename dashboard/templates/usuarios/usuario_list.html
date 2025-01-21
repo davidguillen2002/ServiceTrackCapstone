@@ -11,6 +11,32 @@
         </a>
     </div>
 
+    <!-- Formulario de filtros -->
+    <form method="GET" class="row g-3 mb-4 p-3 shadow-sm bg-light rounded">
+        <div class="col-md-6">
+            <input
+                type="text"
+                name="nombre"
+                class="form-control"
+                placeholder="Buscar por nombre"
+                value="{{ request.GET.nombre }}">
+        </div>
+        <div class="col-md-4">
+            <select name="rol" class="form-control">
+                <option value="">Filtrar por rol</option>
+                {% for rol in roles %}
+                <option value="{{ rol.id }}" {% if request.GET.rol == rol.id|stringformat:"s" %}selected{% endif %}>
+                    {{ rol.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary w-100 me-2">Filtrar</button>
+            <a href="{% url 'usuario-list' %}" class="btn btn-secondary w-100">Limpiar</a>
+        </div>
+    </form>
+
     <div class="card shadow-sm">
         <div class="card-body">
             <table class="table table-hover align-middle">
@@ -38,7 +64,7 @@
                             <a href="{% url 'usuario-update' usuario.pk %}" class="btn btn-warning btn-sm me-2">
                                 <i class="bi bi-pencil-square"></i> Editar
                             </a>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" 
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
                                     data-usuario-id="{{ usuario.pk }}" data-usuario-nombre="{{ usuario.nombre }}">
                                 <i class="bi bi-trash"></i> Eliminar
                             </button>
@@ -59,7 +85,7 @@
                     <!-- Página anterior -->
                     {% if usuarios.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ usuarios.previous_page_number }}" aria-label="Anterior">
+                        <a class="page-link" href="?page={{ usuarios.previous_page_number }}&nombre={{ request.GET.nombre }}&rol={{ request.GET.rol }}" aria-label="Anterior">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -77,7 +103,7 @@
                     </li>
                     {% elif num > usuarios.number|add:"-3" and num < usuarios.number|add:"3" %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}&nombre={{ request.GET.nombre }}&rol={{ request.GET.rol }}">{{ num }}</a>
                     </li>
                     {% endif %}
                     {% endfor %}
@@ -85,7 +111,7 @@
                     <!-- Página siguiente -->
                     {% if usuarios.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ usuarios.next_page_number }}" aria-label="Siguiente">
+                        <a class="page-link" href="?page={{ usuarios.next_page_number }}&nombre={{ request.GET.nombre }}&rol={{ request.GET.rol }}" aria-label="Siguiente">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
