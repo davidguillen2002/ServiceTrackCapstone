@@ -82,6 +82,10 @@ class TemporadaForm(forms.ModelForm):
     class Meta:
         model = Temporada
         fields = ['nombre', 'fecha_inicio', 'fecha_fin', 'activa']
+        widgets = {
+            'fecha_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'fecha_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
