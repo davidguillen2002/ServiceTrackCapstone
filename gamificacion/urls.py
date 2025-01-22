@@ -27,4 +27,9 @@ urlpatterns = [
     path('observaciones/editar/<int:observacion_id>/', views.editar_observacion, name='editar_observacion'),
     path('observaciones/eliminar/<int:observacion_id>/', views.eliminar_observacion, name='eliminar_observacion'),
 
+    # Rutas AJAX para creación de elementos
+    path('ajax/crear-temporada/', views.crear_temporada_ajax, name='crear_temporada_ajax'),
+    path('ajax/crear-reto/', views.crear_reto_ajax, name='crear_reto_ajax'),
+    path('ajax/crear-recompensa/', views.crear_recompensa_ajax, name='crear_recompensa_ajax'),
+    path('ajax/crear-medalla/', views.crear_medalla_ajax, name='crear_medalla_ajax'),
 ]

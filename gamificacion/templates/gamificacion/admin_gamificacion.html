@@ -14,14 +14,14 @@
     </form>
 
     <!-- Temporadas -->
+    <!-- Formulario para crear temporadas -->
     <h2 class="mt-5 text-secondary">📅 Temporadas</h2>
-    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
+    <form id="form-crear-temporada" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ temporada_form.as_p }}
-        <input type="hidden" name="action" value="crear_temporada">
-        <button class="btn btn-success btn-lg w-100">Crear Temporada</button>
+        <button type="submit" class="btn btn-success btn-lg w-100">Crear Temporada</button>
     </form>
-    <ul class="list-group mb-5">
+    <ul id="lista-temporadas" class="list-group mb-5">
         {% for temporada in temporadas %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
@@ -29,7 +29,6 @@
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="eliminar_temporada">
                 <input type="hidden" name="temporada_id" value="{{ temporada.id }}">
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
@@ -75,14 +74,14 @@
     </div>
 
     <!-- Retos -->
+    <!-- Formulario para crear retos -->
     <h2 class="mt-5 text-secondary">📜 Retos</h2>
-    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
+    <form id="form-crear-reto" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ reto_form.as_p }}
-        <input type="hidden" name="action" value="crear_reto">
-        <button class="btn btn-success btn-lg w-100">Crear Reto</button>
+        <button type="submit" class="btn btn-success btn-lg w-100">Crear Reto</button>
     </form>
-    <ul class="list-group mb-5">
+    <ul id="lista-retos" class="list-group mb-5">
         {% for reto in retos %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
@@ -90,7 +89,6 @@
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="eliminar_reto">
                 <input type="hidden" name="reto_id" value="{{ reto.id }}">
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
@@ -136,14 +134,14 @@
     </div>
 
     <!-- Recompensas -->
+    <!-- Formulario para crear recompensas -->
     <h2 class="mt-5 text-secondary">🎁 Recompensas</h2>
-    <form method="post" class="mb-3 shadow p-4 rounded bg-light">
+    <form id="form-crear-recompensa" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
         {{ recompensa_form.as_p }}
-        <input type="hidden" name="action" value="crear_recompensa">
-        <button class="btn btn-success btn-lg w-100">Crear Recompensa</button>
+        <button type="submit" class="btn btn-success btn-lg w-100">Crear Recompensa</button>
     </form>
-    <ul class="list-group mb-5">
+    <ul id="lista-recompensas" class="list-group mb-5">
         {% for recompensa in recompensas %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
@@ -151,7 +149,6 @@
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="eliminar_recompensa">
                 <input type="hidden" name="recompensa_id" value="{{ recompensa.id }}">
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
@@ -197,14 +194,14 @@
     </div>
 
     <!-- Medallas -->
+    <!-- Formulario para crear medallas -->
     <h2 class="mt-5 text-secondary">🏅 Medallas</h2>
-    <form method="post" enctype="multipart/form-data" class="mb-3 shadow p-4 rounded bg-light">
+    <form id="form-crear-medalla" class="mb-3 shadow p-4 rounded bg-light" enctype="multipart/form-data">
         {% csrf_token %}
         {{ medalla_form.as_p }}
-        <input type="hidden" name="action" value="crear_medalla">
-        <button class="btn btn-success btn-lg w-100">Crear Medalla</button>
+        <button type="submit" class="btn btn-success btn-lg w-100">Crear Medalla</button>
     </form>
-    <ul class="list-group">
+    <ul id="lista-medallas" class="list-group mb-5">
         {% for medalla in medallas %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
@@ -212,7 +209,6 @@
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="eliminar_medalla">
                 <input type="hidden" name="medalla_id" value="{{ medalla.id }}">
                 <button class="btn btn-sm btn-danger">Eliminar</button>
             </form>
@@ -257,4 +253,151 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+// Script para crear temporada
+document.getElementById('form-crear-temporada').addEventListener('submit', function (e) {
+    e.preventDefault(); // Evitar recargar la página
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch('{% url "crear_temporada_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar la lista de temporadas
+            const lista = document.getElementById('lista-temporadas');
+            const nuevaTemporada = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>${data.temporada.nombre}</strong> (${data.temporada.fecha_inicio} - ${data.temporada.fecha_fin})
+                    </span>
+                </li>`;
+            lista.insertAdjacentHTML('beforeend', nuevaTemporada);
+
+            // Limpiar el formulario
+            form.reset();
+        } else {
+            alert('Error al crear la temporada: ' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+// Script para crear reto
+document.getElementById('form-crear-reto').addEventListener('submit', function (e) {
+    e.preventDefault(); // Evitar recargar la página
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch('{% url "crear_reto_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar la lista de retos
+            const lista = document.getElementById('lista-retos');
+            const nuevoReto = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>${data.reto.nombre}</strong> (Nivel: ${data.reto.nivel})
+                    </span>
+                </li>`;
+            lista.insertAdjacentHTML('beforeend', nuevoReto);
+
+            // Limpiar el formulario
+            form.reset();
+        } else {
+            alert('Error al crear el reto: ' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+// Script para crear recompensa
+document.getElementById('form-crear-recompensa').addEventListener('submit', function (e) {
+    e.preventDefault(); // Evitar recargar la página
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch('{% url "crear_recompensa_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar la lista de recompensas
+            const lista = document.getElementById('lista-recompensas');
+            const nuevaRecompensa = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>${data.recompensa.descripcion}</strong> (${data.recompensa.tipo})
+                    </span>
+                </li>`;
+            lista.insertAdjacentHTML('beforeend', nuevaRecompensa);
+
+            // Limpiar el formulario
+            form.reset();
+        } else {
+            alert('Error al crear la recompensa: ' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+// Script para crear medalla
+document.getElementById('form-crear-medalla').addEventListener('submit', function (e) {
+    e.preventDefault(); // Evitar recargar la página
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch('{% url "crear_medalla_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar la lista de medallas
+            const lista = document.getElementById('lista-medallas');
+            const nuevaMedalla = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>${data.medalla.nombre}</strong> (Nivel: ${data.medalla.nivel_requerido})
+                    </span>
+                </li>`;
+            lista.insertAdjacentHTML('beforeend', nuevaMedalla);
+
+            // Limpiar el formulario
+            form.reset();
+        } else {
+            alert('Error al crear la medalla: ' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+</script>
+
 {% endblock %}

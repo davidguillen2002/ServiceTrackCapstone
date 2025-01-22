@@ -637,4 +637,74 @@ def retos_disponibles(request):
         'progreso_retos': progreso_retos,
     })
 
+def crear_temporada_ajax(request):
+    if request.method == "POST":
+        form = TemporadaForm(request.POST)
+        if form.is_valid():
+            temporada = form.save()
+            return JsonResponse({
+                "success": True,
+                "temporada": {
+                    "id": temporada.id,
+                    "nombre": temporada.nombre,
+                    "fecha_inicio": temporada.fecha_inicio.strftime("%Y-%m-%d"),
+                    "fecha_fin": temporada.fecha_fin.strftime("%Y-%m-%d"),
+                },
+            })
+        return JsonResponse({"success": False, "errors": form.errors})
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
 
+def crear_reto_ajax(request):
+    if request.method == "POST":
+        form = RetoForm(request.POST)
+        if form.is_valid():
+            reto = form.save()
+            return JsonResponse({
+                "success": True,
+                "reto": {
+                    "id": reto.id,
+                    "nombre": reto.nombre,
+                    "descripcion": reto.descripcion,
+                    "puntos_otorgados": reto.puntos_otorgados,
+                    "criterio": reto.criterio,
+                    "valor_objetivo": reto.valor_objetivo,
+                },
+            })
+        return JsonResponse({"success": False, "errors": form.errors})
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
+
+def crear_recompensa_ajax(request):
+    if request.method == "POST":
+        form = RecompensaForm(request.POST)
+        if form.is_valid():
+            recompensa = form.save()
+            return JsonResponse({
+                "success": True,
+                "recompensa": {
+                    "id": recompensa.id,
+                    "tipo": recompensa.tipo,
+                    "descripcion": recompensa.descripcion,
+                    "valor": recompensa.valor,
+                    "puntos_necesarios": recompensa.puntos_necesarios,
+                },
+            })
+        return JsonResponse({"success": False, "errors": form.errors})
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
+
+def crear_medalla_ajax(request):
+    if request.method == "POST":
+        form = MedallaForm(request.POST, request.FILES)
+        if form.is_valid():
+            medalla = form.save()
+            return JsonResponse({
+                "success": True,
+                "medalla": {
+                    "id": medalla.id,
+                    "nombre": medalla.nombre,
+                    "descripcion": medalla.descripcion,
+                    "puntos_necesarios": medalla.puntos_necesarios,
+                    "nivel_requerido": medalla.nivel_requerido,
+                },
+            })
+        return JsonResponse({"success": False, "errors": form.errors})
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
