@@ -16,7 +16,13 @@ class CustomLoginView(LoginView):
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')  # Redirige al login después del logout
 
+
 def custom_login_view(request):
+    # Limpiar mensajes residuales
+    storage = get_messages(request)
+    for _ in storage:
+        pass  # Vacía los mensajes existentes
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -24,9 +30,9 @@ def custom_login_view(request):
 
         if user is not None:
             login(request, user)
-            messages.success(request, 'Has iniciado sesión correctamente.')
             return redirect('home')  # Redirige al home
         else:
+            # Registrar un mensaje de error
             messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
 
     return render(request, 'authentication/login.html')
