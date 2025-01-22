@@ -26,8 +26,14 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-        .logo {
-            margin-bottom: 20px;
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px; /* Controla el espacio debajo de las imágenes */
+        }
+        .logo-container img {
+            margin-bottom: 5px; /* Controla el espacio entre las dos imágenes */
         }
         .footer {
             margin-top: 15px;
@@ -39,15 +45,17 @@
 <body>
 
     <div class="login-wrapper">
-        <div class="logo">
+        <!-- Contenedor para ambas imágenes -->
+        <div class="logo-container">
             <img src="{% static 'img/logo.png' %}" alt="Logo" width="120">
+            <img src="{% static 'img/empresa.png' %}" alt="Empresa" width="120">
         </div>
 
         <h2 class="text-center">Inicio de Sesión</h2>
         <p class="text-center text-muted">Ingrese sus credenciales</p>
 
         <!-- Mostrar mensajes de error -->
-        {% if messages %}
+        {% if user.is_authenticated and messages %}
             <div class="alert alert-warning" role="alert">
                 {% for message in messages %}
                     {{ message }}

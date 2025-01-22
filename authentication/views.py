@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import logout, authenticate, login
 from django.shortcuts import redirect, render
 from django.contrib import messages
+from django.contrib.messages import get_messages
 
 class CustomLoginView(LoginView):
     template_name = 'authentication/login.html'  # Asegúrate de tener esta plantilla
@@ -24,13 +25,16 @@ def custom_login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Has iniciado sesión correctamente.')
-            # Redirige a la vista `home`, que manejará la lógica según el rol
-            return redirect('home')
+            return redirect('home')  # Redirige al home
         else:
             messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
 
     return render(request, 'authentication/login.html')
 
 def logout_view(request):
-    logout(request)
-    return redirect('login')
+    storage = get_messages(request)  # Obtén los mensajes almacenados
+    for _ in storage:
+        pass  # Itera sobre los mensajes para limpiarlos
+
+    logout(request)  # Cierra la sesión del usuario
+    return redirect('login')  # Redirige a la página de inicio de sesión
