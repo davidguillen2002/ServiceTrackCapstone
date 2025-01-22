@@ -52,13 +52,21 @@
     <!-- Gráfico de Progreso Mensual -->
     <h2 class="mt-5 text-center">Progreso Mensual</h2>
     <div class="d-flex justify-content-center my-4">
-        <canvas id="monthlyProgressChart" style="max-height: 400px;"></canvas>
+        {% if servicios_por_dia %}
+            <canvas id="monthlyProgressChart" style="max-height: 400px;"></canvas>
+        {% else %}
+            <p class="text-center text-muted">No hay información disponible para mostrar el progreso mensual.</p>
+        {% endif %}
     </div>
 
     <!-- Gráfico de Tiempos de Resolución -->
     <h2 class="mt-5 text-center">Tiempos de Resolución por Servicio</h2>
     <div class="d-flex justify-content-center my-4">
-        <canvas id="resolutionTimeChart" style="max-height: 400px;"></canvas>
+        {% if tiempos_resolucion_data %}
+            <canvas id="resolutionTimeChart" style="max-height: 400px;"></canvas>
+        {% else %}
+            <p class="text-center text-muted">No hay información disponible para mostrar los tiempos de resolución.</p>
+        {% endif %}
     </div>
 
     <!-- Servicios Realizados -->

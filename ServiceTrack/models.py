@@ -472,8 +472,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         self.save()
 
     def clean(self):
-        if Usuario.objects.filter(correo=self.correo).exclude(id=self.id).exists():
-            raise ValidationError("El correo ya está registrado.")
         if not self.celular.isdigit() or len(self.celular) < 10:
             raise ValidationError("El número de celular debe tener al menos 10 dígitos.")
         super().clean()

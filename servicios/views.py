@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import user_passes_test, login_required
-from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion, ObservacionIncidente
+from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion, ObservacionIncidente, Rol
 from seguimiento.forms import ServicioEstadoForm
 from .ai_utils import get_similar_guides, get_similar_guides_with_context
 from django.http import JsonResponse
@@ -37,7 +37,7 @@ def crear_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             cliente = form.save(commit=False)
-            cliente.rol = Usuario.objects.get(nombre="cliente")  # Asigna el rol cliente
+            cliente.rol = Rol.objects.get(nombre="cliente")  # Asigna el rol cliente
             cliente.password = make_password(form.cleaned_data['password'])  # Hashea la contraseña
             cliente.tecnico_asignado = request.user  # Asigna el cliente al técnico autenticado
             cliente.save()
