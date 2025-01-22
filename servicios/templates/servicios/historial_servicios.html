@@ -9,11 +9,11 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Fecha Inicio</th>
-                <th>Fecha Fin</th>
+                <th>Fecha de Recepción</th>
+                <th>Fecha de Entrega</th>
                 <th>Estado</th>
                 <th>Calificación</th>
-                <th>Comentario</th>
+                <th>Diagnosticos Anteriores</th>
             </tr>
         </thead>
         <tbody>
@@ -24,7 +24,7 @@
                     <td>{{ servicio.fecha_fin|default:"N/A" }}</td>
                     <td>{{ servicio.estado }}</td>
                     <td>{{ servicio.calificacion|default:"No Calificado" }}</td>
-                    <td>{{ servicio.comentario_cliente|default:"Sin Comentario" }}</td>
+                    <td>{{ servicio.diagnostico_inicial|default:"Sin Diagnóstico Inicial" }}</td>
                 </tr>
             {% empty %}
                 <tr>

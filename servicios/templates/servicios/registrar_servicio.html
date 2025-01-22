@@ -13,7 +13,7 @@
 
         <div class="row">
             <!-- Datos del Servicio -->
-            <div class="col-md-6">
+            <div class="col-md-8 offset-md-2">
                 <h4 class="text-primary border-bottom pb-2">Datos del Servicio</h4>
 
                 <div class="mb-3">
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="fecha_inicio" class="form-label fw-bold">Fecha de Inicio</label>
+                    <label for="fecha_inicio" class="form-label fw-bold">Fecha de Recepción</label>
                     {{ servicio_form.fecha_inicio|add_class:"form-control" }}
                 </div>
 
@@ -42,38 +42,12 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="costo" class="form-label fw-bold">Costo</label>
+                    <label for="costo" class="form-label fw-bold">Valor de Reparación</label>
                     {{ servicio_form.costo|add_class:"form-control" }}
                 </div>
-            </div>
-
-            <!-- Repuestos -->
-            <div class="col-md-6">
-                <h4 class="text-primary border-bottom pb-2">Repuestos</h4>
-
                 <div class="mb-3">
-                    <label for="nombre" class="form-label fw-bold">Nombre</label>
-                    {{ repuesto_form.nombre|add_class:"form-control" }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label fw-bold">Descripción</label>
-                    {{ repuesto_form.descripcion|add_class:"form-control" }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="costo" class="form-label fw-bold">Costo</label>
-                    {{ repuesto_form.costo|add_class:"form-control" }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="cantidad" class="form-label fw-bold">Cantidad</label>
-                    {{ repuesto_form.cantidad|add_class:"form-control" }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="proveedor" class="form-label fw-bold">Proveedor</label>
-                    {{ repuesto_form.proveedor|add_class:"form-select" }}
+                    <label for="diagnostico_inicial" class="form-label fw-bold">Diagnóstico Inicial</label>
+                    {{ servicio_form.diagnostico_inicial }}
                 </div>
             </div>
         </div>
@@ -94,21 +68,20 @@
         equipoSelect.addEventListener('change', function () {
             const equipoId = this.value;
             if (equipoId) {
-                // Cambia la ruta para incluir el prefijo "servicios/"
                 fetch(`/servicios/api/equipo_cliente/?equipo_id=${equipoId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.cliente) {
-                            clienteName.value = data.cliente; // Muestra el nombre del cliente
+                            clienteName.value = data.cliente;
                         } else {
-                            clienteName.value = 'No encontrado'; // Si no hay cliente
+                            clienteName.value = 'No encontrado';
                         }
                     })
                     .catch(() => {
-                        clienteName.value = 'Error al cargar el cliente'; // Error de conexión
+                        clienteName.value = 'Error al cargar el cliente';
                     });
             } else {
-                clienteName.value = ''; // Limpia el campo si no hay selección
+                clienteName.value = '';
             }
         });
     });

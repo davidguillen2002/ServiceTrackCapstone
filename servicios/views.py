@@ -299,8 +299,7 @@ def registrar_servicio(request):
 
     if request.method == "POST":
         servicio_form = ServicioForm(request.POST, equipos_disponibles=equipos_disponibles)
-        repuesto_form = RepuestoForm(request.POST)
-        if servicio_form.is_valid() and repuesto_form.is_valid():
+        if servicio_form.is_valid():
             servicio = servicio_form.save(commit=False)
 
             # Validación para generar el código de entrega y notificar solo si el estado es "completado"
@@ -316,7 +315,7 @@ def registrar_servicio(request):
                 )
                 messages.success(request, "El servicio completado ha sido registrado y el cliente notificado.")
             else:
-                servicio.codigo_entrega = None  # No generar código de entrega si no está completado
+                servicio.codigo_entrega = None
                 estado_actual = servicio.get_estado_display()
                 messages.warning(request, f"El servicio ha sido registrado en estado '{estado_actual}', por lo que no se generó un código de entrega.")
 
@@ -326,12 +325,11 @@ def registrar_servicio(request):
             messages.error(request, "Por favor, corrige los errores del formulario.")
     else:
         servicio_form = ServicioForm(equipos_disponibles=equipos_disponibles)
-        repuesto_form = RepuestoForm()
 
     return render(request, "servicios/registrar_servicio.html", {
         "servicio_form": servicio_form,
-        "repuesto_form": repuesto_form,
     })
+
 
 @login_required
 @user_passes_test(is_admin)

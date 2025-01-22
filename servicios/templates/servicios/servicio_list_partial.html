@@ -9,8 +9,8 @@
             <span class="badge {% if servicio.estado == 'pendiente' %}bg-warning{% elif servicio.estado == 'en_progreso' %}bg-primary{% else %}bg-success{% endif %}">
                 {{ servicio.estado|capfirst }}
             </span><br>
-            <strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d M, Y" }}<br>
-            <strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin|default:"N/A" }}<br>
+            <strong>Fecha de Recepción:</strong> {{ servicio.fecha_inicio|date:"d M, Y" }}<br>
+            <strong>Fecha de Entrega:</strong> {{ servicio.fecha_fin|default:"N/A" }}<br>
             <strong>Repuestos:</strong>
             {% if servicio.repuestos.all %}
                 <ul>

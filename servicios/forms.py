@@ -26,7 +26,13 @@ class ServicioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if equipos_disponibles is not None:
+            # Aplica el queryset de equipos disponibles
             self.fields['equipo'].queryset = equipos_disponibles
+
+            # Personaliza las etiquetas que se muestran en el desplegable del equipo
+            self.fields['equipo'].label_from_instance = lambda obj: (
+                f"{obj.marca} {obj.modelo} - {obj.cliente.nombre if obj.cliente else 'Sin Cliente'} - {obj.cliente.cedula if obj.cliente else 'Sin Cédula'}"
+            )
 
     def clean(self):
         """
@@ -38,7 +44,8 @@ class ServicioForm(forms.ModelForm):
         if equipo and not equipo.cliente:
             self.add_error('equipo', 'El equipo seleccionado no tiene un cliente asociado.')
         else:
-            cleaned_data['cliente'] = equipo.cliente.nombre
+            # Asigna el nombre del cliente al campo de solo lectura
+            cleaned_data['cliente'] = equipo.cliente.nombre if equipo.cliente else None
 
         return cleaned_data
 

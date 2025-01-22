@@ -545,6 +545,12 @@ class Equipo(models.Model):
     tipo_equipo = models.CharField(max_length=50)
     observaciones = models.TextField(null=True, blank=True)
 
+    @property
+    def display_text(self):
+        if self.cliente:
+            return f"{self.marca} {self.modelo} - {self.cliente.nombre} - {self.cliente.cedula}"
+        return f"{self.marca} {self.modelo} - Sin Cliente"
+
     def __str__(self):
         return f"{self.marca} {self.modelo} ({self.anio})"
 
@@ -574,7 +580,7 @@ class Servicio(models.Model):
     )
     comentario_cliente = models.TextField(null=True, blank=True)
     diagnostico_inicial = models.TextField(null=True, blank=True)
-    costo = models.DecimalField(max_digits=10, decimal_places=2)
+    costo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     codigo_entrega = models.CharField(max_length=6, null=True, blank=True)  # Código de validación único
     entrega_confirmada = models.BooleanField(default=False)  # Estado de confirmación de entrega
 
