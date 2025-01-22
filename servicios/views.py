@@ -791,17 +791,37 @@ def api_equipo_cliente(request):
 @login_required
 @user_passes_test(lambda u: u.rol.nombre in ["administrador", "tecnico"])
 def lista_equipos(request):
+    # Determinar si es administrador o técnico para filtrar equipos
     if request.user.rol.nombre == "administrador":
-        equipos = Equipo.objects.all().order_by('marca')
-    else:  # Si es técnico, solo ve equipos de sus servicios
-        equipos = Equipo.objects.filter(servicio__tecnico=request.user).distinct().order_by('marca')
+        equipos = Equipo.objects.all()
+    else:
+        equipos = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
 
-    # Implementar paginación
+    # Obtener los parámetros de búsqueda
+    cedula_cliente = request.GET.get('cedula', '')
+    marca = request.GET.get('marca', '')
+    tipo_equipo = request.GET.get('tipo_equipo', '')
+
+    # Aplicar filtros si existen
+    if cedula_cliente:
+        equipos = equipos.filter(cliente__cedula__icontains=cedula_cliente)
+    if marca:
+        equipos = equipos.filter(marca__icontains=marca)
+    if tipo_equipo:
+        equipos = equipos.filter(tipo_equipo__icontains=tipo_equipo)
+
+    # Ordenar por marca y configurar la paginación
+    equipos = equipos.order_by('marca')
     paginator = Paginator(equipos, 5)  # Mostrar 5 equipos por página
     page_number = request.GET.get('page')
     equipos_paginados = paginator.get_page(page_number)
 
-    return render(request, "servicios/lista_equipos.html", {"equipos": equipos_paginados})
+    return render(request, "servicios/lista_equipos.html", {
+        "equipos": equipos_paginados,
+        "cedula_cliente": cedula_cliente,
+        "marca": marca,
+        "tipo_equipo": tipo_equipo
+    })
 
 
 # Crear equipo (Solo administradores)
