@@ -340,19 +340,27 @@ def lista_servicios(request):
     Vista para listar servicios con búsqueda y filtros, con soporte para paginación y solicitudes AJAX.
     """
     query = request.GET.get('q', '')
-    estado_filtro = request.GET.get('estado', '')
+    filtro = request.GET.get('filtro', 'numero')  # Por defecto, filtrar por N# de Servicio
 
     # Filtrar los servicios basados en los parámetros de búsqueda y filtros
     servicios = Servicio.objects.all()
     if query:
-        servicios = servicios.filter(
-            Q(equipo__marca__icontains=query) |
-            Q(equipo__modelo__icontains=query) |
-            Q(tecnico__nombre__icontains=query) |
-            Q(equipo__cliente__nombre__icontains=query)
-        )
-    if estado_filtro:
-        servicios = servicios.filter(estado__iexact=estado_filtro)  # Comparación exacta, insensible a mayúsculas
+        if filtro == "numero" and query.isdigit():
+            servicios = servicios.filter(id=query)
+        else:
+            servicios = servicios.filter(
+                Q(equipo__marca__icontains=query) |
+                Q(equipo__modelo__icontains=query) |
+                Q(tecnico__nombre__icontains=query) |
+                Q(equipo__cliente__nombre__icontains=query)
+            )
+    elif filtro and filtro != "numero":
+        servicios = servicios.filter(estado__iexact=filtro)
+    else:
+        servicios = Servicio.objects.all()
+
+    # Asegurarse de que los resultados estén ordenados por ID
+    servicios = servicios.order_by('-id')
 
     # Obtener los estados únicos sin modificar los valores reales
     estados = Servicio.objects.values_list('estado', flat=True).distinct()
@@ -367,7 +375,7 @@ def lista_servicios(request):
 
     # Manejar solicitudes AJAX para actualizar la lista de servicios
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        html = render_to_string('servicios/servicio_list.html', {'servicios': servicios_paginados})
+        html = render_to_string('servicios/servicio_list_partial.html', {'servicios': servicios_paginados})
         return JsonResponse({'html': html})
 
     # Renderizar la página completa para solicitudes normales

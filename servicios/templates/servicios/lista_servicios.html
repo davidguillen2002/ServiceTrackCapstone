@@ -27,10 +27,13 @@
                     <input type="text" name="q" class="form-control" placeholder="Buscar servicios..." id="search-input">
                 </div>
                 <div class="col-md-4">
-                    <select name="estado" class="form-select" id="estado-select">
+                    <select name="filtro" class="form-select" id="filtro-select">
+                        <option value="numero" {% if request.GET.filtro == "numero" or not request.GET.filtro %}selected{% endif %}>
+                            Filtrar por N# de Servicio
+                        </option>
                         <option value="">Filtrar por Estado</option>
                         {% for estado, estado_amigable in estados.items %}
-                            <option value="{{ estado }}" {% if estado == request.GET.estado %}selected{% endif %}>
+                            <option value="{{ estado }}" {% if estado == request.GET.filtro %}selected{% endif %}>
                                 {{ estado_amigable }}
                             </option>
                         {% endfor %}
@@ -50,7 +53,7 @@
         {% for servicio in servicios %}
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</h5>
+                <h5 class="card-title"><strong>N# {{ servicio.id }}</strong> - {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</h5>
                 <p class="card-text">
                     <strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}<br>
                     <strong>Técnico:</strong> {{ servicio.tecnico.nombre }}<br>
@@ -130,12 +133,12 @@
 <script>
     // Función para realizar búsqueda y filtros con AJAX
     function searchServices() {
-        const query = $('#search-input').val();
-        const estado = $('#estado-select').val();
+        const query = $('#search-input').val() || ''; // Si está vacío, enviar un string vacío
+        const filtro = $('#filtro-select').val();
 
         $.ajax({
             url: '{% url "lista_servicios" %}',
-            data: { q: query, estado: estado },
+            data: { q: query, filtro: filtro },
             dataType: 'json',
             success: function (data) {
                 $('#service-list').html(data.html); // Actualiza el contenido con los datos recibidos
@@ -148,6 +151,6 @@
 
     // Eventos para búsqueda y filtrado
     $('#search-input').on('keyup', searchServices);
-    $('#estado-select').on('change', searchServices);
+    $('#filtro-select').on('change', searchServices);
 </script>
 {% endblock %}

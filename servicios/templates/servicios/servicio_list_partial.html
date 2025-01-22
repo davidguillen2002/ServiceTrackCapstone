@@ -1,0 +1,32 @@
+{% for servicio in servicios %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title"><strong>N# {{ servicio.id }}</strong> - {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</h5>
+        <p class="card-text">
+            <strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}<br>
+            <strong>Técnico:</strong> {{ servicio.tecnico.nombre }}<br>
+            <strong>Estado:</strong>
+            <span class="badge {% if servicio.estado == 'pendiente' %}bg-warning{% elif servicio.estado == 'en_progreso' %}bg-primary{% else %}bg-success{% endif %}">
+                {{ servicio.estado|capfirst }}
+            </span><br>
+            <strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio|date:"d M, Y" }}<br>
+            <strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin|default:"N/A" }}<br>
+            <strong>Repuestos:</strong>
+            {% if servicio.repuestos.all %}
+                <ul>
+                    {% for repuesto in servicio.repuestos.all %}
+                        <li>{{ repuesto.nombre }} ({{ repuesto.cantidad }} unidades) - ${{ repuesto.costo }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                Sin repuestos asignados.
+            {% endif %}
+        </p>
+        <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-info">Ver Detalle</a>
+        <a href="{% url 'historial_servicios' servicio.equipo.id %}" class="btn btn-primary">Ver Historial</a>
+        <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-secondary">Actualizar</a>
+    </div>
+</div>
+{% empty %}
+<p>No se encontraron servicios.</p>
+{% endfor %}
