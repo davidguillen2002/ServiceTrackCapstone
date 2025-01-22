@@ -18,9 +18,9 @@
             <div class="list-group-item">
                 <h3 class="guia-titulo">{{ guide.titulo }}</h3>
                 <p class="guia-descripcion">{{ guide.descripcion }}</p>
-                <button class="btn btn-info preview-btn" data-guide="{{ guide.id }}">
+                <!--<button class="btn btn-info preview-btn" data-guide="{{ guide.id }}">
                     <i class="fas fa-eye"></i> Previsualizar
-                </button>
+                </button>-->
                 <div class="guia-links mt-2">
                     {% if guide.manual %}
                         <a href="{{ guide.manual }}" class="btn btn-primary" target="_blank">
@@ -29,13 +29,13 @@
                     {% else %}
                         <p class="text-muted">Sin manual disponible.</p>
                     {% endif %}
-                    {% if guide.video %}
+                    <!--{% if guide.video %}
                         <a href="{{ guide.video }}" class="btn btn-secondary" target="_blank">
                             <i class="fas fa-video"></i> Ver Video
                         </a>
                     {% else %}
                         <p class="text-muted">Sin video disponible.</p>
-                    {% endif %}
+                    {% endif %} -->
                 </div>
             </div>
         {% empty %}

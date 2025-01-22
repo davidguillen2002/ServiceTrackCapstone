@@ -111,6 +111,9 @@ class IncidenteForm(forms.ModelForm):
     class Meta:
         model = ObservacionIncidente
         fields = ['descripcion', 'tipo_observacion', 'estado', 'fecha_reportada']
+        widgets = {
+            'fecha_reportada': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
 
     def save(self, commit=True):
         """
