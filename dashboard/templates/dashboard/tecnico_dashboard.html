@@ -13,15 +13,16 @@
             <select name="anio" class="form-select">
                 <option value="">Seleccionar Año</option>
                 {% for anio in anios %}
-                    <option value="{{ anio.year }}" {% if anio_filtrado == anio.year|stringformat:"d" %}selected{% endif %}>{{ anio.year }}</option>
+                    <option value="{{ anio.year }}" {% if anio_filtrado == anio.year|stringformat:"d" %}selected{% endif %}>
+                        {{ anio.year }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-3">
             <select name="mes" class="form-select">
-                <option value="">Seleccionar Mes</option>
                 {% for mes_num, mes_nombre in meses %}
-                    <option value="{{ mes_num }}" {% if mes_filtrado == mes_num|stringformat:"d" %}selected{% endif %}>
+                    <option value="{{ mes_num }}" {% if mes_filtrado == mes_num %}selected{% endif %}>
                         {{ mes_nombre }}
                     </option>
                 {% endfor %}

@@ -116,11 +116,14 @@ def dashboard_view(request):
 def tecnico_dashboard_view(request):
     usuario = request.user
     anio_filtrado = request.GET.get('anio')
-    mes_filtrado = request.GET.get('mes')
+    mes_filtrado = request.GET.get('mes', '')  # Cadena vacía por defecto
     page_number = request.GET.get('page', 1)
 
     # Filtrar servicios por técnico
     servicios = Servicio.objects.filter(tecnico=usuario)
+
+    # Obtener años disponibles para el filtro
+    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
 
     # Validar y aplicar filtros de año y mes
     if anio_filtrado and anio_filtrado.isdigit():
@@ -158,11 +161,9 @@ def tecnico_dashboard_view(request):
         for t in tiempos_resolucion if t['tiempo_resolucion']
     ]
 
-    # Obtener años disponibles para el filtro
-    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC')
-
     # Generar lista de meses con nombres en español
     meses_disponibles = [
+        ("", _("Seleccionar Mes")),  # Opción vacía predeterminada
         ("1", _("Enero")), ("2", _("Febrero")), ("3", _("Marzo")), ("4", _("Abril")),
         ("5", _("Mayo")), ("6", _("Junio")), ("7", _("Julio")), ("8", _("Agosto")),
         ("9", _("Septiembre")), ("10", _("Octubre")), ("11", _("Noviembre")), ("12", _("Diciembre"))
@@ -185,6 +186,8 @@ def tecnico_dashboard_view(request):
         'tiempos_resolucion_data': tiempos_resolucion_data,
     }
     return render(request, 'dashboard/tecnico_dashboard.html', context)
+
+
 
 @login_required
 def cliente_dashboard_view(request):
