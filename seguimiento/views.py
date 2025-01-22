@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from ServiceTrack.models import Equipo, Servicio, Notificacion, Usuario
 from .forms import ServicioEstadoForm, ResenaForm
 from django.db import models
+from datetime import datetime
+from django.db.models import Q, Value
+from django.db.models.functions import Upper, Concat
 
 # Helper to check if the user is a technician
 def is_tecnico(user):
@@ -18,11 +21,29 @@ def is_cliente(user):
 @user_passes_test(is_cliente)
 def lista_equipos_cliente(request):
     """
-    Vista para mostrar el seguimiento de las reparaciones del cliente con paginación.
+    Vista para mostrar el seguimiento de las reparaciones del cliente con paginación y filtros.
     """
-    servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
+    # Obtener parámetros de búsqueda
+    id_servicio = request.GET.get('id', '')
+    estado = request.GET.get('estado', '')
+    fecha_inicio = request.GET.get('fecha_inicio', '')
+    fecha_fin = request.GET.get('fecha_fin', '')
 
-    # Paginación: 5 servicios por página
+    # Filtrar servicios por cliente
+    servicios = Servicio.objects.filter(equipo__cliente=request.user)
+
+    # Aplicar filtros
+    if id_servicio:
+        servicios = servicios.filter(id=id_servicio)
+    if estado:
+        servicios = servicios.filter(estado=estado)
+    if fecha_inicio:
+        servicios = servicios.filter(fecha_inicio__gte=fecha_inicio)
+    if fecha_fin:
+        servicios = servicios.filter(fecha_inicio__lte=fecha_fin)
+
+    # Ordenar y paginar resultados
+    servicios = servicios.order_by('-fecha_inicio')
     paginator = Paginator(servicios, 5)
     page_number = request.GET.get('page', 1)
     servicios_paginados = paginator.get_page(page_number)
@@ -30,8 +51,6 @@ def lista_equipos_cliente(request):
     return render(request, 'seguimiento/lista_equipos_cliente.html', {
         'servicios': servicios_paginados,
     })
-
-
 
 @login_required
 @user_passes_test(is_cliente)
@@ -130,8 +149,39 @@ def detalle_servicio_tecnico(request, servicio_id):
 @login_required
 @user_passes_test(is_cliente)
 def panel_cliente(request):
+    # Obtener parámetros de búsqueda
+    equipo_filtrado = request.GET.get('equipo', '').strip()  # Filtro por nombre de equipo
+    estado_filtrado = request.GET.get('estado', '')  # Filtro por estado
+    fecha_inicio_filtrada = request.GET.get('fecha_inicio', '')  # Filtro por fecha de recepción
+
     # Filtrar los servicios del cliente actual
     servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
+
+    # Aplicar filtros
+    if equipo_filtrado:
+        # Normaliza la entrada eliminando espacios y transformando a minúsculas
+        equipo_filtrado = equipo_filtrado.strip().lower()
+
+        # Divide las palabras del filtro por espacios
+        palabras = equipo_filtrado.split()
+
+        # Construye el query dinámico para buscar cada palabra en marca o modelo
+        query = Q()
+        for palabra in palabras:
+            query &= Q(
+                Q(equipo__marca__icontains=palabra) |
+                Q(equipo__modelo__icontains=palabra)
+            )
+
+        servicios = servicios.filter(query)
+
+    if estado_filtrado:
+        servicios = servicios.filter(estado=estado_filtrado)  # Filtrar por estado
+    if fecha_inicio_filtrada:
+        try:
+            servicios = servicios.filter(fecha_inicio=datetime.strptime(fecha_inicio_filtrada, '%Y-%m-%d').date())
+        except ValueError:
+            pass  # Ignorar errores si la fecha no tiene el formato correcto
 
     # Configurar paginación
     page = request.GET.get('page', 1)
@@ -148,4 +198,8 @@ def panel_cliente(request):
         'promedio_calificacion': round(promedio_calificacion, 2),
         'servicios_completados': servicios_completados,
         'costo_total': round(costo_total, 2),
+        'equipo_filtrado': equipo_filtrado,  # Valor actual del filtro por equipo
+        'estado_filtrado': estado_filtrado,  # Valor actual del filtro por estado
+        'fecha_inicio_filtrada': fecha_inicio_filtrada,  # Valor actual del filtro por fecha
+        'estados_disponibles': ['pendiente', 'en_progreso', 'completado'],  # Estados posibles para el filtro
     })

@@ -6,6 +6,36 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">Panel del Cliente</h1>
 
+    <form method="get" class="row g-3 mb-4">
+        <!-- Filtro por Nombre del Equipo -->
+        <div class="col-md-4">
+            <input type="text" name="equipo" class="form-control" placeholder="Buscar por Nombre de Equipo"
+                   value="{{ equipo_filtrado }}">
+        </div>
+
+        <!-- Filtro por Estado -->
+        <div class="col-md-3">
+            <select name="estado" class="form-select">
+                <option value="">Todos los Estados</option>
+                {% for estado in estados_disponibles %}
+                    <option value="{{ estado }}" {% if estado_filtrado == estado %}selected{% endif %}>
+                        {{ estado|capfirst }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Filtro por Fecha de Recepción -->
+        <div class="col-md-3">
+            <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio_filtrada }}">
+        </div>
+
+        <!-- Botón para Aplicar Filtros -->
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </form>
+
     <!-- Tabla de Servicios -->
     <div class="table-responsive">
         <table class="table table-striped table-hover text-center align-middle">
@@ -13,8 +43,8 @@
                 <tr>
                     <th>Equipo</th>
                     <th>Estado</th>
-                    <th>Fecha de Inicio</th>
-                    <th>Fecha Estimada de Finalización</th>
+                    <th>Fecha de Recepción</th>
+                    <th>Fecha Estimada de Entrega</th>
                     <th>Acciones</th>
                 </tr>
             </thead>

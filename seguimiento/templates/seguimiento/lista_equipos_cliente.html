@@ -1,16 +1,52 @@
 {% extends "base.html" %}
 
-{% block title %}Seguimiento de Reparaciones - Cliente{% endblock %}
-
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center mb-4">Seguimiento de Reparaciones</h1>
     <p class="text-center mb-4">Consulta el estado de las reparaciones técnicas en curso y completadas.</p>
 
+    <!-- Filtros -->
+    <form method="get" class="mb-4">
+        <div class="row g-3 align-items-center">
+            <!-- Número de Servicio -->
+            <div class="col-md-3">
+                <label for="id" class="form-label">N° de Servicio</label>
+                <input type="text" id="id" name="id" class="form-control" placeholder="Ejemplo: 123" value="{{ request.GET.id }}">
+            </div>
+            <!-- Estado -->
+            <div class="col-md-3">
+                <label for="estado" class="form-label">Estado</label>
+                <select id="estado" name="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="completado" {% if request.GET.estado == 'completado' %}selected{% endif %}>Completado</option>
+                    <option value="pendiente" {% if request.GET.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="en_progreso" {% if request.GET.estado == 'en_progreso' %}selected{% endif %}>En Progreso</option>
+                </select>
+            </div>
+            <!-- Fecha de Inicio -->
+            <div class="col-md-3">
+                <label for="fecha_inicio" class="form-label">Fecha de Recepción (Desde)</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" value="{{ request.GET.fecha_inicio }}">
+            </div>
+            <!-- Fecha de Fin -->
+            <div class="col-md-3">
+                <label for="fecha_fin" class="form-label">Fecha de Recepción (Hasta)</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin }}">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-2 offset-md-5">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de servicios -->
     <div class="table-responsive">
         <table class="table table-bordered table-striped text-center align-middle">
             <thead class="table-dark">
                 <tr>
+                    <th>N° Servicio</th>
                     <th>Equipo</th>
                     <th>Fecha de Inicio</th>
                     <th>Fecha Estimada de Finalización</th>
@@ -21,6 +57,7 @@
             <tbody>
                 {% for servicio in servicios %}
                     <tr>
+                        <td>{{ servicio.id }}</td>
                         <td>{{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</td>
                         <td>{{ servicio.fecha_inicio|date:"d/m/Y" }}</td>
                         <td>{{ servicio.fecha_fin|date:"d/m/Y" }}</td>
@@ -44,7 +81,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center">No tienes reparaciones en curso.</td>
+                        <td colspan="6" class="text-center">No se encontraron resultados.</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -57,19 +94,19 @@
             <ul class="pagination">
                 {% if servicios.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ servicios.previous_page_number }}" aria-label="Anterior">
+                        <a class="page-link" href="?page={{ servicios.previous_page_number }}&{{ request.GET.urlencode }}" aria-label="Anterior">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% endif %}
                 {% for num in servicios.paginator.page_range %}
                     <li class="page-item {% if servicios.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
                     </li>
                 {% endfor %}
                 {% if servicios.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ servicios.next_page_number }}" aria-label="Siguiente">
+                        <a class="page-link" href="?page={{ servicios.next_page_number }}&{{ request.GET.urlencode }}" aria-label="Siguiente">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -78,38 +115,4 @@
         </nav>
     </div>
 </div>
-
-<style>
-    .table {
-        background-color: #fff;
-        border-collapse: collapse;
-        font-size: 0.95rem;
-    }
-
-    .table th, .table td {
-        vertical-align: middle;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-    .pagination .page-link {
-        color: #007bff;
-    }
-
-    .pagination .page-link:hover {
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-    }
-
-    .badge {
-        font-size: 0.9rem;
-    }
-
-    .btn-sm {
-        font-size: 0.85rem;
-    }
-</style>
 {% endblock %}
