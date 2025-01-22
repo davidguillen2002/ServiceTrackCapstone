@@ -195,9 +195,12 @@ def cliente_dashboard_view(request):
     anio_filtrado = request.GET.get('anio', None)  # Obtener filtro de año
     mes_filtrado = request.GET.get('mes', None)  # Obtener filtro de mes
 
-    # Filtrar servicios y equipos del cliente
+    # Filtrar equipos y obtener servicios del cliente
     equipos = Equipo.objects.filter(cliente=usuario)
     servicios = Servicio.objects.filter(equipo__cliente=usuario)
+
+    # Obtener todos los años disponibles antes de aplicar los filtros
+    anios_disponibles = Servicio.objects.filter(equipo__cliente=usuario).dates('fecha_inicio', 'year', order='DESC')
 
     # Aplicar filtros de año y mes
     if anio_filtrado and anio_filtrado.isdigit():
@@ -215,9 +218,6 @@ def cliente_dashboard_view(request):
     for estado in estados_servicios:
         estados_totales[estado['estado']] = estado['total']
 
-    # Años disponibles
-    anios_disponibles = servicios.dates('fecha_inicio', 'year', order='DESC').distinct()
-
     # Lista de meses con nombres
     meses_nombres = [
         ("1", _("Enero")), ("2", _("Febrero")), ("3", _("Marzo")), ("4", _("Abril")),
@@ -231,9 +231,10 @@ def cliente_dashboard_view(request):
         'costos_totales': costos_totales,
         'anio_filtrado': anio_filtrado,
         'mes_filtrado': mes_filtrado,
-        'anios': anios_disponibles,
+        'anios': anios_disponibles,  # Lista completa de años
         'meses': meses_nombres,
         'estados_servicios': estados_totales,  # Datos para el gráfico
+        'nombre_cliente': usuario.nombre,
     }
     return render(request, 'dashboard/cliente_dashboard.html', context)
 
