@@ -21,7 +21,7 @@ load_dotenv()
 # Variables de entorno
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'default-secret-key')
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') or ['localhost', 'servicetrackcapstone.onrender.com']
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
