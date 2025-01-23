@@ -6,12 +6,12 @@ from django.db.models import Sum, Avg, F, Count, OuterRef, Subquery
 from django import forms
 from django.contrib import messages
 import json
+from django.utils import timezone
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
-
 from ServiceTrack.models import Usuario, Medalla, Reto, RegistroPuntos, RetoUsuario, Guia, ObservacionIncidente, \
-    Servicio, Recompensa, Temporada
+    Servicio, Recompensa, Temporada, RecompensaUsuario
 from .decorators import validar_temporada_activa
 from .forms import GuiaForm, ObservacionIncidenteForm, RetoForm, MedallaForm, TemporadaForm, RecompensaForm
 from .utils import (
@@ -21,22 +21,25 @@ from .utils import (
     asignar_retos_dinamicos,
     otorgar_experiencia,
     generar_recomendaciones_con_ia,
-    asignar_recompensas_a_tecnico,
+    sincronizar_y_asignar_recompensas,
 )
 from .notifications import notificar_tecnico, notificar_tecnico_con_animacion
 
 def es_administrador(usuario):
     return usuario.is_authenticated and usuario.rol.nombre == "administrador"
 
+# Vista para administrar la gamificación
 @login_required
-@user_passes_test(es_administrador)
+@user_passes_test(es_administrador)  # Asegura que solo el personal administrativo acceda
 def administrar_gamificacion(request):
     """
     Vista principal para administrar la gamificación con funcionalidad CRUD, otorgar puntos y paginación.
+    Incluye soporte para procesamiento mediante AJAX.
     """
+
     # Paginación de datos
     def paginate_queryset(queryset, page_param, items_per_page=5):
-        page = request.GET.get(page_param, 1)  # Cada lista tiene un parámetro único para la paginación
+        page = request.GET.get(page_param, 1)
         paginator = Paginator(queryset, items_per_page)
         try:
             paginated_data = paginator.page(page)
@@ -79,49 +82,90 @@ def administrar_gamificacion(request):
     else:
         otorgar_puntos_form = OtorgarPuntosForm()
 
-    # Procesar acciones CRUD dinámicas
+    # Procesar acciones CRUD dinámicas y soporte para AJAX
     if request.method == "POST" and request.POST.get("action") != "otorgar_puntos":
         action = request.POST.get("action")
+
         if action == "crear_temporada":
             form = TemporadaForm(request.POST)
             if form.is_valid():
-                form.save()
+                temporada = form.save()
+                if request.is_ajax():
+                    return JsonResponse({"success": True, "temporada": {
+                        "nombre": temporada.nombre,
+                        "fecha_inicio": temporada.fecha_inicio.strftime('%Y-%m-%d'),
+                        "fecha_fin": temporada.fecha_fin.strftime('%Y-%m-%d')
+                    }})
                 messages.success(request, "Temporada creada con éxito.")
             else:
+                if request.is_ajax():
+                    return JsonResponse({"success": False, "errors": form.errors})
                 messages.error(request, "Error al crear la temporada.")
+
         elif action == "eliminar_temporada":
             Temporada.objects.filter(id=request.POST.get("temporada_id")).delete()
             messages.success(request, "Temporada eliminada con éxito.")
+
         elif action == "crear_reto":
             form = RetoForm(request.POST)
             if form.is_valid():
-                form.save()
+                reto = form.save()
+                if request.is_ajax():
+                    return JsonResponse({"success": True, "reto": {
+                        "nombre": reto.nombre,
+                        "nivel": reto.nivel,
+                        "temporada": reto.temporada.nombre
+                    }})
                 messages.success(request, "Reto creado con éxito.")
             else:
+                if request.is_ajax():
+                    return JsonResponse({"success": False, "errors": form.errors})
                 messages.error(request, "Error al crear el reto.")
+
         elif action == "eliminar_reto":
             Reto.objects.filter(id=request.POST.get("reto_id")).delete()
             messages.success(request, "Reto eliminado con éxito.")
+
         elif action == "crear_recompensa":
             form = RecompensaForm(request.POST)
             if form.is_valid():
-                form.save()
+                recompensa = form.save()
+                if request.is_ajax():
+                    return JsonResponse({"success": True, "recompensa": {
+                        "descripcion": recompensa.descripcion,
+                        "tipo": recompensa.tipo,
+                        "temporada": recompensa.temporada.nombre
+                    }})
                 messages.success(request, "Recompensa creada con éxito.")
             else:
+                if request.is_ajax():
+                    return JsonResponse({"success": False, "errors": form.errors})
                 messages.error(request, "Error al crear la recompensa.")
+
         elif action == "eliminar_recompensa":
             Recompensa.objects.filter(id=request.POST.get("recompensa_id")).delete()
             messages.success(request, "Recompensa eliminada con éxito.")
+
         elif action == "crear_medalla":
             form = MedallaForm(request.POST, request.FILES)
             if form.is_valid():
-                form.save()
+                medalla = form.save()
+                if request.is_ajax():
+                    return JsonResponse({"success": True, "medalla": {
+                        "nombre": medalla.nombre,
+                        "nivel_requerido": medalla.nivel_requerido,
+                        "temporada": medalla.temporada.nombre if medalla.temporada else "Sin Temporada"
+                    }})
                 messages.success(request, "Medalla creada con éxito.")
             else:
+                if request.is_ajax():
+                    return JsonResponse({"success": False, "errors": form.errors})
                 messages.error(request, "Error al crear la medalla.")
+
         elif action == "eliminar_medalla":
             Medalla.objects.filter(id=request.POST.get("medalla_id")).delete()
             messages.success(request, "Medalla eliminada con éxito.")
+
         else:
             messages.error(request, "Acción no reconocida.")
         return redirect("administrar_gamificacion")
@@ -141,6 +185,7 @@ def administrar_gamificacion(request):
         "recompensas_paginator": recompensas_paginator,
         "medallas_paginator": medallas_paginator,
     })
+
 
 
 class OtorgarPuntosForm(forms.Form):
@@ -413,9 +458,6 @@ def historial_puntos_paginated(request):
 @login_required
 @validar_temporada_activa
 def recompensas_disponibles(request):
-    """
-    Vista para mostrar las recompensas disponibles y redimidas del usuario actual.
-    """
     usuario = request.user
     temporada_actual = Temporada.obtener_temporada_actual()
 
@@ -423,48 +465,32 @@ def recompensas_disponibles(request):
         messages.warning(request, "No hay una temporada activa en este momento.")
         return redirect("home")
 
-    # Asignar recompensas globales y asociarlas a retos cumplidos
-    asignar_recompensas_a_tecnico(usuario, temporada_actual)
+    # Sincronizar y asignar recompensas específicas al usuario
+    sincronizar_y_asignar_recompensas(temporada_actual, usuario)
 
-    # Obtener recompensas disponibles clasificadas por nivel
-    recompensas_disponibles = (
-        Recompensa.objects.filter(
-            temporada=temporada_actual,
-            reto__retos_asignados__usuario=usuario,
-            reto__retos_asignados__cumplido=True,
-            puntos_necesarios__lte=usuario.puntos  # Usuario debe tener puntos suficientes
-        )
-        .exclude(usuarios_redimidos=usuario)  # Excluir recompensas ya redimidas
-        .order_by('reto__nivel', 'puntos_necesarios')  # Ordenar por nivel y puntos necesarios
-    )
+    # Obtener recompensas disponibles para el usuario
+    recompensas_disponibles = RecompensaUsuario.objects.filter(
+        usuario=usuario,
+        redimido=False,
+        recompensa__temporada=temporada_actual
+    ).select_related('recompensa')
 
-    # Clasificar recompensas por nivel
-    recompensas_clasificadas = {}
-    for recompensa in recompensas_disponibles:
-        nivel = recompensa.reto.nivel if recompensa.reto else 0
-        if nivel not in recompensas_clasificadas:
-            recompensas_clasificadas[nivel] = []
-        recompensas_clasificadas[nivel].append(recompensa)
+    # Obtener recompensas ya redimidas por el usuario
+    recompensas_redimidas = RecompensaUsuario.objects.filter(
+        usuario=usuario,
+        redimido=True,
+        recompensa__temporada=temporada_actual
+    ).select_related('recompensa')
 
-    # Obtener recompensas redimidas por el usuario
-    recompensas_redimidas = (
-        Recompensa.objects.filter(
-            temporada=temporada_actual,
-            usuarios_redimidos=usuario
-        )
-        .distinct()
-        .order_by('tipo', 'puntos_necesarios')
-    )
-
+    # Renderizar la vista con las recompensas disponibles y redimidas
     return render(request, 'gamificacion/recompensas_disponibles.html', {
-        'recompensas_disponibles': recompensas_clasificadas,
+        'recompensas_disponibles': recompensas_disponibles,
         'recompensas_redimidas': recompensas_redimidas,
         'nivel_actual': usuario.nivel,
     })
 
 
-
-@csrf_exempt  # Para manejar solicitudes AJAX sin problemas con CSRF
+@csrf_exempt
 @login_required
 def redimir_recompensa(request):
     """
@@ -473,48 +499,46 @@ def redimir_recompensa(request):
     if request.method == "POST":
         try:
             body = json.loads(request.body)
-            recompensa_id = body.get("recompensa_id")
+            recompensa_usuario_id = body.get("recompensa_id")
             usuario = request.user
 
-            # Validar si la recompensa existe
-            recompensa = Recompensa.objects.get(
-                id=recompensa_id,
-                temporada=Temporada.obtener_temporada_actual()
+            # Validar si la recompensa está asignada al usuario y aún no ha sido redimida
+            recompensa_usuario = RecompensaUsuario.objects.get(
+                id=recompensa_usuario_id,
+                usuario=usuario,
+                redimido=False
             )
 
-            # Validar si ya ha sido redimida
-            if recompensa.usuarios_redimidos.filter(id=usuario.id).exists():
-                return JsonResponse({"success": False, "error": "La recompensa ya ha sido redimida."})
-
-            # Validar puntos suficientes
-            if usuario.puntos < recompensa.puntos_necesarios:
+            # Validar si el usuario tiene suficientes puntos
+            if usuario.puntos < recompensa_usuario.recompensa.puntos_necesarios:
                 return JsonResponse({"success": False, "error": "No tienes suficientes puntos para redimir esta recompensa."})
 
-            # Redimir la recompensa
-            recompensa.usuarios_redimidos.add(usuario)
-            usuario.puntos -= recompensa.puntos_necesarios
+            # Procesar la redención de la recompensa
+            recompensa_usuario.redimido = True
+            recompensa_usuario.fecha_redencion = timezone.now()
+            recompensa_usuario.save()
+
+            # Descontar los puntos del usuario
+            usuario.puntos -= recompensa_usuario.recompensa.puntos_necesarios
             usuario.save()
 
-            # Respuesta JSON con información de la recompensa
             return JsonResponse({
                 "success": True,
                 "mensaje": {
-                    "tipo": recompensa.tipo,
-                    "descripcion": recompensa.descripcion,
-                    "id": recompensa.id
+                    "tipo": recompensa_usuario.recompensa.tipo,
+                    "descripcion": recompensa_usuario.recompensa.descripcion,
+                    "id": recompensa_usuario.id
                 }
             })
 
-        except Recompensa.DoesNotExist:
-            return JsonResponse({"success": False, "error": "La recompensa no existe."})
-
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "error": "Solicitud mal formada."})
+        except RecompensaUsuario.DoesNotExist:
+            return JsonResponse({"success": False, "error": "La recompensa no existe o ya fue redimida."})
 
         except Exception as e:
             return JsonResponse({"success": False, "error": f"Error inesperado: {str(e)}"})
 
     return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
+
 
 # CRUD para Observaciones de Incidentes
 @login_required

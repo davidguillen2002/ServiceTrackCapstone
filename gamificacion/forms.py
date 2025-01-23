@@ -35,15 +35,23 @@ class ObservacionIncidenteForm(forms.ModelForm):
 
 
 class RetoForm(forms.ModelForm):
+    temporada = forms.ModelChoiceField(
+        queryset=Temporada.objects.all(),
+        required=True,
+        label="Temporada",
+        help_text="Selecciona la temporada a la que pertenece este reto."
+    )
+
     class Meta:
         model = Reto
-        fields = ['nombre', 'descripcion', 'puntos_otorgados', 'criterio', 'valor_objetivo']
+        fields = ['nombre', 'descripcion', 'puntos_otorgados', 'criterio', 'valor_objetivo', 'temporada']
         labels = {
             'nombre': 'Nombre del reto',
             'descripcion': 'Descripción del reto',
             'puntos_otorgados': 'Puntos a otorgar',
             'criterio': 'Criterio de cumplimiento',
             'valor_objetivo': 'Valor objetivo (puntos, servicios, calificación promedio)',
+            'temporada': 'Temporada asociada al reto',
         }
 
     def clean_puntos_otorgados(self):
@@ -60,15 +68,23 @@ class RetoForm(forms.ModelForm):
 
 
 class MedallaForm(forms.ModelForm):
+    temporada = forms.ModelChoiceField(
+        queryset=Temporada.objects.all(),
+        required=False,  # Permitir que sea opcional
+        label="Temporada",
+        help_text="Selecciona la temporada a la que pertenece esta medalla (opcional)."
+    )
+
     class Meta:
         model = Medalla
-        fields = ['nombre', 'descripcion', 'icono', 'puntos_necesarios', 'nivel_requerido']
+        fields = ['nombre', 'descripcion', 'icono', 'puntos_necesarios', 'nivel_requerido', 'temporada']
         labels = {
             'nombre': 'Nombre de la medalla',
             'descripcion': 'Descripción',
             'icono': 'Ícono de la medalla',
             'puntos_necesarios': 'Puntos necesarios para desbloquear',
             'nivel_requerido': 'Nivel mínimo requerido',
+            'temporada': 'Temporada asociada a la medalla',
         }
 
     def clean_puntos_necesarios(self):
@@ -99,6 +115,13 @@ class TemporadaForm(forms.ModelForm):
 
 
 class RecompensaForm(forms.ModelForm):
+    temporada = forms.ModelChoiceField(
+        queryset=Temporada.objects.all(),
+        required=True,
+        label="Temporada",
+        help_text="Selecciona la temporada a la que pertenece esta recompensa."
+    )
+
     class Meta:
         model = Recompensa
         fields = [
@@ -117,50 +140,25 @@ class RecompensaForm(forms.ModelForm):
         }
 
     def clean_puntos_necesarios(self):
-        """
-        Valida que los puntos necesarios sean mayores que cero.
-        """
         puntos = self.cleaned_data.get("puntos_necesarios")
         if puntos <= 0:
             raise forms.ValidationError("Los puntos necesarios deben ser mayores que cero.")
         return puntos
 
     def clean_valor(self):
-        """
-        Valida que el valor de la recompensa sea positivo y razonable.
-        """
         valor = self.cleaned_data.get("valor")
         if valor < 0:
             raise forms.ValidationError("El valor de la recompensa no puede ser negativo.")
-        if valor > 10000:  # Límite arbitrario; ajusta según tus necesidades
+        if valor > 10000:
             raise forms.ValidationError("El valor de la recompensa parece ser demasiado alto.")
         return valor
 
     def clean(self):
-        """
-        Validaciones generales del formulario.
-        """
         cleaned_data = super().clean()
-        tipo = cleaned_data.get("tipo")
-        descripcion = cleaned_data.get("descripcion")
         temporada = cleaned_data.get("temporada")
-        puntos_necesarios = cleaned_data.get("puntos_necesarios")
         reto = cleaned_data.get("reto")
 
-        if not tipo or not descripcion or not temporada:
-            raise forms.ValidationError("El tipo, la descripción y la temporada son obligatorios.")
-
-        # Validación específica: si se proporciona un reto, debe coincidir con la temporada de la recompensa.
         if reto and reto.temporada != temporada:
             raise forms.ValidationError("El reto asociado debe pertenecer a la misma temporada que la recompensa.")
 
-        # Validación adicional: verificar unicidad del reto si está presente.
-        if reto:
-            recompensa_existente = Recompensa.objects.filter(reto=reto).exclude(id=self.instance.id).first()
-            if recompensa_existente:
-                raise forms.ValidationError(
-                    f"El reto '{reto.nombre}' ya está asociado a otra recompensa: '{recompensa_existente.descripcion}'."
-                )
-
         return cleaned_data
-

@@ -7,11 +7,13 @@
     <h1>Mis Servicios</h1>
     <p>Selecciona un servicio para ver más opciones o crea nuevos registros.</p>
 
-    <!-- Botones para crear cliente y servicio -->
+    <!-- Botones para crear cliente, servicio y equipo -->
     <div class="mb-3">
         <a href="{% url 'crear_cliente' %}" class="btn btn-success">Crear Cliente</a>
         <a href="{% url 'crear_servicio' %}" class="btn btn-primary">Crear Servicio</a>
+        <a href="{% url 'crear_equipo_tecnico' %}" class="btn btn-info">Crear Equipo</a>
     </div>
+
 
     <!-- Listado de servicios -->
     <ul class="list-group mb-4">

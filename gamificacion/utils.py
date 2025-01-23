@@ -13,7 +13,7 @@ import json
 import pandas as pd
 from django.db.models import Sum, Avg
 from ServiceTrack.models import (
-    RegistroPuntos, RetoUsuario, Temporada, ObservacionIncidente
+    RegistroPuntos, RetoUsuario, Temporada, ObservacionIncidente, RecompensaUsuario
 )
 from django.utils.timezone import now
 import joblib
@@ -452,7 +452,8 @@ def finalizar_temporada():
 # Función para sincronizar recompensas globales
 def sincronizar_recompensas_globales(temporada_actual):
     """
-    Sincroniza las recompensas globales por nivel para la temporada actual.
+    Sincroniza las recompensas globales por nivel para la temporada actual
+    y las asocia a retos correspondientes en el mismo orden en que aparecen.
     """
     descripcion_recompensas = {
         1: [
@@ -485,7 +486,14 @@ def sincronizar_recompensas_globales(temporada_actual):
     print("[INFO] Sincronizando recompensas globales para la temporada actual.")
 
     for nivel, recompensas in descripcion_recompensas.items():
+        # Obtener los retos de este nivel en el orden en que están en la base de datos
+        retos_nivel = list(
+            Reto.objects.filter(temporada=temporada_actual, nivel=nivel).order_by("id")
+        )
+        recompensa_index = 0
+
         for recompensa_data in recompensas:
+            # Buscar o crear la recompensa
             recompensa, created = Recompensa.objects.get_or_create(
                 temporada=temporada_actual,
                 tipo=recompensa_data["tipo"],
@@ -493,56 +501,78 @@ def sincronizar_recompensas_globales(temporada_actual):
                 defaults={
                     "valor": recompensa_data["valor"],
                     "puntos_necesarios": recompensa_data["puntos"],
-                    "reto": None,
                 },
             )
+
             if created:
                 print(f"[SUCCESS] Recompensa creada: '{recompensa.descripcion}' (Nivel: {nivel}).")
             else:
+                # Actualizar valores si ya existe
                 recompensa.valor = recompensa_data["valor"]
                 recompensa.puntos_necesarios = recompensa_data["puntos"]
                 recompensa.save()
                 print(f"[INFO] Recompensa actualizada: '{recompensa.descripcion}' (Nivel: {nivel}).")
 
-    print("[SUCCESS] Sincronización completada.")
+            # Asociar recompensa al reto correspondiente en orden
+            if recompensa_index < len(retos_nivel):
+                reto_asociado = retos_nivel[recompensa_index]
+                recompensa.reto = reto_asociado
+                recompensa.save()
+                print(f"[INFO] Recompensa '{recompensa.descripcion}' asociada al reto '{reto_asociado.nombre}'.")
+                recompensa_index += 1
+            else:
+                print(f"[WARNING] No hay suficientes retos para asociar a la recompensa '{recompensa.descripcion}'.")
+
+    print("[SUCCESS] Sincronización de recompensas globales completada.")
 
 
-# Función para asignar recompensas a técnicos, incluyendo niveles previos
-def asignar_recompensas_a_tecnico(usuario, temporada_actual):
+def sincronizar_y_asignar_recompensas(temporada_actual, usuario=None):
     """
-    Asigna recompensas globales al usuario si cumple los requisitos de retos,
-    incluyendo las de niveles previos no asignadas.
+    Sincroniza recompensas globales para la temporada actual y asigna las recompensas a los usuarios
+    que cumplieron retos. Si se pasa un usuario específico, se asignan recompensas solo para ese usuario.
     """
+    # Paso 1: Sincronizar recompensas globales
     sincronizar_recompensas_globales(temporada_actual)
 
-    # Obtener todos los niveles hasta el nivel actual del usuario
-    niveles_revisar = range(1, usuario.nivel + 1)
+    # Paso 2: Obtener usuarios técnicos (si no se especifica un usuario)
+    usuarios = [usuario] if usuario else Usuario.objects.filter(rol__nombre="tecnico")
 
-    for nivel in niveles_revisar:
-        # Obtener los retos cumplidos por el usuario en este nivel
+    for user in usuarios:
+        print(f"[INFO] Procesando recompensas para el usuario '{user.username}'.")
+
+        # Obtener retos cumplidos por el usuario en la temporada actual
         retos_cumplidos = RetoUsuario.objects.filter(
-            usuario=usuario,
+            usuario=user,
             cumplido=True,
-            reto__nivel=nivel,
             reto__temporada=temporada_actual,
-        )
+        ).select_related('reto')
 
         for reto_usuario in retos_cumplidos:
-            # Verificar si el reto ya tiene una recompensa asociada
-            if not hasattr(reto_usuario.reto, 'recompensa'):
-                # Buscar recompensas globales no asociadas a un reto y que coincidan con este nivel
-                recompensa_disponible = Recompensa.objects.filter(
+            # Verificar si ya tiene una recompensa asignada
+            recompensa_asignada = RecompensaUsuario.objects.filter(
+                usuario=user,
+                recompensa__reto=reto_usuario.reto
+            ).exists()
+
+            if not recompensa_asignada:
+                # Buscar recompensa asociada al reto
+                recompensa = Recompensa.objects.filter(
                     temporada=temporada_actual,
-                    puntos_necesarios__lte=reto_usuario.reto.puntos_otorgados,
-                    reto__isnull=True,  # No asociada a otro reto
-                    tipo__in=["Trofeo", "Herramienta", "Bono"]  # Priorizar tipos comunes
-                ).order_by('puntos_necesarios').first()
+                    reto=reto_usuario.reto
+                ).first()
 
-                if recompensa_disponible:
-                    recompensa_disponible.reto = reto_usuario.reto
-                    recompensa_disponible.save()
-                    print(f"[SUCCESS] Recompensa '{recompensa_disponible.descripcion}' asociada al reto '{reto_usuario.reto.nombre}' para {usuario.username}.")
+                if recompensa:
+                    # Asignar recompensa al usuario
+                    RecompensaUsuario.objects.create(
+                        usuario=user,
+                        recompensa=recompensa,
+                        redimido=False  # Inicialmente no redimida
+                    )
+                    print(f"[SUCCESS] Recompensa '{recompensa.descripcion}' asignada a '{user.username}'.")
+                else:
+                    print(f"[WARNING] No se encontró recompensa asociada al reto '{reto_usuario.reto.nombre}'.")
 
+    print("[SUCCESS] Sincronización y asignación de recompensas completada.")
 
 # Función para eliminar recompensas duplicadas
 def eliminar_duplicados_globales(temporada_actual):

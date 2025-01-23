@@ -30,28 +30,25 @@
         <h4 class="text-center text-primary">🌟 Tus Recompensas Disponibles</h4>
         <div id="recompensas-disponibles">
             {% if recompensas_disponibles %}
-                {% for nivel, recompensas in recompensas_disponibles.items %}
-                    <div class="nivel-recompensas">
-                        <h5 class="text-secondary">Recompensas del Nivel {{ nivel }}</h5>
-                        {% for recompensa in recompensas %}
-                            <div class="card mb-3 animate__animated animate__fadeIn">
-                                <div class="row g-0">
-                                    <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
-                                        <img src="{% static 'img/' %}{{ recompensa.tipo }}.png" alt="{{ recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
-                                            <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
-                                            <p class="card-text"><strong>Puntos necesarios:</strong> {{ recompensa.puntos_necesarios }}</p>
-                                            <button class="btn btn-success mt-2 reclamar-btn" data-id="{{ recompensa.id }}">
-                                                Redimir <i class="fas fa-check-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                {% for recompensa_usuario in recompensas_disponibles %}
+                    <div class="card mb-3 animate__animated animate__fadeIn">
+                        <div class="row g-0">
+                            <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
+                                <img src="{% static 'img/' %}{{ recompensa_usuario.recompensa.tipo }}.png"
+                                     alt="{{ recompensa_usuario.recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title text-uppercase"><strong>{{ recompensa_usuario.recompensa.tipo }}</strong></h5>
+                                    <p class="card-text"><strong>Descripción:</strong> {{ recompensa_usuario.recompensa.descripcion }}</p>
+                                    <p class="card-text"><strong>Puntos necesarios:</strong> {{ recompensa_usuario.recompensa.puntos_necesarios }}</p>
+                                    <button class="btn btn-success mt-2 reclamar-btn"
+                                            data-id="{{ recompensa_usuario.id }}">
+                                        Redimir <i class="fas fa-check-circle"></i>
+                                    </button>
                                 </div>
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -65,16 +62,17 @@
         <h4 class="text-center text-info">✔️ Recompensas Redimidas</h4>
         <div id="recompensas-redimidas">
             {% if recompensas_redimidas %}
-                {% for recompensa in recompensas_redimidas %}
+                {% for recompensa_usuario in recompensas_redimidas %}
                     <div class="card mb-3 animate__animated animate__fadeIn">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
-                                <img src="{% static 'img/' %}{{ recompensa.tipo }}-redimido.png" alt="{{ recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
+                                <img src="{% static 'img/' %}{{ recompensa_usuario.recompensa.tipo }}-redimido.png"
+                                     alt="{{ recompensa_usuario.recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title text-uppercase"><strong>{{ recompensa.tipo }}</strong></h5>
-                                    <p class="card-text"><strong>Descripción:</strong> {{ recompensa.descripcion }}</p>
+                                    <h5 class="card-title text-uppercase"><strong>{{ recompensa_usuario.recompensa.tipo }}</strong></h5>
+                                    <p class="card-text"><strong>Descripción:</strong> {{ recompensa_usuario.recompensa.descripcion }}</p>
                                     <span class="badge bg-success">Redimida</span>
                                 </div>
                             </div>

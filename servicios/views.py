@@ -166,47 +166,72 @@ def notificar_incidente(request, incidente_id):
     messages.success(request, "Incidente notificado exitosamente al cliente.")
     return redirect("listar_incidentes", servicio_id=incidente.servicio.id)
 
-# Crear Servicio
 @login_required
 @user_passes_test(is_tecnico)
 def crear_servicio(request):
     """
     Vista para que un técnico registre un nuevo servicio para equipos asignados.
     """
-    equipos_disponibles = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
+    equipos_disponibles = Equipo.objects.filter(cliente__isnull=False)  # Equipos con cliente asociado
 
     if request.method == "POST":
         form = ServicioForm(request.POST, equipos_disponibles=equipos_disponibles)
         if form.is_valid():
             servicio = form.save(commit=False)
-            servicio.tecnico = request.user  # Asignar el técnico autenticado
+            servicio.tecnico = request.user  # Asignar al técnico autenticado
 
-            # Validación para generar el código de entrega y notificación solo si el estado es "completado"
+            # Validación para generar código de entrega
             if servicio.estado.lower() == "completado":
-                servicio.generar_codigo_entrega()  # Generar código único para el servicio
+                servicio.generar_codigo_entrega()
 
                 # Notificar al cliente
                 Notificacion.crear_notificacion(
                     usuario=servicio.equipo.cliente,
                     tipo="codigo_entrega",
-                    mensaje=f"Se ha creado un nuevo servicio para el equipo {servicio.equipo.marca}. "
-                            f"Su código de entrega es: {servicio.codigo_entrega}."
+                    mensaje=(
+                        f"Se ha creado un nuevo servicio para el equipo {servicio.equipo.marca} "
+                        f"{servicio.equipo.modelo}. Su código de entrega es: {servicio.codigo_entrega}."
+                    ),
                 )
-                messages.success(request, "El servicio completado ha sido creado y el cliente ha sido notificado.")
+                messages.success(request, "El servicio completado ha sido creado y el cliente notificado.")
             else:
-                servicio.codigo_entrega = None  # No generar código de entrega si no está completado
-                estado_actual = servicio.get_estado_display()
-                messages.warning(request,
-                                 f"El servicio ha sido creado en estado '{estado_actual}', por lo que no se generó un código de entrega.")
+                servicio.codigo_entrega = None
+                messages.info(
+                    request,
+                    f"El servicio se creó en estado '{servicio.get_estado_display()}'. No se generó código de entrega."
+                )
 
-            servicio.save()  # Guardar el servicio en la base de datos
-            return redirect('tecnico_services_list')
+            servicio.save()  # Guardar servicio
+            return redirect("tecnico_services_list")  # Redirigir a la lista de servicios
         else:
-            messages.error(request, "Por favor, corrige los errores del formulario.")
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
     else:
         form = ServicioForm(equipos_disponibles=equipos_disponibles)
 
     return render(request, "servicios/crear_servicio.html", {"form": form})
+
+
+
+@login_required
+@user_passes_test(is_tecnico)
+def crear_equipo_tecnico(request):
+    """
+    Permite a los técnicos crear equipos y asociarlos a clientes existentes.
+    """
+    if request.method == "POST":
+        form = EquipoForm(request.POST)
+        if form.is_valid():
+            equipo = form.save(commit=False)
+            equipo.save()
+            messages.success(request, "Equipo creado exitosamente.")
+            return redirect("lista_equipos")
+        else:
+            messages.error(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = EquipoForm()
+
+    return render(request, "servicios/crear_equipo_tecnico.html", {"form": form})
+
 
 # CRUD de Incidentes
 @login_required

@@ -1,20 +1,21 @@
-from django import forms
 from ServiceTrack.models import Servicio, Repuesto, Capacitacion, ObservacionIncidente, Usuario, TipoObservacion
-
 from django import forms
 from ServiceTrack.models import Servicio, Equipo, Usuario
+from django.core.exceptions import ValidationError
+from datetime import datetime
 
 class ServicioForm(forms.ModelForm):
     cliente = forms.CharField(
         required=False,
         label="Cliente",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
     )
 
     class Meta:
         model = Servicio
-        fields = ['cliente', 'equipo', 'tecnico', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
+        fields = ['cliente', 'equipo', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
         widgets = {
+            'equipo': forms.Select(attrs={'class': 'form-control'}),
             'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
             'diagnostico_inicial': forms.Textarea(attrs={'class': 'form-control'}),
@@ -26,12 +27,9 @@ class ServicioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if equipos_disponibles is not None:
-            # Aplica el queryset de equipos disponibles
             self.fields['equipo'].queryset = equipos_disponibles
-
-            # Personaliza las etiquetas que se muestran en el desplegable del equipo
             self.fields['equipo'].label_from_instance = lambda obj: (
-                f"{obj.marca} {obj.modelo} - {obj.cliente.nombre if obj.cliente else 'Sin Cliente'} - {obj.cliente.cedula if obj.cliente else 'Sin Cédula'}"
+                f"{obj.marca} {obj.modelo} - Cliente: {obj.cliente.nombre}"
             )
 
     def clean(self):
@@ -44,10 +42,10 @@ class ServicioForm(forms.ModelForm):
         if equipo and not equipo.cliente:
             self.add_error('equipo', 'El equipo seleccionado no tiene un cliente asociado.')
         else:
-            # Asigna el nombre del cliente al campo de solo lectura
-            cleaned_data['cliente'] = equipo.cliente.nombre if equipo.cliente else None
+            cleaned_data['cliente'] = equipo.cliente.nombre if equipo and equipo.cliente else None
 
         return cleaned_data
+
 
 
 class RepuestoForm(forms.ModelForm):
@@ -137,10 +135,31 @@ class RepuestoForm(forms.ModelForm):
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+
 class EquipoForm(forms.ModelForm):
     class Meta:
         model = Equipo
         fields = ['cliente', 'marca', 'modelo', 'anio', 'tipo_equipo', 'observaciones']
         widgets = {
-            'observaciones': forms.Textarea(attrs={'rows': 3}),
+            'cliente': forms.Select(attrs={'class': 'form-control select2'}),
+            'marca': forms.TextInput(attrs={'class': 'form-control'}),
+            'modelo': forms.TextInput(attrs={'class': 'form-control'}),
+            'anio': forms.NumberInput(attrs={'class': 'form-control'}),
+            'tipo_equipo': forms.TextInput(attrs={'class': 'form-control'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
+    def clean_anio(self):
+        """
+        Valida que el año sea razonable y esté dentro del rango lógico.
+        """
+        anio = self.cleaned_data.get('anio')
+        current_year = datetime.now().year
+        min_year = 1980  # Año mínimo razonable para equipos
+
+        if anio is not None:
+            if anio < min_year:
+                raise ValidationError(f"El año debe ser posterior a {min_year}.")
+            if anio > current_year:
+                raise ValidationError(f"El año no puede ser mayor al actual ({current_year}).")
+        return anio

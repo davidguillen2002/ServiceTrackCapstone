@@ -961,31 +961,21 @@ class Recompensa(models.Model):
         related_name="recompensas",
         help_text="Temporada a la que pertenece esta recompensa."
     )
-    descripcion = models.TextField(
-        help_text="Descripción detallada de la recompensa."
-    )
-    valor = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        help_text="Valor monetario o simbólico asociado a la recompensa."
-    )
-    puntos_necesarios = models.IntegerField(
-        help_text="Cantidad de puntos requeridos para redimir esta recompensa."
-    )
-    tipo = models.CharField(
-        max_length=50,
-        help_text="Tipo de recompensa: bono, herramienta o trofeo."
-    )
+    descripcion = models.TextField(help_text="Descripción detallada de la recompensa.")
+    valor = models.DecimalField(max_digits=10, decimal_places=2, help_text="Valor monetario o simbólico asociado a la recompensa.")
+    puntos_necesarios = models.IntegerField(help_text="Cantidad de puntos requeridos para redimir esta recompensa.")
+    tipo = models.CharField(max_length=50, help_text="Tipo de recompensa: bono, herramienta o trofeo.")
     reto = models.OneToOneField(
         'Reto',
         on_delete=models.SET_NULL,
         related_name="recompensa",
-        null=True,  # Permitir valores nulos
-        blank=True,  # Opcional en formularios
+        null=True,
+        blank=True,
         help_text="Reto asociado directamente a esta recompensa (opcional)."
     )
     usuarios_redimidos = models.ManyToManyField(
         'Usuario',
+        through='RecompensaUsuario',
         related_name="recompensas_redimidas",
         blank=True,
         help_text="Usuarios que han redimido esta recompensa."
@@ -993,10 +983,7 @@ class Recompensa(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=['reto'],
-                name='unique_recompensa_por_reto'
-            )
+            models.UniqueConstraint(fields=['reto'], name='unique_recompensa_por_reto')
         ]
         ordering = ['temporada', 'tipo']
         verbose_name = "Recompensa"
@@ -1007,15 +994,34 @@ class Recompensa(models.Model):
 
     def verificar_y_otorgar(self, usuario):
         """
-        Verifica si el usuario cumple con el reto asociado y otorga la recompensa si es aplicable.
+        Verifica si la recompensa puede ser otorgada al usuario y realiza el registro si es aplicable.
         """
-        if self.reto:
-            reto_usuario = RetoUsuario.objects.filter(usuario=usuario, reto=self.reto).first()
-            if reto_usuario and reto_usuario.cumplido:
-                if not self.usuarios_redimidos.filter(id=usuario.id).exists():
-                    self.usuarios_redimidos.add(usuario)
-                    return True
-        return False
+        # Verificar si el usuario ya tiene esta recompensa
+        recompensa_usuario = RecompensaUsuario.objects.filter(usuario=usuario, recompensa=self).exists()
+        if not recompensa_usuario:
+            # Crear la relación entre el usuario y la recompensa
+            RecompensaUsuario.objects.create(usuario=usuario, recompensa=self)
+            print(f"[INFO] Recompensa '{self.descripcion}' otorgada al usuario '{usuario.username}'.")
+        else:
+            print(f"[INFO] El usuario '{usuario.username}' ya tiene la recompensa '{self.descripcion}'.")
+
+
+
+class RecompensaUsuario(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="recompensas_usuario")
+    recompensa = models.ForeignKey(Recompensa, on_delete=models.CASCADE, related_name="usuarios_asignados")
+    redimido = models.BooleanField(default=False, help_text="Indica si el usuario ya redimió esta recompensa.")
+    fecha_asignacion = models.DateTimeField(auto_now_add=True)
+    fecha_redencion = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('usuario', 'recompensa')
+        verbose_name = "Recompensa de Usuario"
+        verbose_name_plural = "Recompensas de Usuarios"
+
+    def __str__(self):
+        return f"{self.usuario.nombre} - {self.recompensa.descripcion} - Redimido: {self.redimido}"
+
 
 class ChatMessage(models.Model):
     user = models.ForeignKey(

@@ -3,7 +3,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ServiceTrack.models import Guia, Servicio
 
 # Cargar un modelo preentrenado de embeddings semánticos
-model = SentenceTransformer('all-MiniLM-L6-v2')  # Cambia el modelo según sea necesario
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def get_similar_guides(current_service):
     # Obtener guías relevantes relacionadas con el equipo del servicio actual

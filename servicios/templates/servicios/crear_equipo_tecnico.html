@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% load widget_tweaks %} <!-- Carga el filtro necesario -->
-
 {% block title %}Registrar Nuevo Equipo{% endblock %}
 
 {% block content %}
@@ -10,15 +8,13 @@
     <form id="equipoForm" method="POST" novalidate class="needs-validation">
         {% csrf_token %}
         <div class="row g-3">
-            <!-- Iterar sobre los campos del formulario -->
             {% for field in form %}
             <div class="col-md-6">
                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label|default:"Campo" }}</label>
-                {{ field|add_class:"form-control" }}
+                {{ field }}
                 <div class="invalid-feedback">
                     {% for error in field.errors %}{{ error }}{% if not forloop.last %}, {% endif %}{% endfor %}
                 </div>
-                <div class="valid-feedback">Campo válido.</div>
             </div>
             {% endfor %}
         </div>
@@ -29,7 +25,20 @@
     </form>
 </div>
 
+<!-- Scripts para Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+
 <script>
+    // Inicializar Select2 en el campo de cliente
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.select2').select2({
+            placeholder: "Seleccione un cliente",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+
     // Validación del formulario
     document.getElementById('equipoForm').addEventListener('submit', function (event) {
         let isValid = true;
@@ -64,17 +73,6 @@
         if (!isValid) {
             event.preventDefault();
         }
-    });
-
-    // Validación en tiempo real
-    document.querySelectorAll('.form-control').forEach(field => {
-        field.addEventListener('input', function () {
-            if (field.value.trim() === '') {
-                field.classList.add('is-invalid');
-            } else {
-                field.classList.remove('is-invalid');
-            }
-        });
     });
 </script>
 {% endblock %}

@@ -53,5 +53,6 @@ urlpatterns = [
     path('incidente/<int:incidente_id>/notificar/', views.notificar_incidente, name='notificar_incidente'),
     path('servicio/<int:servicio_id>/agregar_repuesto/', views.agregar_repuesto, name='agregar_repuesto'),
     path('api/equipo_cliente/', views.api_equipo_cliente, name='api_equipo_cliente'),
+    path('equipos/crear_tecnico/', views.crear_equipo_tecnico, name='crear_equipo_tecnico'),
 
 ]

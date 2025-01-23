@@ -14,11 +14,10 @@
             {% for field in form %}
             <div class="col-md-6">
                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label|default:"Campo" }}</label>
-                {{ field|add_class:"form-control" }}
+                {{ field }}
                 <div class="invalid-feedback">
                     {% for error in field.errors %}{{ error }}{% if not forloop.last %}, {% endif %}{% endfor %}
                 </div>
-                <div class="valid-feedback">Campo válido.</div>
             </div>
             {% endfor %}
         </div>
@@ -33,22 +32,36 @@
     // Validación del formulario
     document.getElementById('equipoEditForm').addEventListener('submit', function (event) {
         let isValid = true;
+        const anioField = document.querySelector('#id_anio'); // Campo del año
+        const currentYear = new Date().getFullYear(); // Año actual
+        const minYear = 1980; // Año mínimo razonable
+
         const fields = document.querySelectorAll('.form-control');
 
         fields.forEach(field => {
             if (field.value.trim() === '') {
                 field.classList.add('is-invalid');
-                field.classList.remove('is-valid');
                 isValid = false;
             } else {
                 field.classList.remove('is-invalid');
-                field.classList.add('is-valid');
             }
         });
 
+        // Validación específica del año
+        if (anioField) {
+            const anioValue = parseInt(anioField.value, 10);
+            if (anioValue < minYear || anioValue > currentYear) {
+                anioField.classList.add('is-invalid');
+                const feedback = anioField.nextElementSibling;
+                feedback.textContent = `El año debe estar entre ${minYear} y ${currentYear}.`;
+                isValid = false;
+            } else {
+                anioField.classList.remove('is-invalid');
+            }
+        }
+
         if (!isValid) {
             event.preventDefault();
-            event.stopPropagation();
         }
     });
 
@@ -57,10 +70,8 @@
         field.addEventListener('input', function () {
             if (field.value.trim() === '') {
                 field.classList.add('is-invalid');
-                field.classList.remove('is-valid');
             } else {
                 field.classList.remove('is-invalid');
-                field.classList.add('is-valid');
             }
         });
     });

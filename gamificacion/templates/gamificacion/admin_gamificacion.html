@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block title %}Administración de Gamificación{% endblock %}
 {% block content %}
 <div class="container mt-5">
@@ -14,7 +15,6 @@
     </form>
 
     <!-- Temporadas -->
-    <!-- Formulario para crear temporadas -->
     <h2 class="mt-5 text-secondary">📅 Temporadas</h2>
     <form id="form-crear-temporada" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
@@ -37,44 +37,33 @@
         <li class="list-group-item text-center">No hay temporadas registradas.</li>
         {% endfor %}
     </ul>
-    <div class="d-flex justify-content-center">
-        {% if temporadas.has_other_pages %}
-        <nav>
-            <ul class="pagination">
-                {% if temporadas.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?temporadas_page={{ temporadas.previous_page_number }}">Anterior</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Anterior</a>
-                </li>
-                {% endif %}
+    {% if temporadas.has_other_pages %}
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if temporadas.has_previous %}
+            <li class="page-item"><a class="page-link" href="?temporadas_page={{ temporadas.previous_page_number }}">Anterior</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
 
-                {% for page_num in temporadas.paginator.page_range %}
-                {% if temporadas.number == page_num %}
-                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
-                {% else %}
-                <li class="page-item"><a class="page-link" href="?temporadas_page={{ page_num }}">{{ page_num }}</a></li>
-                {% endif %}
-                {% endfor %}
+            {% for num in temporadas.paginator.page_range %}
+            {% if temporadas.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?temporadas_page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
 
-                {% if temporadas.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?temporadas_page={{ temporadas.next_page_number }}">Siguiente</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Siguiente</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
-    </div>
+            {% if temporadas.has_next %}
+            <li class="page-item"><a class="page-link" href="?temporadas_page={{ temporadas.next_page_number }}">Siguiente</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 
     <!-- Retos -->
-    <!-- Formulario para crear retos -->
     <h2 class="mt-5 text-secondary">📜 Retos</h2>
     <form id="form-crear-reto" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
@@ -85,7 +74,7 @@
         {% for reto in retos %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
-                <strong>{{ reto.nombre }}</strong> (Nivel: {{ reto.nivel }})
+                <strong>{{ reto.nombre }}</strong> (Nivel: {{ reto.nivel }}, Temporada: {{ reto.temporada.nombre }})
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
@@ -97,44 +86,33 @@
         <li class="list-group-item text-center">No hay retos registrados.</li>
         {% endfor %}
     </ul>
-    <div class="d-flex justify-content-center">
-        {% if retos.has_other_pages %}
-        <nav>
-            <ul class="pagination">
-                {% if retos.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?retos_page={{ retos.previous_page_number }}">Anterior</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Anterior</a>
-                </li>
-                {% endif %}
+    {% if retos.has_other_pages %}
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if retos.has_previous %}
+            <li class="page-item"><a class="page-link" href="?retos_page={{ retos.previous_page_number }}">Anterior</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
 
-                {% for page_num in retos.paginator.page_range %}
-                {% if retos.number == page_num %}
-                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
-                {% else %}
-                <li class="page-item"><a class="page-link" href="?retos_page={{ page_num }}">{{ page_num }}</a></li>
-                {% endif %}
-                {% endfor %}
+            {% for num in retos.paginator.page_range %}
+            {% if retos.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?retos_page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
 
-                {% if retos.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?retos_page={{ retos.next_page_number }}">Siguiente</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Siguiente</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
-    </div>
+            {% if retos.has_next %}
+            <li class="page-item"><a class="page-link" href="?retos_page={{ retos.next_page_number }}">Siguiente</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 
     <!-- Recompensas -->
-    <!-- Formulario para crear recompensas -->
     <h2 class="mt-5 text-secondary">🎁 Recompensas</h2>
     <form id="form-crear-recompensa" class="mb-3 shadow p-4 rounded bg-light">
         {% csrf_token %}
@@ -145,7 +123,7 @@
         {% for recompensa in recompensas %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
-                <strong>{{ recompensa.descripcion }}</strong> ({{ recompensa.tipo }})
+                <strong>{{ recompensa.descripcion }}</strong> ({{ recompensa.tipo }}, Temporada: {{ recompensa.temporada.nombre }})
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
@@ -157,44 +135,33 @@
         <li class="list-group-item text-center">No hay recompensas registradas.</li>
         {% endfor %}
     </ul>
-    <div class="d-flex justify-content-center">
-        {% if recompensas.has_other_pages %}
-        <nav>
-            <ul class="pagination">
-                {% if recompensas.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?recompensas_page={{ recompensas.previous_page_number }}">Anterior</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Anterior</a>
-                </li>
-                {% endif %}
+    {% if recompensas.has_other_pages %}
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if recompensas.has_previous %}
+            <li class="page-item"><a class="page-link" href="?recompensas_page={{ recompensas.previous_page_number }}">Anterior</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
 
-                {% for page_num in recompensas.paginator.page_range %}
-                {% if recompensas.number == page_num %}
-                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
-                {% else %}
-                <li class="page-item"><a class="page-link" href="?recompensas_page={{ page_num }}">{{ page_num }}</a></li>
-                {% endif %}
-                {% endfor %}
+            {% for num in recompensas.paginator.page_range %}
+            {% if recompensas.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?recompensas_page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
 
-                {% if recompensas.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?recompensas_page={{ recompensas.next_page_number }}">Siguiente</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Siguiente</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
-    </div>
+            {% if recompensas.has_next %}
+            <li class="page-item"><a class="page-link" href="?recompensas_page={{ recompensas.next_page_number }}">Siguiente</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 
     <!-- Medallas -->
-    <!-- Formulario para crear medallas -->
     <h2 class="mt-5 text-secondary">🏅 Medallas</h2>
     <form id="form-crear-medalla" class="mb-3 shadow p-4 rounded bg-light" enctype="multipart/form-data">
         {% csrf_token %}
@@ -205,7 +172,7 @@
         {% for medalla in medallas %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
-                <strong>{{ medalla.nombre }}</strong> (Nivel: {{ medalla.nivel_requerido }})
+                <strong>{{ medalla.nombre }}</strong> (Nivel: {{ medalla.nivel_requerido }}, Temporada: {{ medalla.temporada.nombre|default:"Sin Temporada" }})
             </span>
             <form method="post" class="d-inline">
                 {% csrf_token %}
@@ -217,187 +184,83 @@
         <li class="list-group-item text-center">No hay medallas registradas.</li>
         {% endfor %}
     </ul>
-    <div class="d-flex justify-content-center">
-        {% if medallas.has_other_pages %}
-        <nav>
-            <ul class="pagination">
-                {% if medallas.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?medallas_page={{ medallas.previous_page_number }}">Anterior</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Anterior</a>
-                </li>
-                {% endif %}
+    {% if medallas.has_other_pages %}
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if medallas.has_previous %}
+            <li class="page-item"><a class="page-link" href="?medallas_page={{ medallas.previous_page_number }}">Anterior</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
 
-                {% for page_num in medallas.paginator.page_range %}
-                {% if medallas.number == page_num %}
-                <li class="page-item active"><a class="page-link">{{ page_num }}</a></li>
-                {% else %}
-                <li class="page-item"><a class="page-link" href="?medallas_page={{ page_num }}">{{ page_num }}</a></li>
-                {% endif %}
-                {% endfor %}
+            {% for num in medallas.paginator.page_range %}
+            {% if medallas.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?medallas_page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
 
-                {% if medallas.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?medallas_page={{ medallas.next_page_number }}">Siguiente</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">Siguiente</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
-    </div>
+            {% if medallas.has_next %}
+            <li class="page-item"><a class="page-link" href="?medallas_page={{ medallas.next_page_number }}">Siguiente</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
 <script>
-// Script para crear temporada
-document.getElementById('form-crear-temporada').addEventListener('submit', function (e) {
-    e.preventDefault(); // Evitar recargar la página
+// Scripts genéricos para formularios AJAX
+function handleFormSubmission(formId, listId, url, templateCallback) {
+    document.getElementById(formId).addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
 
-    const form = e.target;
-    const formData = new FormData(form);
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(listId).insertAdjacentHTML('beforeend', templateCallback(data));
+                form.reset();
+            } else {
+                alert('Error: ' + JSON.stringify(data.errors));
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+}
 
-    fetch('{% url "crear_temporada_ajax" %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Actualizar la lista de temporadas
-            const lista = document.getElementById('lista-temporadas');
-            const nuevaTemporada = `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                        <strong>${data.temporada.nombre}</strong> (${data.temporada.fecha_inicio} - ${data.temporada.fecha_fin})
-                    </span>
-                </li>`;
-            lista.insertAdjacentHTML('beforeend', nuevaTemporada);
+// Configuración de formularios específicos con URLs
+handleFormSubmission('form-crear-temporada', 'lista-temporadas', '{% url "crear_temporada_ajax" %}', data => `
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><strong>${data.temporada.nombre}</strong> (${data.temporada.fecha_inicio} - ${data.temporada.fecha_fin})</span>
+    </li>
+`);
 
-            // Limpiar el formulario
-            form.reset();
-        } else {
-            alert('Error al crear la temporada: ' + JSON.stringify(data.errors));
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
+handleFormSubmission('form-crear-reto', 'lista-retos', '{% url "crear_reto_ajax" %}', data => `
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><strong>${data.reto.nombre}</strong> (Nivel: ${data.reto.nivel}, Temporada: ${data.reto.temporada})</span>
+    </li>
+`);
 
-// Script para crear reto
-document.getElementById('form-crear-reto').addEventListener('submit', function (e) {
-    e.preventDefault(); // Evitar recargar la página
+handleFormSubmission('form-crear-recompensa', 'lista-recompensas', '{% url "crear_recompensa_ajax" %}', data => `
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><strong>${data.recompensa.descripcion}</strong> (${data.recompensa.tipo}, Temporada: ${data.recompensa.temporada})</span>
+    </li>
+`);
 
-    const form = e.target;
-    const formData = new FormData(form);
-
-    fetch('{% url "crear_reto_ajax" %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Actualizar la lista de retos
-            const lista = document.getElementById('lista-retos');
-            const nuevoReto = `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                        <strong>${data.reto.nombre}</strong> (Nivel: ${data.reto.nivel})
-                    </span>
-                </li>`;
-            lista.insertAdjacentHTML('beforeend', nuevoReto);
-
-            // Limpiar el formulario
-            form.reset();
-        } else {
-            alert('Error al crear el reto: ' + JSON.stringify(data.errors));
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
-
-// Script para crear recompensa
-document.getElementById('form-crear-recompensa').addEventListener('submit', function (e) {
-    e.preventDefault(); // Evitar recargar la página
-
-    const form = e.target;
-    const formData = new FormData(form);
-
-    fetch('{% url "crear_recompensa_ajax" %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Actualizar la lista de recompensas
-            const lista = document.getElementById('lista-recompensas');
-            const nuevaRecompensa = `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                        <strong>${data.recompensa.descripcion}</strong> (${data.recompensa.tipo})
-                    </span>
-                </li>`;
-            lista.insertAdjacentHTML('beforeend', nuevaRecompensa);
-
-            // Limpiar el formulario
-            form.reset();
-        } else {
-            alert('Error al crear la recompensa: ' + JSON.stringify(data.errors));
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
-
-// Script para crear medalla
-document.getElementById('form-crear-medalla').addEventListener('submit', function (e) {
-    e.preventDefault(); // Evitar recargar la página
-
-    const form = e.target;
-    const formData = new FormData(form);
-
-    fetch('{% url "crear_medalla_ajax" %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Actualizar la lista de medallas
-            const lista = document.getElementById('lista-medallas');
-            const nuevaMedalla = `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                        <strong>${data.medalla.nombre}</strong> (Nivel: ${data.medalla.nivel_requerido})
-                    </span>
-                </li>`;
-            lista.insertAdjacentHTML('beforeend', nuevaMedalla);
-
-            // Limpiar el formulario
-            form.reset();
-        } else {
-            alert('Error al crear la medalla: ' + JSON.stringify(data.errors));
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
+handleFormSubmission('form-crear-medalla', 'lista-medallas', '{% url "crear_medalla_ajax" %}', data => `
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><strong>${data.medalla.nombre}</strong> (Nivel: ${data.medalla.nivel_requerido}, Temporada: ${data.medalla.temporada})</span>
+    </li>
+`);
 </script>
 
 {% endblock %}

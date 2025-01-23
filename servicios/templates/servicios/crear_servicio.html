@@ -23,39 +23,64 @@
                 {% csrf_token %}
 
                 <!-- Campo de Cliente (solo lectura) -->
-                <div class="form-group">
-                    <label for="cliente">Cliente</label>
+                <div class="mb-3">
+                    <label for="id_cliente" class="form-label">Cliente</label>
                     <input type="text" id="id_cliente" class="form-control" readonly>
                 </div>
 
                 <!-- Campo de Equipo -->
-                <div class="form-group">
-                    <label for="equipo">Equipo</label>
+                <div class="mb-3">
+                    <label for="id_equipo" class="form-label">Equipo</label>
                     {{ form.equipo }}
+                    <div class="text-danger">
+                        {% for error in form.equipo.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <!-- Campo de Fecha de Inicio -->
-                <div class="form-group">
-                    <label for="fecha_inicio">Fecha de Inicio</label>
+                <div class="mb-3">
+                    <label for="id_fecha_inicio" class="form-label">Fecha de Inicio</label>
                     {{ form.fecha_inicio }}
+                    <div class="text-danger">
+                        {% for error in form.fecha_inicio.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <!-- Campo de Estado -->
-                <div class="form-group">
-                    <label for="estado">Estado</label>
+                <div class="mb-3">
+                    <label for="id_estado" class="form-label">Estado</label>
                     {{ form.estado }}
+                    <div class="text-danger">
+                        {% for error in form.estado.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <!-- Campo de Diagnóstico Inicial -->
-                <div class="form-group">
-                    <label for="diagnostico_inicial">Diagnóstico Inicial</label>
+                <div class="mb-3">
+                    <label for="id_diagnostico_inicial" class="form-label">Diagnóstico Inicial</label>
                     {{ form.diagnostico_inicial }}
+                    <div class="text-danger">
+                        {% for error in form.diagnostico_inicial.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <!-- Campo de Costo -->
-                <div class="form-group">
-                    <label for="costo">Costo</label>
+                <div class="mb-3">
+                    <label for="id_costo" class="form-label">Costo</label>
                     {{ form.costo }}
+                    <div class="text-danger">
+                        {% for error in form.costo.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <!-- Botones de acción -->
