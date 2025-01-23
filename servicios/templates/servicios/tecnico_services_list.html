@@ -7,6 +7,14 @@
     <h1>Mis Servicios</h1>
     <p>Selecciona un servicio para ver más opciones o crea nuevos registros.</p>
 
+    <!-- Formulario de búsqueda -->
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Buscar por número de servicio" value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+    </form>
+
     <!-- Botones para crear cliente, servicio y equipo -->
     <div class="mb-3">
         <a href="{% url 'crear_cliente' %}" class="btn btn-success">Crear Cliente</a>
@@ -14,18 +22,13 @@
         <a href="{% url 'crear_equipo_tecnico' %}" class="btn btn-info">Crear Equipo</a>
     </div>
 
-
     <!-- Listado de servicios -->
     <ul class="list-group mb-4">
         {% for service in services %}
             <li class="list-group-item">
-                <!-- Información del equipo -->
                 <h5>{{ service.equipo.marca }} {{ service.equipo.modelo }} ({{ service.equipo.anio }})</h5>
-
-                <!-- Fecha de inicio -->
+                <p><strong>ID del Servicio:</strong> {{ service.id }}</p>
                 <p><strong>Fecha de Inicio:</strong> {{ service.fecha_inicio|date:"d/m/Y" }}</p>
-
-                <!-- Estado con etiquetas -->
                 <p><strong>Estado:</strong>
                     {% if service.estado == "pendiente" %}
                         <span class="badge bg-secondary">Pendiente</span>
@@ -35,46 +38,17 @@
                         <span class="badge bg-success">Completado</span>
                     {% endif %}
                 </p>
-
-                <!-- Entrega confirmada -->
-                <p><strong>Entrega Confirmada:</strong>
-                    {% if service.entrega_confirmada %}
-                        <span class="text-success">Sí</span>
-                    {% else %}
-                        <span class="text-danger">No</span>
-                    {% endif %}
-                </p>
-
-                <!-- Último incidente registrado -->
-                <p><strong>Último Incidente:</strong>
-                    {% with service.observaciones.last as ultimo_incidente %}
-                        {% if ultimo_incidente %}
-                            {{ ultimo_incidente.descripcion|truncatewords:10 }}
-                        {% else %}
-                            <span class="text-muted">Ninguno registrado.</span>
-                        {% endif %}
-                    {% endwith %}
-                </p>
-
-                <!-- Botones de acción -->
                 <div class="d-flex gap-2">
                     <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías</a>
                     <a href="{% url 'detalle_servicio' service.id %}" class="btn btn-outline-info btn-sm">Detalles</a>
-                    <a href="{% url 'listar_incidentes' service.id %}" class="btn btn-warning btn-sm">Incidentes</a>
-                    {% if not service.entrega_confirmada %}
-                        <a href="{% url 'confirmar_entrega' service.id %}" class="btn btn-outline-success btn-sm">
-                            Confirmar Entrega
-                        </a>
-                    {% endif %}
-                    {% if service.estado != "completado" %}
-                        <a href="{% url 'actualizar_estado_servicio' service.id %}" class="btn btn-outline-warning btn-sm">
-                            Actualizar Estado
-                        </a>
-                    {% endif %}
+                    <form method="post" action="{% url 'actualizar_estado_servicio' service.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success btn-sm">Actualizar Estado</button>
+                    </form>
                 </div>
             </li>
         {% empty %}
-            <li class="list-group-item text-center">No tienes servicios registrados.</li>
+            <li class="list-group-item text-center">No se encontraron servicios.</li>
         {% endfor %}
     </ul>
 
@@ -83,12 +57,11 @@
         <ul class="pagination justify-content-center">
             {% if services.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ services.previous_page_number }}" aria-label="Anterior">
+                    <a class="page-link" href="?q={{ query }}&page={{ services.previous_page_number }}" aria-label="Anterior">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
             {% endif %}
-
             {% for num in services.paginator.page_range %}
                 {% if services.number == num %}
                     <li class="page-item active">
@@ -96,14 +69,13 @@
                     </li>
                 {% elif num > services.number|add:'-3' and num < services.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
-
             {% if services.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ services.next_page_number }}" aria-label="Siguiente">
+                    <a class="page-link" href="?q={{ query }}&page={{ services.next_page_number }}" aria-label="Siguiente">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

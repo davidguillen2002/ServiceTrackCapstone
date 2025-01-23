@@ -456,14 +456,21 @@ def historial_servicios(request, equipo_id):
 @user_passes_test(is_tecnico)
 def tecnico_services_list(request):
     """Vista para mostrar todos los servicios asociados a un técnico con paginación."""
+    query = request.GET.get('q', '')  # Captura el parámetro de búsqueda
     services = Servicio.objects.filter(tecnico=request.user).order_by('-fecha_inicio')
+
+    if query:
+        services = services.filter(Q(id=query))  # Filtra por ID del servicio
 
     # Paginación: Mostrar 5 servicios por página
     paginator = Paginator(services, 5)  # Cambia el número para ajustar los elementos por página
     page_number = request.GET.get('page')
     paginated_services = paginator.get_page(page_number)
 
-    return render(request, 'servicios/tecnico_services_list.html', {'services': paginated_services})
+    return render(request, 'servicios/tecnico_services_list.html', {
+        'services': paginated_services,
+        'query': query  # Enviar el valor de búsqueda al template
+    })
 
 @login_required
 @user_passes_test(lambda u: u.rol.nombre in ["tecnico", "administrador"])

@@ -92,7 +92,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],  # Puerto por defecto de Redis
+            "hosts": [("127.0.0.1", 6380)],  # Puerto por defecto de Redis
         },
     },
 }
@@ -105,9 +105,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'service_track_db',
         'USER': 'postgres',
-        'PASSWORD': 'Monono123',
+        'PASSWORD': 'post17clave',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT':'5432',
     }
 }
 
