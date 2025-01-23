@@ -15,27 +15,20 @@ import os
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
 
+# Cargar variables de entorno desde .env
 load_dotenv()
+
+# Variables de entorno
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'default-secret-key')
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
+
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i0e#mthtw92v#n76vfrvlhru05d)zgq=ip6&ct_!jx4awzthm1'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,9 +48,9 @@ INSTALLED_APPS = [
     'widget_tweaks',
 ]
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para servir archivos estáticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,7 +64,7 @@ ROOT_URLCONF = 'ServiceTrack.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / 'ServiceTrack' / 'templates' ],
+        'DIRS': [BASE_DIR / 'ServiceTrack' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,32 +81,29 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'ServiceTrack.asgi.application'
 
+# Configuración de Redis para Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6380)],  # Puerto por defecto de Redis
+            "hosts": [os.getenv('REDIS_URL', 'redis://127.0.0.1:6380')],
         },
     },
 }
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+# Configuración de la base de datos (PostgreSQL)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'service_track_db',
-        'USER': 'postgres',
-        'PASSWORD': 'post17clave',
-        'HOST': 'localhost',
-        'PORT':'5432',
+        'NAME': os.getenv('DB_NAME', 'default_db'),
+        'USER': os.getenv('DB_USER', 'default_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'default_password'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -129,34 +119,30 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
+# Archivos estáticos y medios
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']  # Asegúrate de que esta línea está presente
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/auth/login/'  # URL donde los usuarios no autenticados serán redirigidos
-LOGIN_REDIRECT_URL = 'home'  # Redirige a la vista principal que redirecciona por rol
-LOGOUT_REDIRECT_URL = 'home'  # Redirige a la vista home después de cerrar sesión
+# Configuración de autenticación
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
+# Configuración de mensajes
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
     messages.INFO: 'alert-info',
@@ -165,7 +151,5 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+# Configuración del modelo de usuario personalizado
 AUTH_USER_MODEL = 'ServiceTrack.Usuario'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
