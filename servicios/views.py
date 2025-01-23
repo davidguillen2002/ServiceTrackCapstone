@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q, Avg, F, Q, FloatField, ExpressionWrapper, Count
-from django.db.models.functions import Coalesce
+from django.db.models import Avg, F, Q, FloatField, ExpressionWrapper, Count, Value
+from django.db.models.functions import Coalesce, Concat
 from django.contrib.auth.decorators import user_passes_test, login_required
 from ServiceTrack.models import Guia, Categoria, Servicio, Usuario, Notificacion, Equipo, ChatMessage, Capacitacion, ObservacionIncidente, Rol
 from seguimiento.forms import ServicioEstadoForm
@@ -115,24 +115,52 @@ def obtener_cliente_por_equipo(request):
 def actualizar_estado_servicio(request, servicio_id):
     servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
 
+    # Validar si el estado actual ya está completado, no se puede editar
+    if servicio.estado.lower() == "completado":
+        messages.error(request, f"El estado del servicio #{servicio.id} ya está completado y no puede ser modificado.")
+        return redirect("detalle_servicio", servicio_id=servicio.id)
+
     if request.method == "POST":
         estado_anterior = servicio.estado
         form = ServicioEstadoForm(request.POST, instance=servicio)
         if form.is_valid():
+            nuevo_estado = form.cleaned_data.get('estado').lower()
+
+            # Validaciones de transición de estados
+            if estado_anterior.lower() == "en_progreso" and nuevo_estado == "pendiente":
+                messages.error(request, "No puede cambiar un servicio 'En Progreso' a 'Pendiente'.")
+                return redirect("actualizar_estado_servicio", servicio_id=servicio.id)
+
             with transaction.atomic():
                 servicio = form.save()
 
-                # Crear notificación para el cliente
-                Notificacion.crear_notificacion(
-                    usuario=servicio.equipo.cliente,
-                    tipo="actualizacion_servicio",
-                    mensaje=(
-                        f"El estado de su servicio para el equipo {servicio.equipo.marca} "
-                        f"{servicio.equipo.modelo} ha cambiado de '{estado_anterior}' a '{servicio.estado}'."
-                    )
-                )
+                # Si el estado cambia a "completado", generar el código de entrega
+                if nuevo_estado == "completado":
+                    servicio.generar_codigo_entrega()
 
-            messages.success(request, "Estado del servicio actualizado y cliente notificado.")
+                    # Notificar al cliente sobre el cambio de estado y el código de entrega
+                    Notificacion.crear_notificacion(
+                        usuario=servicio.equipo.cliente,
+                        tipo="codigo_entrega",
+                        mensaje=(
+                            f"El estado de su servicio #{servicio.id} para el equipo {servicio.equipo.marca} "
+                            f"{servicio.equipo.modelo} ha cambiado a 'Completado'. "
+                            f"Su código de entrega es: {servicio.codigo_entrega}."
+                        )
+                    )
+                    messages.success(request, f"Estado del servicio #{servicio.id} cambiado a 'Completado', código de entrega generado y cliente notificado.")
+                else:
+                    # Notificar al cliente sobre cualquier otro cambio de estado
+                    Notificacion.crear_notificacion(
+                        usuario=servicio.equipo.cliente,
+                        tipo="actualizacion_servicio",
+                        mensaje=(
+                            f"El estado de su servicio #{servicio.id} para el equipo {servicio.equipo.marca} "
+                            f"{servicio.equipo.modelo} ha cambiado de '{estado_anterior}' a '{servicio.estado}'."
+                        )
+                    )
+                    messages.success(request, f"Estado del servicio #{servicio.id} actualizado y cliente notificado.")
+
             return redirect("detalle_servicio", servicio_id=servicio.id)
         else:
             messages.error(request, "Por favor, corrige los errores en el formulario.")
@@ -143,7 +171,6 @@ def actualizar_estado_servicio(request, servicio_id):
         "form": form,
         "servicio": servicio,
     })
-
 
 @login_required
 @user_passes_test(is_tecnico)
@@ -456,20 +483,42 @@ def historial_servicios(request, equipo_id):
 @user_passes_test(is_tecnico)
 def tecnico_services_list(request):
     """Vista para mostrar todos los servicios asociados a un técnico con paginación."""
-    query = request.GET.get('q', '')  # Captura el parámetro de búsqueda
-    services = Servicio.objects.filter(tecnico=request.user).order_by('-fecha_inicio')
+    # Capturar parámetros de búsqueda
+    query = request.GET.get('q', '')  # ID del servicio
+    equipo_nombre = request.GET.get('equipo_nombre', '')  # Nombre del equipo
+    cliente_cedula = request.GET.get('cliente_cedula', '')  # Cédula del cliente
+    estado = request.GET.get('estado', '')  # Estado del servicio
 
+    # Filtrar servicios asociados al técnico y ordenar por ID (descendente)
+    services = Servicio.objects.filter(tecnico=request.user).order_by('-id')  # Ordenar por ID de forma descendente
+
+    # Aplicar filtros
     if query:
-        services = services.filter(Q(id=query))  # Filtra por ID del servicio
+        services = services.filter(Q(id=query))  # Filtro por ID del servicio
 
-    # Paginación: Mostrar 5 servicios por página
-    paginator = Paginator(services, 5)  # Cambia el número para ajustar los elementos por página
+    if equipo_nombre:
+        # Combina marca y modelo para buscar coincidencias
+        services = services.annotate(
+            nombre_completo=Concat(F('equipo__marca'), Value(' '), F('equipo__modelo'))
+        ).filter(nombre_completo__icontains=equipo_nombre)
+
+    if cliente_cedula:
+        services = services.filter(equipo__cliente__cedula__icontains=cliente_cedula)  # Filtro por cédula del cliente
+
+    if estado:
+        services = services.filter(estado=estado)  # Filtro por estado del servicio
+
+    # Paginación
+    paginator = Paginator(services, 5)  # Mostrar 5 servicios por página
     page_number = request.GET.get('page')
     paginated_services = paginator.get_page(page_number)
 
     return render(request, 'servicios/tecnico_services_list.html', {
         'services': paginated_services,
-        'query': query  # Enviar el valor de búsqueda al template
+        'query': query,
+        'equipo_nombre': equipo_nombre,
+        'cliente_cedula': cliente_cedula,
+        'estado': estado,
     })
 
 @login_required
@@ -646,8 +695,34 @@ def lista_servicios_cliente(request):
     if request.user.rol.nombre != "cliente":
         return redirect("home")  # Redirige si no es cliente
 
-    # Filtra los servicios relacionados con el cliente
-    servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-fecha_inicio')
+    # Capturar filtros
+    query = request.GET.get('q', '')  # # de servicio
+    tecnico = request.GET.get('tecnico', '')  # Técnico
+    estado = request.GET.get('estado', '')  # Estado del servicio
+    fecha_inicio = request.GET.get('fecha_inicio', '')  # Fecha de inicio
+    equipo_nombre = request.GET.get('equipo_nombre', '')  # Nombre del equipo (marca + modelo)
+
+    # Filtrar los servicios relacionados con el cliente
+    servicios = Servicio.objects.filter(equipo__cliente=request.user).order_by('-id')  # Orden por ID descendente
+
+    # Aplicar filtros
+    if query:
+        servicios = servicios.filter(Q(id=query))  # Filtro por ID del servicio
+
+    if tecnico:
+        servicios = servicios.filter(Q(tecnico__nombre__icontains=tecnico))  # Filtro por técnico (nombre)
+
+    if estado:
+        servicios = servicios.filter(estado=estado)  # Filtro por estado del servicio
+
+    if fecha_inicio:
+        servicios = servicios.filter(fecha_inicio=fecha_inicio)  # Filtro por fecha exacta
+
+    if equipo_nombre:
+        # Combina marca y modelo para buscar coincidencias
+        servicios = servicios.annotate(
+            nombre_equipo=Concat(F('equipo__marca'), Value(' '), F('equipo__modelo'))
+        ).filter(nombre_equipo__icontains=equipo_nombre)
 
     # Configura la paginación (5 servicios por página)
     paginator = Paginator(servicios, 5)
@@ -657,6 +732,11 @@ def lista_servicios_cliente(request):
     # Renderiza el template con los servicios paginados
     return render(request, "servicios/lista_servicios_cliente.html", {
         "servicios": servicios_paginados,  # Pasa los servicios paginados al template
+        "query": query,
+        "tecnico": tecnico,
+        "estado": estado,
+        "fecha_inicio": fecha_inicio,
+        "equipo_nombre": equipo_nombre,
     })
 
 

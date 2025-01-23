@@ -1,35 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}Actualizar Servicio{% endblock %}
+{% block title %}Actualizar Estado del Servicio{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Actualizar Servicio</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Actualizar Estado del Servicio</h1>
 
-    <form method="post">
-        {% csrf_token %}
+    <!-- Mensajes de éxito o error -->
+    {% if messages %}
         <div class="mb-3">
-            <label for="equipo" class="form-label">Equipo</label>
-            {{ form.equipo }}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
         </div>
-        <div class="mb-3">
-            <label for="tecnico" class="form-label">Técnico</label>
-            {{ form.tecnico }}
+    {% endif %}
+
+    <!-- Botones de navegación -->
+    <div class="mb-3">
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-outline-secondary">Volver a Mis Servicios</a>
+    </div>
+
+    <!-- Información del servicio -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Detalles del Servicio</h5>
         </div>
-        <div class="mb-3">
-            <label for="fecha_inicio" class="form-label">Fecha de Recepción</label>
-            {{ form.fecha_inicio }}
+        <div class="card-body">
+            <p><strong>Equipo:</strong> {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</p>
+            <p><strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}</p>
+            <p><strong>Estado Actual:</strong> {{ servicio.get_estado_display }}</p>
         </div>
-        <div class="mb-3">
-            <label for="estado" class="form-label">Estado</label>
-            {{ form.estado }}
+    </div>
+
+    <!-- Formulario para actualizar el estado -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Actualizar Estado</h5>
         </div>
-        <div class="mb-3">
-            <label for="costo" class="form-label">Costo</label>
-            {{ form.costo }}
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-secondary">Volver al Detalle</a>
+                </div>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary">Actualizar Servicio</button>
-        <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+    </div>
 </div>
-{% endblock %}
+{%endblock%}

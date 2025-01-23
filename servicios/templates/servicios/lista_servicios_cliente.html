@@ -6,15 +6,56 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">Mis Servicios</h1>
 
+    <form method="get" class="mb-4">
+        <div class="row">
+            <!-- Filtro por # de servicio -->
+            <div class="col-md-2">
+                <label for="filtro-servicio" class="form-label"># de Servicio</label>
+                <input id="filtro-servicio" type="text" name="q" class="form-control" placeholder="# de servicio" value="{{ query }}">
+            </div>
+            <!-- Filtro por técnico -->
+            <div class="col-md-2">
+                <label for="filtro-tecnico" class="form-label">Técnico</label>
+                <input id="filtro-tecnico" type="text" name="tecnico" class="form-control" placeholder="Técnico" value="{{ tecnico }}">
+            </div>
+            <!-- Filtro por estado -->
+            <div class="col-md-2">
+                <label for="filtro-estado" class="form-label">Estado</label>
+                <select id="filtro-estado" name="estado" class="form-control">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente" {% if estado == "pendiente" %}selected{% endif %}>Pendiente</option>
+                    <option value="en_progreso" {% if estado == "en_progreso" %}selected{% endif %}>En Progreso</option>
+                    <option value="completado" {% if estado == "completado" %}selected{% endif %}>Completado</option>
+                </select>
+            </div>
+            <!-- Filtro por fecha de inicio -->
+            <div class="col-md-2">
+                <label for="filtro-fecha" class="form-label">Fecha de Recepción</label>
+                <input id="filtro-fecha" type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+            </div>
+            <!-- Filtro por nombre del equipo -->
+            <div class="col-md-2">
+                <label for="filtro-equipo" class="form-label">Nombre del Equipo</label>
+                <input id="filtro-equipo" type="text" name="equipo_nombre" class="form-control" placeholder="Nombre del equipo" value="{{ equipo_nombre }}">
+            </div>
+        </div>
+        <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'lista_servicios_cliente' %}" class="btn btn-secondary">Limpiar Filtros</a>
+        </div>
+    </form>
+
+
     {% if servicios %}
     <div class="table-responsive">
         <table class="table table-bordered table-striped text-center align-middle">
             <thead class="table-dark">
                 <tr>
+                    <th># de Servicio</th>
                     <th>Equipo</th>
                     <th>Técnico</th>
                     <th>Estado</th>
-                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Recepción</th>
                     <th>Entrega Confirmada</th>
                     <th>Acciones</th>
                 </tr>
@@ -22,6 +63,7 @@
             <tbody>
                 {% for servicio in servicios %}
                 <tr>
+                    <td>{{ servicio.id }}</td> <!-- Muestra el ID del servicio -->
                     <td>{{ servicio.equipo }}</td>
                     <td>{{ servicio.tecnico }}</td>
                     <td>
@@ -51,7 +93,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">No tienes servicios registrados.</td>
+                    <td colspan="7" class="text-center">No tienes servicios registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -9,12 +9,12 @@
     <form method="get" class="mb-4">
         <div class="row g-3 align-items-center">
             <!-- Número de Servicio -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="id" class="form-label">N° de Servicio</label>
                 <input type="text" id="id" name="id" class="form-control" placeholder="Ejemplo: 123" value="{{ request.GET.id }}">
             </div>
             <!-- Estado -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="estado" class="form-label">Estado</label>
                 <select id="estado" name="estado" class="form-select">
                     <option value="">Todos los estados</option>
@@ -24,14 +24,19 @@
                 </select>
             </div>
             <!-- Fecha de Inicio -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="fecha_inicio" class="form-label">Fecha de Recepción (Desde)</label>
                 <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" value="{{ request.GET.fecha_inicio }}">
             </div>
             <!-- Fecha de Fin -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="fecha_fin" class="form-label">Fecha de Recepción (Hasta)</label>
                 <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin }}">
+            </div>
+            <!-- Nombre del Equipo -->
+            <div class="col-md-2">
+                <label for="equipo_nombre" class="form-label">Nombre del Equipo</label>
+                <input type="text" id="equipo_nombre" name="equipo_nombre" class="form-control" placeholder="Ejemplo: HP Pavilion" value="{{ request.GET.equipo_nombre }}">
             </div>
         </div>
         <div class="row mt-3">
@@ -48,7 +53,7 @@
                 <tr>
                     <th>N° Servicio</th>
                     <th>Equipo</th>
-                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Recepción</th>
                     <th>Fecha Estimada de Finalización</th>
                     <th>Estado</th>
                     <th>Acciones</th>

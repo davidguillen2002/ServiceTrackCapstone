@@ -5,7 +5,7 @@ from ServiceTrack.models import Equipo, Servicio, Notificacion, Usuario
 from .forms import ServicioEstadoForm, ResenaForm
 from django.db import models
 from datetime import datetime
-from django.db.models import Q, Value
+from django.db.models import Q, F, Value
 from django.db.models.functions import Upper, Concat
 
 # Helper to check if the user is a technician
@@ -28,6 +28,7 @@ def lista_equipos_cliente(request):
     estado = request.GET.get('estado', '')
     fecha_inicio = request.GET.get('fecha_inicio', '')
     fecha_fin = request.GET.get('fecha_fin', '')
+    equipo_nombre = request.GET.get('equipo_nombre', '')
 
     # Filtrar servicios por cliente
     servicios = Servicio.objects.filter(equipo__cliente=request.user)
@@ -41,15 +42,23 @@ def lista_equipos_cliente(request):
         servicios = servicios.filter(fecha_inicio__gte=fecha_inicio)
     if fecha_fin:
         servicios = servicios.filter(fecha_inicio__lte=fecha_fin)
+    if equipo_nombre:
+        # Combinar marca y modelo para el filtro de nombre de equipo
+        servicios = servicios.annotate(
+            nombre_equipo=Concat(F('equipo__marca'), Value(' '), F('equipo__modelo'))
+        ).filter(nombre_equipo__icontains=equipo_nombre)
 
-    # Ordenar y paginar resultados
-    servicios = servicios.order_by('-fecha_inicio')
+    # Ordenar por ID descendente
+    servicios = servicios.order_by('-id')
+
+    # Paginar resultados
     paginator = Paginator(servicios, 5)
     page_number = request.GET.get('page', 1)
     servicios_paginados = paginator.get_page(page_number)
 
     return render(request, 'seguimiento/lista_equipos_cliente.html', {
         'servicios': servicios_paginados,
+        'request': request,
     })
 
 @login_required
