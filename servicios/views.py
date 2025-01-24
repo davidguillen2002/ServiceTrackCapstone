@@ -646,13 +646,13 @@ def guia_detalle(request, guia_id):
 def register_service(request, service_id):
     """
     Vista para obtener guías recomendadas basadas en el servicio actual del técnico.
-    Incluye recomendaciones contextuales según el historial del técnico.
     """
     current_service = get_object_or_404(Servicio, id=service_id, tecnico=request.user)
 
     # Obtener guías similares con contexto (servicio actual y técnico)
     similar_guides = get_similar_guides_with_context(current_service, request.user)
 
+    # Nota: `similar_guides` ahora contiene datos optimizados, incluyendo el manual.
     return render(request, 'servicios/similar_guides.html', {
         'current_service': current_service,
         'similar_guides': similar_guides,
