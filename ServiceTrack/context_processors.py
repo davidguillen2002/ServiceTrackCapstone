@@ -24,10 +24,10 @@ def gamificacion_context(request):
                         "temporada_activa": None,
                     }
 
-                # Convertir experiencia acumulada a puntos en tiempo real
+                # Sincronizar experiencia y convertirla en puntos
                 puntos_obtenidos = usuario.convertir_experiencia_a_puntos()
 
-                # Experiencia y progreso de nivel
+                # Experiencia actual y progreso de nivel
                 experiencia_actual = usuario.experiencia
                 experiencia_requerida = usuario.calcular_experiencia_nivel_siguiente()
                 progreso_nivel = (
@@ -35,10 +35,18 @@ def gamificacion_context(request):
                     if experiencia_requerida > 0 else 0
                 )
 
-                # Calificación promedio dentro de la temporada
-                calificacion_promedio_temporada = usuario.calificacion_promedio_temporada(temporada_activa)
+                # Calcular promedio de calificaciones dentro de la temporada activa
+                servicios_temporada = usuario.servicios_en_temporada(temporada_activa)
+                calificacion_promedio_temporada = servicios_temporada.aggregate(
+                    promedio=Avg('calificacion')
+                )['promedio'] or 0
 
-                # Progreso de medallas
+                # Actualizar calificación promedio del usuario si es necesario
+                if round(usuario.calificacion_promedio, 2) != round(calificacion_promedio_temporada, 2):
+                    usuario.calificacion_promedio = round(calificacion_promedio_temporada, 2)
+                    usuario.save()
+
+                # Progreso de medallas asociadas al nivel y temporada activa
                 total_medallas_nivel = Medalla.objects.filter(
                     retos_asociados__nivel=usuario.nivel,
                     temporada=temporada_activa
@@ -67,8 +75,8 @@ def gamificacion_context(request):
                 # Puntos obtenidos dentro de la temporada
                 puntos_temporada = usuario.puntos_en_temporada(temporada_activa)
 
-                # Total de servicios completados dentro de la temporada
-                servicios_temporada = usuario.servicios_en_temporada(temporada_activa).count()
+                # Total de servicios completados en la temporada
+                servicios_completados_temporada = servicios_temporada.filter(estado="completado").count()
 
                 return {
                     "usuario": usuario,
@@ -81,8 +89,8 @@ def gamificacion_context(request):
                     "retos_cumplidos": retos_cumplidos,
                     "retos_pendientes": retos_pendientes,
                     "puntos_temporada": puntos_temporada,
-                    "servicios_temporada": servicios_temporada,
-                    "puntos_obtenidos": puntos_obtenidos,  # Incluye los puntos obtenidos en tiempo real
+                    "servicios_completados_temporada": servicios_completados_temporada,
+                    "puntos_obtenidos": puntos_obtenidos,  # Puntos convertidos de experiencia
                 }
     except Exception as e:
         # Registrar errores para depuración

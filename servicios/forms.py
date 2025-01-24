@@ -16,10 +16,18 @@ class ServicioForm(forms.ModelForm):
         label="Técnico",
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
+    fecha_fin = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        label="Fecha de Finalización",
+    )
 
     class Meta:
         model = Servicio
-        fields = ['cliente', 'equipo', 'tecnico', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
+        fields = [
+            'cliente', 'equipo', 'tecnico', 'fecha_inicio', 'fecha_fin',
+            'estado', 'diagnostico_inicial', 'costo'
+        ]
         widgets = {
             'equipo': forms.Select(attrs={'class': 'form-control'}),
             'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -45,20 +53,31 @@ class ServicioForm(forms.ModelForm):
 
     def clean(self):
         """
-        Valida que el equipo seleccionado tenga un cliente asociado.
+        Validaciones adicionales
         """
         cleaned_data = super().clean()
         equipo = cleaned_data.get('equipo')
+        estado = cleaned_data.get('estado')
+        fecha_fin = cleaned_data.get('fecha_fin')
 
+        # Validar que el equipo tenga un cliente asociado
         if equipo and not equipo.cliente:
             self.add_error('equipo', 'El equipo seleccionado no tiene un cliente asociado.')
-        else:
-            cleaned_data['cliente'] = equipo.cliente.nombre if equipo and equipo.cliente else None
+
+        # Validar que la fecha de finalización esté presente si el estado es "completado"
+        if estado == "completado" and not fecha_fin:
+            self.add_error('fecha_fin', 'Debe especificar una fecha de finalización para completar el servicio.')
 
         return cleaned_data
 
 
 
+class ServicioActualizarForm(ServicioForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Eliminar el campo 'cliente' del formulario
+        if 'cliente' in self.fields:
+            del self.fields['cliente']
 
 class RepuestoForm(forms.ModelForm):
     class Meta:

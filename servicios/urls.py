@@ -54,5 +54,5 @@ urlpatterns = [
     path('servicio/<int:servicio_id>/agregar_repuesto/', views.agregar_repuesto, name='agregar_repuesto'),
     path('api/equipo_cliente/', views.api_equipo_cliente, name='api_equipo_cliente'),
     path('equipos/crear_tecnico/', views.crear_equipo_tecnico, name='crear_equipo_tecnico'),
-
+    path('servicios/<int:servicio_id>/editar_tecnico/', views.editar_servicio_tecnico, name='editar_servicio_tecnico'),
 ]

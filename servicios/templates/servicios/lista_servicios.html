@@ -53,7 +53,9 @@
         {% for servicio in servicios %}
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title"><strong>N# {{ servicio.id }}</strong> - {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</h5>
+                <h5 class="card-title">
+                    <strong>N# {{ servicio.id }}</strong> - {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}
+                </h5>
                 <p class="card-text">
                     <strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}<br>
                     <strong>Técnico:</strong> {{ servicio.tecnico.nombre }}<br>
@@ -64,7 +66,7 @@
                     <strong>Fecha de Recepción:</strong> {{ servicio.fecha_inicio|date:"d M, Y" }}<br>
                     <strong>Fecha de Entrega:</strong> {{ servicio.fecha_fin|default:"N/A" }}<br>
                     <strong>Repuestos:</strong>
-                    {% if servicio.repuestos.all %}
+                    {% if servicio.repuestos.exists %}
                         <ul>
                             {% for repuesto in servicio.repuestos.all %}
                                 <li>{{ repuesto.nombre }} ({{ repuesto.cantidad }} unidades) - ${{ repuesto.costo }}</li>
@@ -76,7 +78,12 @@
                 </p>
                 <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-info">Ver Detalle</a>
                 <a href="{% url 'historial_servicios' servicio.equipo.id %}" class="btn btn-primary">Ver Historial</a>
-                <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-secondary">Actualizar</a>
+                <!-- Mostrar botón Actualizar solo si el servicio no está completado -->
+                {% if servicio.estado != 'completado' %}
+                    <a href="{% url 'actualizar_servicio' servicio.id %}" class="btn btn-secondary">Actualizar</a>
+                {% else %}
+                    <span class="badge bg-danger">No editable</span>
+                {% endif %}
             </div>
         </div>
         {% empty %}

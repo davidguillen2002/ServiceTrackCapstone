@@ -111,22 +111,34 @@
         <small>Potenciado por Magic World Computers 🚀</small>
     </footer>
 
+
     <!-- WebSocket Script -->
     {% if user.is_authenticated %}
     <script>
         const socket = new WebSocket('ws://127.0.0.1:8001/ws/notificaciones/{{ user.id }}/');
+
         socket.onmessage = function (e) {
             const data = JSON.parse(e.data);
 
-            // Actualiza el ícono de notificaciones
+            // Actualiza el contador de notificaciones no leídas
             const badge = document.querySelector(".bi-bell .badge");
             if (badge) {
+                // Incrementa el número existente
                 badge.textContent = parseInt(badge.textContent || 0) + 1;
             } else {
+                // Crea un nuevo badge si no existe
                 const bellIcon = document.querySelector(".bi-bell");
                 const span = document.createElement("span");
-                span.classList.add("badge", "bg-danger");
-                span.textContent = 1;
+                span.classList.add(
+                    "position-absolute",
+                    "top-0",
+                    "start-100",
+                    "translate-middle",
+                    "badge",
+                    "rounded-pill",
+                    "bg-danger"
+                );
+                span.textContent = 1; // Inicializa el contador
                 bellIcon.appendChild(span);
             }
         };
@@ -136,9 +148,14 @@
         };
 
         socket.onclose = function () {
-            console.error("Conexión WebSocket cerrada.");
+            console.warn("Conexión WebSocket cerrada.");
+        };
+
+        socket.onerror = function (error) {
+            console.error("Error en WebSocket:", error);
         };
     </script>
     {% endif %}
+
 </body>
 </html>

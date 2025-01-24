@@ -228,7 +228,8 @@ def crear_servicio(request):
                     f"El servicio se creó en estado '{servicio.get_estado_display()}'. No se generó código de entrega."
                 )
 
-            servicio.save()  # Guardar servicio
+            # Guardar servicio
+            servicio.save()
             return redirect("tecnico_services_list")  # Redirigir a la lista de servicios
         else:
             messages.error(request, "Por favor, corrige los errores en el formulario.")
@@ -370,7 +371,9 @@ def registrar_servicio(request):
                 estado_actual = servicio.get_estado_display()
                 messages.warning(request, f"El servicio ha sido registrado en estado '{estado_actual}', por lo que no se generó un código de entrega.")
 
-            servicio.save()  # Guardar el servicio en la base de datos
+            # Guardar el servicio en la base de datos
+            servicio.save()
+
             return redirect('lista_servicios')
         else:
             messages.error(request, "Por favor, corrige los errores en el formulario.")
@@ -380,6 +383,8 @@ def registrar_servicio(request):
     return render(request, "servicios/registrar_servicio.html", {
         "servicio_form": servicio_form,
     })
+
+
 
 
 @login_required
@@ -440,24 +445,100 @@ def lista_servicios(request):
 @user_passes_test(is_admin)
 def actualizar_servicio(request, servicio_id):
     servicio = get_object_or_404(Servicio, id=servicio_id)
-    if request.method == "POST":
-        form = ServicioForm(request.POST, instance=servicio)
-        if form.is_valid():
-            form.save()
 
-            # Notificación para el cliente si el servicio se completa
-            if servicio.estado == "completado":
+    # Verificar si el servicio ya está completado
+    if servicio.estado.lower() == "completado":
+        messages.error(request, f"El servicio #{servicio.id} ya está completado y no se puede editar.")
+        return redirect("lista_servicios")
+
+    # Formulario adaptado para la actualización
+    class ServicioActualizarForm(ServicioForm):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            if 'cliente' in self.fields:
+                del self.fields['cliente']  # Excluir el campo cliente
+
+    if request.method == "POST":
+        form = ServicioActualizarForm(request.POST, instance=servicio)
+        if form.is_valid():
+            servicio = form.save()
+
+            # Notificar al cliente si el estado cambia a "completado"
+            if servicio.estado.lower() == "completado" and servicio.fecha_fin:
+                servicio.generar_codigo_entrega()
                 Notificacion.crear_notificacion(
                     usuario=servicio.equipo.cliente,
                     tipo="servicio_completado",
-                    mensaje=f"Su servicio para el equipo {servicio.equipo.marca} {servicio.equipo.modelo} ha sido completado."
+                    mensaje=(
+                        f"Su servicio para el equipo {servicio.equipo.marca} {servicio.equipo.modelo} "
+                        f"ha sido completado. Su código de entrega es: {servicio.codigo_entrega}."
+                    ),
                 )
+                messages.success(
+                    request,
+                    "El servicio se ha actualizado a 'Completado', el cliente fue notificado, y se generó el código de entrega."
+                )
+            else:
+                messages.info(request, "El servicio se actualizó correctamente.")
 
-            # No se necesita enviar WebSocket directamente aquí
             return redirect("lista_servicios")
+        else:
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
     else:
-        form = ServicioForm(instance=servicio)
+        form = ServicioActualizarForm(instance=servicio)
+
     return render(request, "servicios/actualizar_servicio.html", {"form": form, "servicio": servicio})
+
+
+
+@login_required
+@user_passes_test(is_tecnico)
+def editar_servicio_tecnico(request, servicio_id):
+    """
+    Permite a un técnico editar los detalles de un servicio asignado.
+    """
+    servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
+
+    # Validar si el servicio ya está completado
+    if servicio.estado.lower() == "completado":
+        messages.error(request, "No se pueden editar servicios que ya han sido completados.")
+        return redirect("tecnico_services_list")
+
+    # Formulario sin los campos cliente y equipo
+    class ServicioEditarForm(ServicioForm):
+        class Meta(ServicioForm.Meta):
+            exclude = ['cliente', 'equipo']
+
+    if request.method == "POST":
+        form = ServicioEditarForm(request.POST, instance=servicio)
+        if form.is_valid():
+            servicio = form.save()
+
+            # Registrar notificación si el estado cambia a 'completado'
+            if servicio.estado.lower() == "completado":
+                servicio.generar_codigo_entrega()
+                Notificacion.crear_notificacion(
+                    usuario=servicio.equipo.cliente,
+                    tipo="codigo_entrega",
+                    mensaje=f"El servicio #{servicio.id} para el equipo {servicio.equipo.marca} {servicio.equipo.modelo} ha sido completado. "
+                            f"Su código de entrega es: {servicio.codigo_entrega}."
+                )
+                messages.success(request, "Servicio actualizado a 'Completado' y cliente notificado.")
+            else:
+                messages.success(request, "Servicio actualizado correctamente.")
+
+            return redirect("tecnico_services_list")
+        else:
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
+    else:
+        form = ServicioEditarForm(instance=servicio)
+
+    return render(request, "servicios/editar_servicio_tecnico.html", {
+        "form": form,
+        "servicio": servicio,
+    })
+
+
 
 @login_required
 @user_passes_test(is_admin)

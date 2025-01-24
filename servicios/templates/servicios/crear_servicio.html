@@ -9,7 +9,6 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
             <li class="breadcrumb-item"><a href="{% url 'tecnico_services_list' %}">Mis Servicios</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'listar_clientes_tecnico' %}">Clientes Asignados</a></li>
             <li class="breadcrumb-item active" aria-current="page">Crear Servicio</li>
         </ol>
     </nav>
@@ -45,6 +44,17 @@
                     {{ form.fecha_inicio }}
                     <div class="text-danger">
                         {% for error in form.fecha_inicio.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Campo de Fecha de Finalización -->
+                <div class="mb-3">
+                    <label for="id_fecha_fin" class="form-label">Fecha de Finalización</label>
+                    {{ form.fecha_fin }}
+                    <div class="text-danger">
+                        {% for error in form.fecha_fin.errors %}
                             {{ error }}
                         {% endfor %}
                     </div>

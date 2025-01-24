@@ -86,6 +86,26 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.nombre
 
+    def actualizar_estadisticas(self):
+        """
+        Actualiza estadísticas del técnico, incluyendo calificación promedio y servicios completados.
+        """
+        # Calcular servicios completados
+        servicios_completados = Servicio.objects.filter(
+            tecnico=self,
+            estado="completado"
+        ).count()
+        self.servicios_completados = servicios_completados
+
+        # Calcular calificación promedio
+        promedio = Servicio.objects.filter(
+            tecnico=self,
+            estado="completado"
+        ).aggregate(promedio=Avg("calificacion"))["promedio"] or 0
+        self.calificacion_promedio = round(promedio, 2)
+
+        self.save()
+
     def servicios_en_temporada(self, temporada):
         """
         Obtiene los servicios completados dentro del intervalo de la temporada.
@@ -98,13 +118,17 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def calificacion_promedio_temporada(self, temporada):
         """
-        Calcula el promedio de calificaciones dentro del intervalo de la temporada.
+        Calcula el promedio de calificaciones de los servicios completados
+        dentro del rango de fechas de la temporada.
         """
-        promedio = Servicio.objects.filter(
+        servicios_temporada = Servicio.objects.filter(
             tecnico=self,
             estado="completado",
             fecha_fin__range=(temporada.fecha_inicio, temporada.fecha_fin)
-        ).aggregate(promedio=Avg('calificacion'))['promedio'] or 0
+        )
+        promedio = servicios_temporada.aggregate(
+            promedio=Avg('calificacion')
+        )['promedio'] or 0
         return round(promedio, 2)
 
     def puntos_en_temporada(self, temporada):
@@ -585,6 +609,21 @@ class Servicio(models.Model):
     class Meta:
         ordering = ['-fecha_inicio']
 
+    def save(self, *args, **kwargs):
+        # Validar si la fecha de finalización está dentro de la temporada activa
+        if self.fecha_fin:
+            temporada_actual = Temporada.obtener_temporada_actual()
+            if temporada_actual and not (temporada_actual.fecha_inicio <= self.fecha_fin <= temporada_actual.fecha_fin):
+                raise ValidationError(
+                    "La fecha de finalización del servicio debe estar dentro de la temporada activa."
+                )
+
+        super().save(*args, **kwargs)
+
+        # Actualizar estadísticas del técnico al guardar un servicio completado
+        if self.estado == "completado" and self.calificacion is not None:
+            self.tecnico.actualizar_estadisticas()
+
     def __str__(self):
         return f"Servicio {self.id} - {self.equipo}"
 
@@ -595,6 +634,8 @@ class Servicio(models.Model):
     @property
     def esta_completado(self):
         return self.estado == "completado"
+
+
 
 class Repuesto(models.Model):
     nombre = models.CharField(max_length=100)

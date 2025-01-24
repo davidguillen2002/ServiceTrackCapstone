@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% load widget_tweaks %}
-
 {% block title %}Registrar Nuevo Servicio{% endblock %}
 
 {% block content %}
@@ -16,40 +14,53 @@
             <div class="col-md-8 offset-md-2">
                 <h4 class="text-primary border-bottom pb-2">Datos del Servicio</h4>
 
+                <!-- Equipo -->
                 <div class="mb-3">
                     <label for="equipo" class="form-label fw-bold">Equipo</label>
-                    {{ servicio_form.equipo|add_class:"form-select" }}
+                    {{ servicio_form.equipo }}
                 </div>
 
+                <!-- Cliente -->
                 <div class="mb-3">
                     <label for="cliente" class="form-label fw-bold">Cliente</label>
                     <input type="text" id="cliente-name" class="form-control"
                            placeholder="Selecciona un equipo" readonly>
                 </div>
 
+                <!-- Técnico -->
                 <div class="mb-3">
                     <label for="tecnico" class="form-label fw-bold">Técnico</label>
-                    {{ servicio_form.tecnico|add_class:"form-select" }}
+                    {{ servicio_form.tecnico }}
                 </div>
 
+                <!-- Fecha de Recepción -->
                 <div class="mb-3">
                     <label for="fecha_inicio" class="form-label fw-bold">Fecha de Recepción</label>
-                    {{ servicio_form.fecha_inicio|add_class:"form-control" }}
+                    {{ servicio_form.fecha_inicio }}
                 </div>
 
+                <!-- Fecha de Finalización -->
+                <div class="mb-3">
+                    <label for="fecha_fin" class="form-label fw-bold">Fecha de Finalización</label>
+                    {{ servicio_form.fecha_fin }}
+                </div>
+
+                <!-- Estado -->
                 <div class="mb-3">
                     <label for="estado" class="form-label fw-bold">Estado</label>
-                    {{ servicio_form.estado|add_class:"form-select" }}
+                    {{ servicio_form.estado }}
                 </div>
 
+                <!-- Valor de Reparación -->
                 <div class="mb-3">
                     <label for="costo" class="form-label fw-bold">Valor de Reparación</label>
-                    {{ servicio_form.costo|add_class:"form-control" }}
+                    {{ servicio_form.costo }}
                 </div>
 
+                <!-- Diagnóstico Inicial -->
                 <div class="mb-3">
                     <label for="diagnostico_inicial" class="form-label fw-bold">Diagnóstico Inicial</label>
-                    {{ servicio_form.diagnostico_inicial|add_class:"form-control" }}
+                    {{ servicio_form.diagnostico_inicial }}
                 </div>
             </div>
         </div>
@@ -68,7 +79,7 @@
         const clienteName = document.getElementById('cliente-name');
 
         equipoSelect.addEventListener('change', function () {
-            const equipoId = this.value;
+            const equipoId = equipoSelect.value;
             if (equipoId) {
                 fetch(`/servicios/api/equipo_cliente/?equipo_id=${equipoId}`)
                     .then(response => response.json())

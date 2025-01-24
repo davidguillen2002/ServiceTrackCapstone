@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Servicio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Editar Servicio</h1>
+    <p>Actualiza los detalles del servicio asignado.</p>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5>Servicio #{{ servicio.id }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_fecha_inicio" class="form-label">Fecha inicio</label>
+                    {{ form.fecha_inicio }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_fecha_fin" class="form-label">Fecha de Finalización</label>
+                    {{ form.fecha_fin }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_estado" class="form-label">Estado</label>
+                    {{ form.estado }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_diagnostico_inicial" class="form-label">Diagnóstico inicial</label>
+                    {{ form.diagnostico_inicial }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_costo" class="form-label">Costo</label>
+                    {{ form.costo }}
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

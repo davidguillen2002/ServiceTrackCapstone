@@ -8,7 +8,7 @@
 
     <!-- Botones de navegación -->
     <div class="mb-3">
-        <a href="{% url 'tecnico_services_list' %}" class="btn btn-outline-secondary">Volver a Mis Servicios</a>
+        <a href="{% url 'lista_servicios' %}" class="btn btn-outline-secondary">Volver a la Lista de Servicios</a>
     </div>
 
     <!-- Información del servicio -->
@@ -20,6 +20,12 @@
             <p><strong>Equipo:</strong> {{ servicio.equipo.marca }} {{ servicio.equipo.modelo }}</p>
             <p><strong>Cliente:</strong> {{ servicio.equipo.cliente.nombre }}</p>
             <p><strong>Estado Actual:</strong> {{ servicio.get_estado_display }}</p>
+            <p><strong>Fecha de Inicio:</strong> {{ servicio.fecha_inicio }}</p>
+            {% if servicio.fecha_fin %}
+                <p><strong>Fecha de Finalización:</strong> {{ servicio.fecha_fin }}</p>
+            {% else %}
+                <p><strong>Fecha de Finalización:</strong> Sin especificar</p>
+            {% endif %}
         </div>
     </div>
 
@@ -31,9 +37,7 @@
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
-                <div class="mb-3">
-                    {{ form.as_p }}
-                </div>
+                {{ form.as_p }}
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-primary">Actualizar</button>
                     <a href="{% url 'detalle_servicio' servicio.id %}" class="btn btn-secondary">Volver al Detalle</a>
@@ -42,4 +46,4 @@
         </div>
     </div>
 </div>
-{%endblock%}
+{% endblock %}
