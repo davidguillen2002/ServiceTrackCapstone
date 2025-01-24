@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% load custom_filters %}
 
 {% block title %}Mi Perfil Gamificado{% endblock %}
@@ -99,7 +100,7 @@
                     data-desbloqueada="{% if medalla in medallas_usuario %}true{% else %}false{% endif %}">
                     <div class="d-flex justify-content-center align-items-center medalla-contenedor">
                         {% if medalla.icono %}
-                        <img src="{% static medalla.icono %}"
+                        <img src="{% static 'img/medallas/' %}{{ medalla.icono|basename }}"
                              class="img-fluid medalla-icono {% if medalla not in medallas_usuario %}grayscale{% endif %}"
                              alt="{{ medalla.nombre }}">
                         {% else %}
