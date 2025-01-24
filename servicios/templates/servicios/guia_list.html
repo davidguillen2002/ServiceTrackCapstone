@@ -1,3 +1,4 @@
+#servicios/templates/servicios/guia_list.html
 <div class="row">
     {% for guia in guias %}
         <div class="col-md-4 mb-4">
@@ -7,7 +8,7 @@
                     <p class="card-text">{{ guia.descripcion|slice:":100" }}...</p>
                     <p><strong>Categoría:</strong> {{ guia.categoria.nombre }}</p>
                     <p><strong>Tipo de Servicio:</strong> {{ guia.tipo_servicio }}</p>
-                    <p><strong>Puntuación:</strong> <i class="fas fa-star"></i> {{ guia.puntuacion }}</p>
+                    <!-- <p><strong>Puntuación:</strong> <i class="fas fa-star"></i> {{ guia.puntuacion }}</p> -->
                     <a href="{% url 'guia_detalle' guia.id %}" class="btn btn-primary">Ver Detalles</a>
                 </div>
             </div>

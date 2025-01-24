@@ -1,3 +1,4 @@
+#servicios/templates/servicios/tecnico_services_list.html
 {% extends "base.html" %}
 
 {% block title %}Mis Servicios{% endblock %}
@@ -60,6 +61,7 @@
                 <div class="d-flex gap-2">
                     <a href="{% url 'register_service' service.id %}" class="btn btn-outline-primary btn-sm">Ver Guías</a>
                     <a href="{% url 'detalle_servicio' service.id %}" class="btn btn-outline-info btn-sm">Detalles</a>
+                    <a href="{% url 'historial_servicios' service.equipo.id %}" class="btn btn-outline-secondary btn-sm">Historial</a>
                     <form method="post" action="{% url 'actualizar_estado_servicio' service.id %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-success btn-sm">Actualizar Estado</button>
