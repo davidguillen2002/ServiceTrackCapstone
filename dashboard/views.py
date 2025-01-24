@@ -317,20 +317,6 @@ class UsuarioForm(forms.ModelForm):
 class UsuarioCreateForm(UsuarioForm):
     """Formulario para crear un usuario con campo de contraseña."""
 
-class UsuarioUpdateForm(forms.ModelForm):
-    """Formulario para actualizar un usuario sin el campo de contraseña."""
-    class Meta:
-        model = Usuario
-        fields = ['nombre', 'username', 'rol', 'cedula', 'correo', 'celular']
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Juan Pérez'}),
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'jperez'}),
-            'cedula': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567890'}),
-            'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'juan.perez@example.com'}),
-            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0991234567'}),
-            'rol': forms.Select(attrs={'class': 'form-control'}),
-        }
-
 class UsuarioCreateView(SuccessMessageMixin, CreateView):
     """Vista para crear un nuevo usuario."""
     model = Usuario
@@ -377,6 +363,14 @@ class UsuarioUpdateForm(forms.ModelForm):
                 raise forms.ValidationError("El número celular debe ser válido y empezar con '09'.")
         return celular
 
+
+# Vista para actualizar un usuario
+class UsuarioUpdateView(SuccessMessageMixin, UpdateView):
+    model = Usuario
+    form_class = UsuarioUpdateForm
+    template_name = 'usuarios/usuario_form.html'
+    success_url = reverse_lazy('usuario-list')
+    success_message = "Usuario actualizado correctamente."
 
 @login_required
 def usuario_list_view(request):
