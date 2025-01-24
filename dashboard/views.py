@@ -18,6 +18,7 @@ from django.db.models.functions import TruncYear
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ValidationError
 import math
+import re
 
 @login_required
 def dashboard_view(request):
@@ -238,29 +239,41 @@ def cliente_dashboard_view(request):
     }
     return render(request, 'dashboard/cliente_dashboard.html', context)
 
+# Algoritmo para validar el número de celular
+def validar_celular(celular):
+    if not re.match(r'^09\d{8}$', celular):
+        raise ValidationError("El número de celular debe comenzar con '09' y contener 10 dígitos.")
+
 # Algoritmo para validar cédula
-def verificar_cedula(cedula):
+def verificar_cedula(cedula=""):
+    """
+    Valida una cédula ecuatoriana.
+    """
     if len(cedula) != 10:
         raise ValidationError("La cédula debe contener exactamente 10 dígitos.")
+
     try:
         multiplicador = [2, 1, 2, 1, 2, 1, 2, 1, 2]
-        ced_array = [int(k) for k in list(cedula[:9])]
+        ced_array = list(map(lambda k: int(k), list(cedula[:9])))
         ultimo_digito = int(cedula[9])
         resultado = []
 
         for i, j in zip(ced_array, multiplicador):
-            prod = i * j
-            resultado.append(prod if prod < 10 else prod - 9)
+            producto = i * j
+            if producto < 10:
+                resultado.append(producto)
+            else:
+                resultado.append(producto - 9)
 
         suma = sum(resultado)
-        verificador = (10 - (suma % 10)) if suma % 10 != 0 else 0
+        verificador_calculado = int(math.ceil(float(suma) / 10) * 10) - suma
 
-        if verificador != ultimo_digito:
+        if verificador_calculado != ultimo_digito:
             raise ValidationError("La cédula ingresada no es válida.")
-    except ValueError:
+    except (ValueError, TypeError):
         raise ValidationError("La cédula debe contener únicamente números.")
 
-# Formulario personalizado con validación de cédula
+# Formulario personalizado con validaciones
 class UsuarioForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '********'}),
@@ -271,6 +284,11 @@ class UsuarioForm(forms.ModelForm):
         label="Cédula",
         max_length=10
     )
+    celular = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0991234567'}),
+        label="Celular",
+        max_length=10
+    )
 
     class Meta:
         model = Usuario
@@ -279,14 +297,22 @@ class UsuarioForm(forms.ModelForm):
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Juan Pérez'}),
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'jperez'}),
             'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'juan.perez@example.com'}),
-            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '5551234567'}),
             'rol': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def clean_cedula(self):
+        """Valida la cédula usando el algoritmo `verificar_cedula`."""
         cedula = self.cleaned_data.get('cedula')
         verificar_cedula(cedula)  # Llama al algoritmo de validación
         return cedula
+
+    def clean_celular(self):
+        """Valida el celular para garantizar que siga el formato ecuatoriano."""
+        celular = self.cleaned_data.get('celular')
+        if not celular.isdigit() or len(celular) != 10 or not celular.startswith("09"):
+            raise ValidationError("El número de celular debe ser válido y empezar con '09'.")
+        return celular
+
 
 class UsuarioCreateForm(UsuarioForm):
     """Formulario para crear un usuario con campo de contraseña."""
@@ -301,7 +327,7 @@ class UsuarioUpdateForm(forms.ModelForm):
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'jperez'}),
             'cedula': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567890'}),
             'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'juan.perez@example.com'}),
-            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '555-1234'}),
+            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0991234567'}),
             'rol': forms.Select(attrs={'class': 'form-control'}),
         }
 

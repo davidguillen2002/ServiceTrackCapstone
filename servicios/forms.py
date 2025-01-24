@@ -10,10 +10,16 @@ class ServicioForm(forms.ModelForm):
         label="Cliente",
         widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
     )
+    tecnico = forms.ModelChoiceField(
+        queryset=Usuario.objects.filter(rol__nombre="tecnico"),
+        required=False,
+        label="Técnico",
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
 
     class Meta:
         model = Servicio
-        fields = ['cliente', 'equipo', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
+        fields = ['cliente', 'equipo', 'tecnico', 'fecha_inicio', 'estado', 'diagnostico_inicial', 'costo']
         widgets = {
             'equipo': forms.Select(attrs={'class': 'form-control'}),
             'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -24,7 +30,12 @@ class ServicioForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         equipos_disponibles = kwargs.pop('equipos_disponibles', None)
+        include_tecnico = kwargs.pop('include_tecnico', False)
         super().__init__(*args, **kwargs)
+
+        # Ocultar el campo técnico si no es necesario
+        if not include_tecnico:
+            self.fields.pop('tecnico')
 
         if equipos_disponibles is not None:
             self.fields['equipo'].queryset = equipos_disponibles
@@ -45,6 +56,7 @@ class ServicioForm(forms.ModelForm):
             cleaned_data['cliente'] = equipo.cliente.nombre if equipo and equipo.cliente else None
 
         return cleaned_data
+
 
 
 

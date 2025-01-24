@@ -22,33 +22,39 @@
     </nav>
 
     <div class="text-center mb-4">
-        <h1 class="fw-bold">
+        <h1 class="fw-bold text-primary">
             {% if form.instance.pk %}Editar Usuario{% else %}Registrar Nuevo Usuario{% endif %}
         </h1>
-        <p class="text-muted">Completa los datos del formulario para continuar.</p>
+        <p class="text-muted">Por favor, completa todos los campos obligatorios para continuar.</p>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm p-4">
-                <form method="post" novalidate>
+                <form method="post" novalidate id="usuario-form">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
+
                     {% for field in form %}
                     <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                            {{ field.label }}
+                            {% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+                        </label>
                         {{ field }}
                         {% if field.help_text %}
                         <small class="form-text text-muted">{{ field.help_text }}</small>
                         {% endif %}
                         {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
+                        <div class="text-danger small mt-1">{{ error }}</div>
                         {% endfor %}
                     </div>
                     {% endfor %}
+
+                    <!-- Botón de acción -->
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-dark btn-lg">
-                            {% if form.instance.pk %}Actualizar Usuario{% else %}Agregar Usuario{% endif %}
+                        <button type="submit" class="btn btn-dark btn-lg" id="submit-btn">
+                            {% if form.instance.pk %}<i class="bi bi-save"></i> Actualizar Usuario{% else %}<i class="bi bi-person-plus"></i> Agregar Usuario{% endif %}
                         </button>
                     </div>
                 </form>
@@ -56,4 +62,62 @@
         </div>
     </div>
 </div>
+
+<!-- Script para validaciones en tiempo real -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cedulaInput = document.getElementById("id_cedula");
+        const celularInput = document.getElementById("id_celular");
+        const submitBtn = document.getElementById("submit-btn");
+
+        function validarCedula(cedula) {
+            if (cedula.length !== 10 || !/^\d+$/.test(cedula)) {
+                return false;
+            }
+            const multiplicador = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+            const cedArray = cedula.slice(0, 9).split("").map(Number);
+            const ultimoDigito = parseInt(cedula[9]);
+            const suma = cedArray.reduce((acc, curr, idx) => {
+                let prod = curr * multiplicador[idx];
+                return acc + (prod > 9 ? prod - 9 : prod);
+            }, 0);
+            const verificador = 10 - (suma % 10 || 10);
+            return verificador === ultimoDigito;
+        }
+
+        function validarCelular(celular) {
+            return celular.length === 10 && celular.startsWith("09") && /^\d+$/.test(celular);
+        }
+
+        cedulaInput.addEventListener("input", () => {
+            if (validarCedula(cedulaInput.value)) {
+                cedulaInput.classList.remove("is-invalid");
+                cedulaInput.classList.add("is-valid");
+            } else {
+                cedulaInput.classList.remove("is-valid");
+                cedulaInput.classList.add("is-invalid");
+            }
+        });
+
+        celularInput.addEventListener("input", () => {
+            if (validarCelular(celularInput.value)) {
+                celularInput.classList.remove("is-invalid");
+                celularInput.classList.add("is-valid");
+            } else {
+                celularInput.classList.remove("is-valid");
+                celularInput.classList.add("is-invalid");
+            }
+        });
+
+        document.getElementById("usuario-form").addEventListener("submit", (e) => {
+            if (
+                !validarCedula(cedulaInput.value) ||
+                !validarCelular(celularInput.value)
+            ) {
+                e.preventDefault();
+                alert("Por favor, corrige los errores antes de enviar el formulario.");
+            }
+        });
+    });
+</script>
 {% endblock %}

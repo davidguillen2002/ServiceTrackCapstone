@@ -238,7 +238,6 @@ def crear_servicio(request):
     return render(request, "servicios/crear_servicio.html", {"form": form})
 
 
-
 @login_required
 @user_passes_test(is_tecnico)
 def crear_equipo_tecnico(request):
@@ -350,7 +349,7 @@ def registrar_servicio(request):
     equipos_disponibles = Equipo.objects.filter(cliente__isnull=False)  # Solo equipos con cliente asociado
 
     if request.method == "POST":
-        servicio_form = ServicioForm(request.POST, equipos_disponibles=equipos_disponibles)
+        servicio_form = ServicioForm(request.POST, equipos_disponibles=equipos_disponibles, include_tecnico=True)
         if servicio_form.is_valid():
             servicio = servicio_form.save(commit=False)
 
@@ -374,9 +373,9 @@ def registrar_servicio(request):
             servicio.save()  # Guardar el servicio en la base de datos
             return redirect('lista_servicios')
         else:
-            messages.error(request, "Por favor, corrige los errores del formulario.")
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
     else:
-        servicio_form = ServicioForm(equipos_disponibles=equipos_disponibles)
+        servicio_form = ServicioForm(equipos_disponibles=equipos_disponibles, include_tecnico=True)
 
     return render(request, "servicios/registrar_servicio.html", {
         "servicio_form": servicio_form,

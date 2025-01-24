@@ -9,7 +9,7 @@
         {% if user.rol.nombre == "administrador" %}
         <a href="{% url 'crear_equipo' %}" class="btn btn-primary">Registrar Nuevo Equipo</a>
         {% endif %}
-        <a href="{% url 'lista_servicios' %}" class="btn btn-secondary">Gestionar Servicios</a>
+        <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Gestionar Servicios</a>
     </div>
 
     <!-- Contenedor de filtros -->

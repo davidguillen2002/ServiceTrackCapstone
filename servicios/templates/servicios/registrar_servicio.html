@@ -23,7 +23,8 @@
 
                 <div class="mb-3">
                     <label for="cliente" class="form-label fw-bold">Cliente</label>
-                    <input type="text" id="cliente-name" class="form-control" placeholder="Selecciona un equipo" readonly>
+                    <input type="text" id="cliente-name" class="form-control"
+                           placeholder="Selecciona un equipo" readonly>
                 </div>
 
                 <div class="mb-3">
@@ -45,9 +46,10 @@
                     <label for="costo" class="form-label fw-bold">Valor de Reparación</label>
                     {{ servicio_form.costo|add_class:"form-control" }}
                 </div>
+
                 <div class="mb-3">
                     <label for="diagnostico_inicial" class="form-label fw-bold">Diagnóstico Inicial</label>
-                    {{ servicio_form.diagnostico_inicial }}
+                    {{ servicio_form.diagnostico_inicial|add_class:"form-control" }}
                 </div>
             </div>
         </div>
