@@ -245,9 +245,6 @@ def perfil_gamificacion(request):
         messages.warning(request, "No hay una temporada activa en este momento.")
         return redirect("home")
 
-    # Actualizar estadísticas del usuario (calificación promedio y servicios completados)
-    usuario.actualizar_estadisticas()
-
     # Obtener retos asociados al nivel y temporada actual
     retos_usuario = RetoUsuario.objects.filter(
         usuario=usuario,
@@ -347,7 +344,6 @@ def perfil_gamificacion(request):
         "animaciones": animaciones,
         "puntos_obtenidos": puntos_obtenidos,  # Puntos obtenidos al convertir experiencia
     })
-
 
 
 
