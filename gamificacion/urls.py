@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # Vistas para técnicos
@@ -33,3 +35,6 @@ urlpatterns = [
     path('ajax/crear-recompensa/', views.crear_recompensa_ajax, name='crear_recompensa_ajax'),
     path('ajax/crear-medalla/', views.crear_medalla_ajax, name='crear_medalla_ajax'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
