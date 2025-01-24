@@ -346,13 +346,37 @@ class UsuarioCreateView(SuccessMessageMixin, CreateView):
         usuario.save()
         return super().form_valid(form)
 
-class UsuarioUpdateView(SuccessMessageMixin, UpdateView):
-    """Vista para actualizar un usuario sin necesidad de cambiar la contraseña."""
-    model = Usuario
-    form_class = UsuarioUpdateForm
-    template_name = 'usuarios/usuario_form.html'
-    success_url = reverse_lazy('usuario-list')
-    success_message = "Usuario actualizado correctamente."
+class UsuarioUpdateForm(forms.ModelForm):
+    """Formulario para actualizar un usuario sin el campo de contraseña."""
+
+    class Meta:
+        model = Usuario
+        fields = ['nombre', 'username', 'rol', 'cedula', 'correo', 'celular']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Juan Pérez'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'jperez'}),
+            'cedula': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567890'}),
+            'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'juan.perez@example.com'}),
+            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0991234567'}),
+            'rol': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def clean_cedula(self):
+        """Valida la cédula usando el algoritmo proporcionado."""
+        cedula = self.cleaned_data.get('cedula')
+        if cedula:
+            if not verificar_cedula(cedula):
+                raise forms.ValidationError("La cédula ingresada no es válida.")
+        return cedula
+
+    def clean_celular(self):
+        """Valida el número de celular para asegurarse de que sea un número ecuatoriano válido."""
+        celular = self.cleaned_data.get('celular')
+        if celular:
+            if not celular.isdigit() or len(celular) != 10 or not celular.startswith("09"):
+                raise forms.ValidationError("El número celular debe ser válido y empezar con '09'.")
+        return celular
+
 
 @login_required
 def usuario_list_view(request):
