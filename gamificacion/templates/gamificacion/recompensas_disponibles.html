@@ -34,7 +34,7 @@
                     <div class="card mb-3 animate__animated animate__fadeIn">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
-                                <img src="{% static 'img/' %}{{ recompensa_usuario.recompensa.tipo }}.png"
+                                <img src="{% static 'img/' %}{{ recompensa_usuario.recompensa.tipo|lower }}.png"
                                      alt="{{ recompensa_usuario.recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
                             </div>
                             <div class="col-md-8">
@@ -66,7 +66,7 @@
                     <div class="card mb-3 animate__animated animate__fadeIn">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center bg-light">
-                                <img src="{% static 'img/' %}{{ recompensa_usuario.recompensa.tipo }}-redimido.png"
+                                <img src="{% static 'img/' %}{{ recompensa_usuario.recompensa.tipo|lower }}-redimido.png"
                                      alt="{{ recompensa_usuario.recompensa.tipo }}" class="img-fluid" style="max-height: 100px;">
                             </div>
                             <div class="col-md-8">

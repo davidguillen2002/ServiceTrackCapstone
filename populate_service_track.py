@@ -358,7 +358,7 @@ medallas_por_nivel = {
             "descripcion": "Completa 5 servicios exitosos.",
             "puntos_necesarios": 50,
             "nivel_requerido": 1,
-            "icono": "medallas/nivel 1-1.png",
+            "icono": "medallas/nivel_1-1.png",
             "retos": [
                 {
                     "nombre": "Primer Servicio",
@@ -374,7 +374,7 @@ medallas_por_nivel = {
             "descripcion": "Acumula 100 puntos.",
             "puntos_necesarios": 100,
             "nivel_requerido": 1,
-            "icono": "medallas/nivel 1-2.png",
+            "icono": "medallas/nivel_1-2.png",
             "retos": [
                 {
                     "nombre": "Acumula Puntos Básicos",
@@ -390,7 +390,7 @@ medallas_por_nivel = {
             "descripcion": "Obtén una calificación promedio mínima de 3.",
             "puntos_necesarios": 0,
             "nivel_requerido": 1,
-            "icono": "medallas/nivel 1-3.png",
+            "icono": "medallas/nivel_1-3.png",
             "retos": [
                 {
                     "nombre": "Calificación Inicial",
@@ -408,7 +408,7 @@ medallas_por_nivel = {
             "descripcion": "Completa 10 servicios exitosos.",
             "puntos_necesarios": 200,
             "nivel_requerido": 2,
-            "icono": "medallas/nivel 2-1.png",
+            "icono": "medallas/nivel_2-1.png",
             "retos": [
                 {
                     "nombre": "Servicio Rápido",
@@ -424,7 +424,7 @@ medallas_por_nivel = {
             "descripcion": "Acumula 200 puntos.",
             "puntos_necesarios": 200,
             "nivel_requerido": 2,
-            "icono": "medallas/nivel 2-2.png",
+            "icono": "medallas/nivel_2-2.png",
             "retos": [
                 {
                     "nombre": "Puntos Progresivos",
@@ -440,7 +440,7 @@ medallas_por_nivel = {
             "descripcion": "Obtén una calificación promedio mínima de 4.",
             "puntos_necesarios": 0,
             "nivel_requerido": 2,
-            "icono": "medallas/nivel 2-3.png",
+            "icono": "medallas/nivel_2-3.png",
             "retos": [
                 {
                     "nombre": "Calificación Excelente",
@@ -458,7 +458,7 @@ medallas_por_nivel = {
             "descripcion": "Completa 20 servicios exitosos.",
             "puntos_necesarios": 300,
             "nivel_requerido": 3,
-            "icono": "medallas/nivel 3-1.png",
+            "icono": "medallas/nivel_3-1.png",
             "retos": [
                 {
                     "nombre": "Avance Profesional",
@@ -474,7 +474,7 @@ medallas_por_nivel = {
             "descripcion": "Acumula 500 puntos.",
             "puntos_necesarios": 500,
             "nivel_requerido": 3,
-            "icono": "medallas/nivel 3-2.png",
+            "icono": "medallas/nivel_3-2.png",
             "retos": [
                 {
                     "nombre": "Puntos Avanzados",
@@ -490,7 +490,7 @@ medallas_por_nivel = {
             "descripcion": "Obtén una calificación promedio mínima de 4.5.",
             "puntos_necesarios": 0,
             "nivel_requerido": 3,
-            "icono": "medallas/nivel 3-3.png",
+            "icono": "medallas/nivel_3-3.png",
             "retos": [
                 {
                     "nombre": "Calificación Sobresaliente",
@@ -508,7 +508,7 @@ medallas_por_nivel = {
             "descripcion": "Completa 30 servicios exitosos.",
             "puntos_necesarios": 700,
             "nivel_requerido": 4,
-            "icono": "medallas/nivel 4-1.png",
+            "icono": "medallas/nivel_4-1.png",
             "retos": [
                 {
                     "nombre": "Técnico Experto",
@@ -524,7 +524,7 @@ medallas_por_nivel = {
             "descripcion": "Acumula 1000 puntos.",
             "puntos_necesarios": 1000,
             "nivel_requerido": 4,
-            "icono": "medallas/nivel 4-2.png",
+            "icono": "medallas/nivel_4-2.png",
             "retos": [
                 {
                     "nombre": "Puntos Máximos",
@@ -540,7 +540,7 @@ medallas_por_nivel = {
             "descripcion": "Obtén una calificación promedio de 5.",
             "puntos_necesarios": 0,
             "nivel_requerido": 4,
-            "icono": "medallas/nivel 4-3.png",
+            "icono": "medallas/nivel_4-3.png",
             "retos": [
                 {
                     "nombre": "Calificación Perfecta",
@@ -558,7 +558,7 @@ medallas_por_nivel = {
             "descripcion": "Completa 50 servicios exitosos.",
             "puntos_necesarios": 1500,
             "nivel_requerido": 5,
-            "icono": "medallas/nivel 5-1.png",
+            "icono": "medallas/nivel_5-1.png",
             "retos": [
                 {
                     "nombre": "Maestro Técnico",
@@ -574,7 +574,7 @@ medallas_por_nivel = {
             "descripcion": "Acumula 2000 puntos.",
             "puntos_necesarios": 2000,
             "nivel_requerido": 5,
-            "icono": "medallas/nivel 5-2.png",
+            "icono": "medallas/nivel_5-2.png",
             "retos": [
                 {
                     "nombre": "Dominio Total",
@@ -590,7 +590,7 @@ medallas_por_nivel = {
             "descripcion": "Mantén una calificación promedio de 4.8 o más en los últimos 10 servicios.",
             "puntos_necesarios": 0,
             "nivel_requerido": 5,
-            "icono": "medallas/nivel 5-3.png",
+            "icono": "medallas/nivel_5-3.png",
             "retos": [
                 {
                     "nombre": "Excelencia Continua",
