@@ -99,7 +99,7 @@
                     data-desbloqueada="{% if medalla in medallas_usuario %}true{% else %}false{% endif %}">
                     <div class="d-flex justify-content-center align-items-center medalla-contenedor">
                         {% if medalla.icono %}
-                        <img src="{{ medalla.icono.url }}"
+                        <img src="{% static 'img/medallas/' %}{{ medalla.icono|filename }}"
                              class="img-fluid medalla-icono {% if medalla not in medallas_usuario %}grayscale{% endif %}"
                              alt="{{ medalla.nombre }}">
                         {% else %}
@@ -117,6 +117,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Retos Disponibles -->
     <div class="card mb-4 shadow-lg animate__animated animate__fadeInUpBig">
