@@ -180,6 +180,11 @@ class EquipoForm(forms.ModelForm):
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtrar solo usuarios con el rol "cliente" para el campo cliente
+        self.fields['cliente'].queryset = Usuario.objects.filter(rol__nombre="cliente")
+
     def clean_anio(self):
         """
         Valida que el año sea razonable y esté dentro del rango lógico.

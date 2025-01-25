@@ -21,12 +21,6 @@
             <form method="POST" id="crear-servicio-form">
                 {% csrf_token %}
 
-                <!-- Campo de Cliente (solo lectura) -->
-                <div class="mb-3">
-                    <label for="id_cliente" class="form-label">Cliente</label>
-                    <input type="text" id="id_cliente" class="form-control" readonly>
-                </div>
-
                 <!-- Campo de Equipo -->
                 <div class="mb-3">
                     <label for="id_equipo" class="form-label">Equipo</label>
@@ -38,9 +32,16 @@
                     </div>
                 </div>
 
+                <!-- Campo de Cliente (solo lectura) -->
+                <div class="mb-3">
+                    <label for="id_cliente" class="form-label">Cliente</label>
+                    <input type="text" id="id_cliente" class="form-control" readonly>
+                </div>
+
+
                 <!-- Campo de Fecha de Inicio -->
                 <div class="mb-3">
-                    <label for="id_fecha_inicio" class="form-label">Fecha de Inicio</label>
+                    <label for="id_fecha_inicio" class="form-label">Fecha de Recepción</label>
                     {{ form.fecha_inicio }}
                     <div class="text-danger">
                         {% for error in form.fecha_inicio.errors %}
@@ -51,7 +52,7 @@
 
                 <!-- Campo de Fecha de Finalización -->
                 <div class="mb-3">
-                    <label for="id_fecha_fin" class="form-label">Fecha de Finalización</label>
+                    <label for="id_fecha_fin" class="form-label">Fecha Estimada de Finalización</label>
                     {{ form.fecha_fin }}
                     <div class="text-danger">
                         {% for error in form.fecha_fin.errors %}

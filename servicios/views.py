@@ -985,6 +985,7 @@ def lista_equipos(request):
     if request.user.rol.nombre == "administrador":
         equipos = Equipo.objects.all()
     else:
+        # Filtrar equipos relacionados al técnico autenticado
         equipos = Equipo.objects.filter(servicio__tecnico=request.user).distinct()
 
     # Obtener los parámetros de búsqueda
@@ -1010,8 +1011,9 @@ def lista_equipos(request):
         "equipos": equipos_paginados,
         "cedula_cliente": cedula_cliente,
         "marca": marca,
-        "tipo_equipo": tipo_equipo
+        "tipo_equipo": tipo_equipo,
     })
+
 
 
 # Crear equipo (Solo administradores)
