@@ -21,7 +21,7 @@
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 class="mb-0">Detalle del Servicio</h3>
-            {% if user.rol.nombre == "tecnico" and not servicio.entrega_confirmada %}
+            {% if user.rol.nombre == "tecnico" and servicio.estado == "completado" and not servicio.entrega_confirmada %}
                 <a href="{% url 'confirmar_entrega' servicio.id %}" class="btn btn-success btn-sm">Confirmar Entrega</a>
             {% endif %}
         </div>
@@ -94,7 +94,7 @@
             {% else %}
                 <a href="{% url 'tecnico_services_list' %}" class="btn btn-secondary">Volver a Mis Servicios</a>
             {% endif %}
-            {% if user.rol.nombre == "tecnico" and not servicio.entrega_confirmada %}
+            {% if user.rol.nombre == "tecnico" and servicio.estado == "completado" and not servicio.entrega_confirmada %}
                 <a href="{% url 'confirmar_entrega' servicio.id %}" class="btn btn-success">Confirmar Entrega</a>
             {% endif %}
         </div>

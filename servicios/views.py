@@ -316,6 +316,11 @@ def crear_incidente(request, servicio_id):
 def confirmar_entrega(request, servicio_id):
     servicio = get_object_or_404(Servicio, id=servicio_id, tecnico=request.user)
 
+    # Validar que el servicio esté en estado "completado"
+    if servicio.estado != "completado":
+        messages.error(request, "Solo se puede confirmar la entrega de servicios completados.")
+        return redirect('detalle_servicio', servicio_id=servicio.id)
+
     if request.method == "POST":
         form = ConfirmarEntregaForm(request.POST)
         if form.is_valid():
