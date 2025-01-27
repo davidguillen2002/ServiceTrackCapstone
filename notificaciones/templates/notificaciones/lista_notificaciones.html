@@ -5,7 +5,12 @@
 {% block content %}
 <div class="container">
     <h1>Mis Notificaciones</h1>
-    <a href="{% url 'marcar_todas_como_leidas' %}" class="btn btn-primary mb-3">Marcar todas como leídas</a>
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{% url 'marcar_todas_como_leidas' %}" class="btn btn-primary">Marcar todas como leídas</a>
+        <a href="{% url 'limpiar_notificaciones' %}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar todas las notificaciones?')">
+            Eliminar todas las notificaciones
+        </a>
+    </div>
     <ul class="list-group">
         {% for notificacion in notificaciones %}
             <li class="list-group-item {% if notificacion.leido %}list-group-item-light{% else %}list-group-item-warning{% endif %}">
