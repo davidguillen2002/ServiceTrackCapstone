@@ -7,8 +7,8 @@ from ServiceTrack.models import Usuario, Servicio, Reto, Equipo, Rol
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.hashers import make_password
 from django import forms
-from django.db.models import Avg, Count, F, Sum, Value, FloatField, Case, When, DurationField, ExpressionWrapper, Q
-from django.db.models.functions import TruncMonth, Coalesce
+from django.db.models import Avg, Count, F, Sum, Value, FloatField, Case, When, DurationField, ExpressionWrapper, Q, OuterRef, Subquery
+from django.db.models.functions import TruncMonth, Coalesce, Cast
 from django.core.paginator import Paginator
 from datetime import datetime
 from django.utils.translation import gettext as _
@@ -26,7 +26,7 @@ def dashboard_view(request):
     mes_filtrado = request.GET.get('mes')
     tecnico_filtrado = request.GET.get('tecnico')
 
-    # Obtener todos los años disponibles antes de aplicar los filtros
+    # Años disponibles para filtro
     anios_disponibles = Servicio.objects.dates('fecha_inicio', 'year', order='DESC')
 
     # Filtrar servicios
@@ -43,12 +43,14 @@ def dashboard_view(request):
         servicios.filter(estado='completado')
         .values('tecnico__nombre')
         .annotate(total=Coalesce(Count('id'), Value(0)))
+        .order_by('-total')
     )
 
     # Proporción de estados de servicios
     estados_servicios = (
         servicios.values('estado')
         .annotate(total=Count('id'))
+        .order_by('estado')
     )
 
     # KPIs generales
@@ -57,11 +59,13 @@ def dashboard_view(request):
             Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='completado')), 0
         ),
         puntuacion_clientes=Avg('tecnico_servicios__calificacion'),
-        tiempo_resolucion=ExpressionWrapper(
-            Avg(F('tecnico_servicios__fecha_fin') - F('tecnico_servicios__fecha_inicio')),
-            output_field=DurationField()
+        tiempo_resolucion=Avg(
+            ExpressionWrapper(
+                F('tecnico_servicios__fecha_fin') - F('tecnico_servicios__fecha_inicio'),
+                output_field=DurationField()
+            )
         )
-    )
+    ).order_by('-total_servicios_completados')
 
     # Rendimiento de técnicos
     tecnicos_rendimiento = Usuario.objects.filter(rol__nombre='tecnico').annotate(
@@ -79,16 +83,22 @@ def dashboard_view(request):
         ),
         total_puntos=Coalesce(Sum('puntos'), 0),
         logros=Coalesce(Count('medallas'), 0)
+    ).order_by('-total_puntos')
+
+    # Progreso general de técnicos (Evitar duplicados)
+    ultimo_logro = Subquery(
+        Usuario.objects.filter(pk=OuterRef('pk'))
+        .values('medallas__nombre')
+        .order_by('-medallas__id')[:1]
     )
 
-    # Progreso general de técnicos
     tecnicos_proceso = Usuario.objects.filter(rol__nombre='tecnico').annotate(
         progreso_servicios=Coalesce(
             Count('tecnico_servicios', filter=Q(tecnico_servicios__estado='en_progreso')), 0
         ),
         puntos_totales=Coalesce(Sum('puntos'), 0),
-        ultimo_logro=F('medallas__nombre')
-    )
+        ultimo_logro=ultimo_logro
+    ).distinct()
 
     # Generar lista de meses con nombres en español
     meses_disponibles = [
@@ -111,7 +121,6 @@ def dashboard_view(request):
         'tecnico_filtrado': tecnico_filtrado,
     }
     return render(request, 'dashboard/dashboard.html', context)
-
 
 @login_required
 def tecnico_dashboard_view(request):
