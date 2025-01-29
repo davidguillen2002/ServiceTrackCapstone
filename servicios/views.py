@@ -755,14 +755,11 @@ def register_service(request, service_id):
 def detalle_servicio(request, servicio_id):
     servicio = get_object_or_404(Servicio, id=servicio_id)
     repuestos = servicio.repuestos.all()  # Acceder a los repuestos relacionados
-    tiempo_resolucion = servicio.tiempo_resolucion if servicio.estado == "completado" else None
 
     return render(request, 'servicios/detalle_servicio.html', {
         'servicio': servicio,
         'repuestos': repuestos,
-        'tiempo_resolucion': tiempo_resolucion,
     })
-
 
 @login_required
 @user_passes_test(lambda u: u.rol.nombre == "tecnico")

@@ -612,7 +612,7 @@ class Servicio(models.Model):
     @property
     def tiempo_resolucion(self):
         if self.fecha_inicio and self.fecha_fin:
-            return self.fecha_fin - self.fecha_inicio
+            return (self.fecha_fin - self.fecha_inicio).days
         return None
 
     def save(self, *args, **kwargs):
