@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from openai import OpenAI, RateLimitError
 from django.conf import settings
+from django.utils.timezone import now
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 import markdown2
@@ -132,10 +133,11 @@ def actualizar_estado_servicio(request, servicio_id):
                 return redirect("actualizar_estado_servicio", servicio_id=servicio.id)
 
             with transaction.atomic():
-                servicio = form.save()
+                servicio = form.save(commit=False)
 
-                # Si el estado cambia a "completado", generar el código de entrega
+                # Si el estado cambia a "completado", guardar la fecha de finalización
                 if nuevo_estado == "completado":
+                    servicio.fecha_fin = now().date()  # Convertir a `date`
                     servicio.generar_codigo_entrega()
 
                     # Notificar al cliente sobre el cambio de estado y el código de entrega
@@ -150,6 +152,8 @@ def actualizar_estado_servicio(request, servicio_id):
                     )
                     messages.success(request, f"Estado del servicio #{servicio.id} cambiado a 'Completado', código de entrega generado y cliente notificado.")
                 else:
+                    servicio.fecha_fin = None  # Limpiar la fecha de finalización si no está completado
+
                     # Notificar al cliente sobre cualquier otro cambio de estado
                     Notificacion.crear_notificacion(
                         usuario=servicio.equipo.cliente,
@@ -161,6 +165,8 @@ def actualizar_estado_servicio(request, servicio_id):
                     )
                     messages.success(request, f"Estado del servicio #{servicio.id} actualizado y cliente notificado.")
 
+                servicio.save()  # Guardar los cambios en la base de datos
+
             return redirect("detalle_servicio", servicio_id=servicio.id)
         else:
             messages.error(request, "Por favor, corrige los errores en el formulario.")
@@ -171,6 +177,8 @@ def actualizar_estado_servicio(request, servicio_id):
         "form": form,
         "servicio": servicio,
     })
+
+
 
 @login_required
 @user_passes_test(is_tecnico)
