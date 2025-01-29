@@ -70,6 +70,11 @@
                             <button type="submit" class="btn btn-outline-success btn-sm">Actualizar Estado</button>
                         </form>
                     {% endif %}
+
+                    <!-- Botón de Crear Incidente para servicios en progreso -->
+                    {% if service.estado == "en_progreso" %}
+                        <a href="{% url 'crear_incidente' service.id %}" class="btn btn-outline-danger btn-sm">Crear Incidente</a>
+                    {% endif %}
                 </div>
             </li>
         {% empty %}

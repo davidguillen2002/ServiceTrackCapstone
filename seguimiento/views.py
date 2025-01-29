@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from ServiceTrack.models import Equipo, Servicio, Notificacion, Usuario
 from .forms import ServicioEstadoForm, ResenaForm
 from django.db import models
+from django.contrib import messages
 from datetime import datetime
 from django.db.models import Q, F, Value
 from django.db.models.functions import Upper, Concat
@@ -90,8 +91,11 @@ def detalle_equipo_cliente(request, equipo_id):
     })
 
 @login_required
-@user_passes_test(is_cliente)
+@user_passes_test(lambda u: u.rol.nombre == "cliente")
 def dejar_resena(request, servicio_id):
+    """
+    Permite a un cliente dejar una reseña para un servicio específico.
+    """
     servicio = get_object_or_404(Servicio, id=servicio_id, equipo__cliente=request.user)
     rango_estrellas = range(1, 6)
 
@@ -99,13 +103,19 @@ def dejar_resena(request, servicio_id):
         form = ResenaForm(request.POST, instance=servicio)
         if form.is_valid():
             form.save()
+
             # Crear notificación al administrador
-            mensaje = f"El cliente {request.user.nombre} ha dejado una reseña para el servicio {servicio.id}."
+            mensaje = (
+                f"El cliente {request.user.nombre} ha dejado una reseña para el servicio #{servicio.id} "
+                f"del equipo {servicio.equipo.marca} {servicio.equipo.modelo}."
+            )
             Notificacion.crear_notificacion(
-                usuario=Usuario.objects.get(rol__nombre="administrador"),
-                tipo="nueva_observacion",
+                usuario=Usuario.objects.filter(rol__nombre="administrador").first(),
+                tipo="reseña_cliente",
                 mensaje=mensaje
             )
+
+            messages.success(request, "¡Gracias por dejar tu reseña!")
             return redirect('lista_equipos_cliente')
     else:
         form = ResenaForm(instance=servicio)
