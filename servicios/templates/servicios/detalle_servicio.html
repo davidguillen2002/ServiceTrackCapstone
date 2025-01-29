@@ -85,6 +85,23 @@
                     </div>
                 {% endif %}
             </div>
+
+            <!-- Calificación y Comentario del Cliente -->
+            {% if servicio.estado == "completado" %}
+                <div class="mt-4">
+                    <h5><i class="fas fa-star"></i> Calificación del Cliente</h5>
+                    {% if servicio.calificacion %}
+                        <p><strong>Calificación:</strong> {{ servicio.calificacion }} / 5</p>
+                    {% else %}
+                        <p class="text-muted">El cliente no ha dejado una calificación.</p>
+                    {% endif %}
+                    {% if servicio.comentario_cliente %}
+                        <p><strong>Comentario:</strong> "{{ servicio.comentario_cliente }}"</p>
+                    {% else %}
+                        <p class="text-muted">El cliente no ha dejado un comentario.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
 
         <!-- Botón de Navegación -->
