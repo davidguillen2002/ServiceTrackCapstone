@@ -2,7 +2,7 @@ from ServiceTrack.models import Servicio, Repuesto, Capacitacion, ObservacionInc
 from django import forms
 from ServiceTrack.models import Servicio, Equipo, Usuario
 from django.core.exceptions import ValidationError
-from datetime import datetime
+from datetime import datetime, date
 
 class ServicioForm(forms.ModelForm):
     cliente = forms.CharField(
@@ -59,6 +59,7 @@ class ServicioForm(forms.ModelForm):
         equipo = cleaned_data.get('equipo')
         estado = cleaned_data.get('estado')
         fecha_fin = cleaned_data.get('fecha_fin')
+        fecha_inicio = cleaned_data.get('fecha_inicio')
 
         # Validar que el equipo tenga un cliente asociado
         if equipo and not equipo.cliente:
@@ -67,6 +68,14 @@ class ServicioForm(forms.ModelForm):
         # Validar que la fecha de finalización esté presente si el estado es "completado"
         if estado == "completado" and not fecha_fin:
             self.add_error('fecha_fin', 'Debe especificar una fecha de finalización para completar el servicio.')
+
+        # Validar que fecha_inicio no sea en el futuro
+        if fecha_inicio and fecha_inicio > date.today():
+            self.add_error('fecha_inicio', 'La fecha de inicio no puede estar en el futuro.')
+
+        # Validar que fecha_fin no sea anterior a fecha_inicio
+        if fecha_fin and fecha_inicio and fecha_fin < fecha_inicio:
+            self.add_error('fecha_fin', 'La fecha de finalización no puede ser anterior a la fecha de inicio.')
 
         return cleaned_data
 
