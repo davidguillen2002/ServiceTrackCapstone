@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.files.base import ContentFile
 from reportlab.pdfgen import canvas
-from ServiceTrack.models import Servicio, HistorialReporte, Notificacion, Usuario, Repuesto
+from ServiceTrack.models import Servicio, HistorialReporte, Notificacion, Usuario, Repuesto, ObservacionIncidente
 from datetime import datetime
 import pandas as pd
 import io
@@ -93,35 +93,56 @@ def historial_reportes(request):
     reportes = HistorialReporte.objects.all().order_by('-fecha_generacion')
     return render(request, 'reportes/historial_reportes.html', {'reportes': reportes})
 
-# Análisis de Incidentes
 @login_required
 @user_passes_test(is_admin)
 def analizar_incidentes(request):
     """
     Vista para analizar los incidentes registrados con métricas clave y gráficos.
     """
-    # Calcular incidentes por diagnóstico
-    incidentes = Servicio.objects.filter(estado='pendiente').values('diagnostico_inicial').annotate(
-        total=Count('id')
-    ).order_by('-total')
+
+    # Obtener los 10 incidentes más recurrentes
+    incidentes_recurrentes = (
+        ObservacionIncidente.objects.values('descripcion')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:10]
+    )
+
+    # Eliminar duplicados y abreviar descripciones en el gráfico
+    incidentes_labels = []
+    incidentes_totales = []
+    labels_seen = set()
+
+    for incidente in incidentes_recurrentes:
+        descripcion = incidente['descripcion']
+        if descripcion not in labels_seen:
+            labels_seen.add(descripcion)
+            shortened_label = descripcion[:25] + "..." if len(descripcion) > 25 else descripcion
+            incidentes_labels.append(shortened_label)
+            incidentes_totales.append(incidente['total'])
+
+    # Obtener los 10 incidentes más recientes
+    incidentes_recientes = ObservacionIncidente.objects.order_by('-fecha_reportada')[:10]
 
     # Calcular métricas clave
-    total_incidentes = sum([incidente['total'] for incidente in incidentes])  # Sumar manualmente los valores de 'total'
-    diagnostico_mas_comun = incidentes[0]['diagnostico_inicial'] if incidentes else "N/A"
-    incidentes_criticos = len([incidente for incidente in incidentes if incidente['total'] >= 10])  # Incidentes críticos >= 10
-
-    # Preparar datos para gráficas
-    diagnosticos = [incidente['diagnostico_inicial'] for incidente in incidentes]
-    totales = [incidente['total'] for incidente in incidentes]
+    total_incidentes = ObservacionIncidente.objects.count()
+    incidente_mas_comun = incidentes_recurrentes[0]['descripcion'] if incidentes_recurrentes else "N/A"
+    incidentes_criticos = (
+        ObservacionIncidente.objects.values('descripcion')
+        .annotate(total=Count('id'))
+        .filter(total__gte=10)
+        .count()
+    )
 
     context = {
-        'incidentes': incidentes,
-        'diagnosticos': diagnosticos,
-        'totales': totales,
+        'incidentes_recurrentes': incidentes_recurrentes,
+        'incidentes_recientes': incidentes_recientes,
+        'incidentes_labels': incidentes_labels,
+        'incidentes_totales': incidentes_totales,
         'total_incidentes': total_incidentes,
-        'diagnostico_mas_comun': diagnostico_mas_comun,
+        'incidente_mas_comun': incidente_mas_comun,
         'incidentes_criticos': incidentes_criticos,
     }
+
     return render(request, 'reportes/analisis_incidentes.html', context)
 
 

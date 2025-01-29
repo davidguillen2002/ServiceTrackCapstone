@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Informe de Diagnóstico de Incidentes{% endblock %}
+{% block title %}Informe de Incidentes{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -18,8 +18,8 @@
             </div>
             <div class="col-md-4">
                 <div class="card shadow-sm p-3">
-                    <h5 class="fw-bold">Incidente Principal Detectado</h5>
-                    <h3 class="text-success">{{ diagnostico_mas_comun }}</h3>
+                    <h5 class="fw-bold">Incidente Más Reportado</h5>
+                    <h3 class="text-success">{{ incidente_mas_comun }}</h3>
                 </div>
             </div>
             <div class="col-md-4">
@@ -31,9 +31,9 @@
         </div>
     </section>
 
-    <!-- Tabla de Diagnósticos de Incidentes -->
+    <!-- Tabla de Incidentes Más Recurrentes -->
     <section class="mb-5">
-        <h2 class="text-center">Incidentes más recurrentes</h2>
+        <h2 class="text-center">Top 10 Incidentes Más Recurrentes</h2>
         <div class="table-responsive">
             <table class="table table-hover text-center mt-3">
                 <thead class="table-dark">
@@ -43,10 +43,43 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for incidente in incidentes %}
+                    {% for incidente in incidentes_recurrentes %}
                         <tr>
-                            <td>{{ incidente.diagnostico_inicial }}</td>
+                            <td>{{ incidente.descripcion }}</td>
                             <td>{{ incidente.total }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Tabla de Incidentes Más Recientes -->
+    <section class="mb-5">
+        <h2 class="text-center">Últimos 10 Incidentes Reportados</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-center mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Incidente</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incidente in incidentes_recientes %}
+                        <tr>
+                            <td>{{ incidente.fecha_reportada|date:"d/m/Y" }}</td>
+                            <td>{{ incidente.descripcion }}</td>
+                            <td>
+                                {% if incidente.estado == "pendiente" %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% elif incidente.estado == "en_progreso" %}
+                                    <span class="badge bg-primary">En Progreso</span>
+                                {% elif incidente.estado == "resuelto" %}
+                                    <span class="badge bg-success">Resuelto</span>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -56,7 +89,7 @@
 
     <!-- Gráfica de Distribución de Incidentes -->
     <section class="mb-5">
-        <h2 class="text-center">Distribución por Incidentes</h2>
+        <h2 class="text-center">Distribución de Incidentes</h2>
         <div class="d-flex justify-content-center">
             <canvas id="incidentChart" style="max-height: 400px;"></canvas>
         </div>
@@ -77,36 +110,19 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: {{ diagnosticos|safe }},
+                labels: {{ incidentes_labels|safe }},
                 datasets: [{
                     label: 'Número de Casos',
-                    data: {{ totales|safe }},
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
+                    data: {{ incidentes_totales|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                    },
+                    legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function (tooltipItem) {
@@ -119,7 +135,12 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Incidentes'
+                            text: 'Incidentes (abreviados)'
+                        },
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 30,
+                            minRotation: 30
                         }
                     },
                     y: {
