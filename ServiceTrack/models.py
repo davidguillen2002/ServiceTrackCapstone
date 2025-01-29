@@ -609,6 +609,12 @@ class Servicio(models.Model):
     class Meta:
         ordering = ['-fecha_inicio']
 
+    @property
+    def tiempo_resolucion(self):
+        if self.fecha_inicio and self.fecha_fin:
+            return self.fecha_fin - self.fecha_inicio
+        return None
+
     def save(self, *args, **kwargs):
         # Validar si la fecha de finalización está dentro de la temporada activa
         if self.fecha_fin:

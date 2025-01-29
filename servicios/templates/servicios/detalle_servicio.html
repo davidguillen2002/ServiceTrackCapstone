@@ -60,6 +60,14 @@
                 </div>
             </div>
 
+            <!-- Tiempo de Resolución -->
+            {% if tiempo_resolucion %}
+                <div class="mt-4">
+                    <h5><i class="fas fa-clock"></i> Tiempo de Resolución</h5>
+                    <p><strong>Duración:</strong> {{ tiempo_resolucion.days }} días</p>
+                </div>
+            {% endif %}
+
             <!-- Repuestos Utilizados -->
             <div class="mt-4">
                 <h5><i class="fas fa-cogs"></i> Repuestos Utilizados</h5>
